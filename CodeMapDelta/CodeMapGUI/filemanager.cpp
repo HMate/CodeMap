@@ -1,6 +1,7 @@
 #include "filemanager.h"
 
 #include <QFile>
+#include <QTextStream>
 #include <QDir>
 #include <QKeyEvent>
 #include <QTextDocumentWriter>
@@ -25,6 +26,24 @@ FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(thi
             this, &FileView::fileContentModified);
 
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+}
+
+void FileView::openFile(const QString& path)
+{
+    // TODO: Show error, or log it somewhere if not exists?
+    if(!QFile::exists(path))
+        return;
+
+    setFilePath(path);
+
+    QFile file(path);
+
+    // TODO: Show error, or log it somewhere if not exists?
+    if(!file.open(QFile::ReadOnly | QFile::Text))
+        return;
+
+    QTextStream ReadFile(&file);
+    setText(ReadFile.readAll());
 }
 
 void FileView::keyPressEvent(QKeyEvent* ke)

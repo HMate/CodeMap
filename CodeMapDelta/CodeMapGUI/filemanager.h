@@ -32,6 +32,7 @@ public:
     void setText(const QString& t);
     void saveFile();
 
+    void openFile(const QString &path);
 protected:
     void keyPressEvent(QKeyEvent* ke);
 
