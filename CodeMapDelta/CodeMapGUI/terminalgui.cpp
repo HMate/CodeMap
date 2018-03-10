@@ -59,6 +59,11 @@ void TerminalView::registerCommand(const QString& command)
     tHistory->insertItem(tHistory->count(), new QListWidgetItem(command, tHistory));
 }
 
+void TerminalView::focusInEvent(QFocusEvent *event)
+{
+    tInput->setFocus();
+}
+
 TerminalHistory::TerminalHistory(QWidget* parent) : QListWidget(parent)
 {
     setLayoutMode(LayoutMode::Batched);

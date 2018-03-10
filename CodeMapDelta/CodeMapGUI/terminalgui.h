@@ -25,6 +25,7 @@ public:
     //void resizeAfterParent(const QSize& parentSize); 
 protected:
 //    void closeEvent(QCloseEvent *closeEvent);
+    void focusInEvent(QFocusEvent *event);
 
 public slots:
     void handleTerminalCommand();
