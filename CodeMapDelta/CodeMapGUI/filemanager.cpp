@@ -2,49 +2,27 @@
 
 #include <QFile>
 #include <QDir>
-#include <QTextStream>
-#include <QMdiSubWindow>
 #include <QKeyEvent>
 #include <QTextDocumentWriter>
+#include <QGridLayout>
 
 #include "mainwindow.h"
 
-
-void FileManager::openFileInEditor(QString& path)
+FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(this))
 {
-    const MainWindow* mainW = MainWindow::instance();
-    auto docManager = mainW->getDocumentManager();
-    mainW->getTerminalView()->registerCommand("Opening: " + path);
 
-    // TODO: Show error, or log it somewhere if not exists?
-    if(!QFile::exists(path))
-        return;
+    layout = new QGridLayout(this);
+    layout->setMargin(0);
 
-    FileView* openedFile = new FileView(docManager);
-    openedFile->setFilePath(path);
-    QMdiSubWindow* subwindow = docManager->addSubWindow(openedFile);
-    subwindow->setAttribute(Qt::WA_DeleteOnClose, true);
-    subwindow->show();
-
-    QFile file(path);
-
-    // TODO: Show error, or log it somewhere if not exists?
-    if(!file.open(QFile::ReadOnly | QFile::Text))
-        return;
-
-    QTextStream ReadFile(&file);
-    openedFile->setText(ReadFile.readAll());
-}
-
-FileView::FileView(QWidget *parent) : QMdiSubWindow(parent), editor(*new QTextEdit(this))
-{
     editor.setVisible(true);
     editor.setLineWrapMode(QTextEdit::LineWrapMode::NoWrap);
     editor.setFont(QFont("Consolas"));
+    layout->addWidget(&editor);
 
-    setWidget(&editor);
+    //setWidget(&editor);
 
-    connect(editor.document(), &QTextDocument::modificationChanged, this, &FileView::fileContentModified);
+    connect(editor.document(), &QTextDocument::modificationChanged,
+            this, &FileView::fileContentModified);
 
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
 }
@@ -60,7 +38,7 @@ void FileView::keyPressEvent(QKeyEvent* ke)
     }
     else
     {
-        QMdiSubWindow::keyPressEvent(ke);
+        QWidget::keyPressEvent(ke);
     }
 }
 

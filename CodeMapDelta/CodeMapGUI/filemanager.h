@@ -1,7 +1,10 @@
+#ifndef FILEMANAGER_H
+#define FILEMANAGER_H
 
 #include <QString>
 #include <QTextEdit>
-#include <QMdiSubWindow>
+#include <QGridLayout>
+//#include <QMdiSubWindow>
 
 /* TODO
  * - Ask to load file again if it was changed outside of editor
@@ -13,9 +16,11 @@
  * - intellisense
  * */
 
-class FileView : public QMdiSubWindow
+class FileView : public QWidget
 {
     Q_OBJECT
+
+    QGridLayout* layout;
 protected:
     QString filePath;
     QTextEdit& editor;
@@ -34,11 +39,4 @@ public slots:
     void fileContentModified(bool changed);
 };
 
-
-class FileManager
-{
-public:
-    static void openFileInEditor(QString& path);
-};
-
-
+#endif // FILEMANAGER_H

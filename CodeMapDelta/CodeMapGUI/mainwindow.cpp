@@ -5,8 +5,6 @@
 #include <QDockWidget>
 #include <QResizeEvent>
 
-#include "filemanager.h"
-
 /* TODO
  * - Need to save/load appstate:
  *      - last opened files
@@ -37,6 +35,8 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
     QMainWindow(parent), app(app)
 {
     instanceP = this;
+
+    resize(1240, 760);
 
     docManager = new DocumentManager(this);
     docManager->setObjectName(QStringLiteral("documentManager"));
@@ -107,7 +107,7 @@ void MainWindow::openFileWithDialog()
     if(dialog.exec())
     {
         QStringList& files = dialog.selectedFiles();
-        FileManager::openFileInEditor(files[0]);
+        docManager->openFileInFileView(files[0]);
     }
 }
 
