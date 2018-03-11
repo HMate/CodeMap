@@ -21,7 +21,7 @@ public:
 
     /* Registers the command that was typed in to the terminal,
      * but doesn't actually execute it. */
-    void registerCommand(const QString& command);
+    void showMessage(const QString& command);
     //void resizeAfterParent(const QSize& parentSize); 
 protected:
 //    void closeEvent(QCloseEvent *closeEvent);

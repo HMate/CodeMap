@@ -1,4 +1,4 @@
-#include "filemanager.h"
+#include "fileview.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -19,8 +19,6 @@ FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(thi
     editor.setLineWrapMode(QTextEdit::LineWrapMode::NoWrap);
     editor.setFont(QFont("Consolas"));
     layout->addWidget(&editor);
-
-    //setWidget(&editor);
 
     connect(editor.document(), &QTextDocument::modificationChanged,
             this, &FileView::fileContentModified);
@@ -51,7 +49,7 @@ void FileView::keyPressEvent(QKeyEvent* ke)
     if(ke->key() == Qt::Key_S && ke->modifiers().testFlag(Qt::ControlModifier))
     {
         auto terminal = MainWindow::instance()->getTerminalView();
-        terminal->registerCommand("Saving " + filePath);
+        terminal->showMessage("Saving " + filePath);
         ke->setAccepted(true);
         saveFile();
     }
@@ -85,9 +83,9 @@ void FileView::saveFile()
     bool success = writer.write(editor.document());
     if (success) {
         editor.document()->setModified(false);
-        terminal->registerCommand(tr("Saved \"%1\"").arg(QDir::toNativeSeparators(filePath)));
+        terminal->showMessage(tr("Saved \"%1\"").arg(QDir::toNativeSeparators(filePath)));
     } else {
-        terminal->registerCommand(tr("Saving failed. Could not write to file \"%1\"")
+        terminal->showMessage(tr("Saving failed. Could not write to file \"%1\"")
                                  .arg(QDir::toNativeSeparators(filePath)));
     }
 }

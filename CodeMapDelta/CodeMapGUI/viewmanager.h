@@ -5,7 +5,7 @@
 #include <QGridLayout>
 //#include <QMdiArea>
 
-#include "filemanager.h"
+#include "fileview.h"
 
 /*
  * Handles document views, that are editors or usually do something for files.

@@ -6,6 +6,7 @@
 
 #include "viewmanager.h"
 #include "terminalgui.h"
+#include "filesystem.h"
 
 class MainWindow : public QMainWindow
 {
@@ -20,7 +21,8 @@ protected:
     };
     Actions action;
     DocumentManager* docManager = nullptr;
-    TerminalView *terminalView = nullptr;
+    TerminalView* terminalView = nullptr;
+    FileSystemManager* fsManager = nullptr;
 
     QApplication& app;
 
@@ -41,6 +43,7 @@ public:
 
     TerminalView* getTerminalView() const {return terminalView;}
     DocumentManager* getDocumentManager() const {return docManager;}
+    FileSystemManager* getFileSystemManager() const {return fsManager;}
     const Actions& getActions() const {return action;}
 signals:
 

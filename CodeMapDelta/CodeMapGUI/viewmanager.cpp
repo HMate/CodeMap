@@ -25,7 +25,7 @@ DocumentManager::DocumentManager(QWidget* parent) : QWidget(parent)
 void DocumentManager::openFileInFileView(QString& path)
 {
     const MainWindow* mainW = MainWindow::instance();
-    mainW->getTerminalView()->registerCommand("Opening: " + path);
+    mainW->getTerminalView()->showMessage("Opening: " + path);
 
     fileView->openFile(path);
 }

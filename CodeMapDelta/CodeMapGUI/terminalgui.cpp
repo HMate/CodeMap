@@ -29,7 +29,7 @@ TerminalView::TerminalView(QWidget* parent)
 void TerminalView::handleTerminalCommand()
 {
     QString command = tInput->text();
-    registerCommand(command);
+    showMessage(command);
 
     /* Terminal TODO:
      * - todo commands:
@@ -45,16 +45,22 @@ void TerminalView::handleTerminalCommand()
         MainWindow::instance()->getActions().quit->trigger();
     }
 
+    if(lcmd == "cwd")
+    {
+        QString cwd = MainWindow::instance()->getFileSystemManager()->getCWD();
+        showMessage(cwd);
+    }
+
     if(lcmd == "asd")
     {
         auto& s = MainWindow::instance()->getDocumentManager()->size();
-        registerCommand(QStringLiteral("Size: %1x%2 r: %3x%4").arg(s.width()).arg(s.height()).arg(s.rwidth()).arg(s.rheight()));
+        showMessage(QStringLiteral("Size: %1x%2 r: %3x%4").arg(s.width()).arg(s.height()).arg(s.rwidth()).arg(s.rheight()));
     }
 
     tInput->clear();
 }
 
-void TerminalView::registerCommand(const QString& command)
+void TerminalView::showMessage(const QString& command)
 {
     tHistory->insertItem(tHistory->count(), new QListWidgetItem(command, tHistory));
 }

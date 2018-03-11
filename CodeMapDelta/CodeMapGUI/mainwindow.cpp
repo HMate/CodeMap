@@ -38,6 +38,8 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
 
     resize(1240, 760);
 
+    fsManager = new FileSystemManager();
+
     docManager = new DocumentManager(this);
     docManager->setObjectName(QStringLiteral("documentManager"));
     setCentralWidget(docManager);
@@ -118,4 +120,6 @@ void MainWindow::quitApp()
 
 MainWindow::~MainWindow()
 {
+    if(fsManager)
+        delete fsManager;
 }

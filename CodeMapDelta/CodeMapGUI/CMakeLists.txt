@@ -13,13 +13,15 @@ add_executable(${PROJECT_NAME}
     mainwindow.cpp
     terminalgui.cpp
     viewmanager.cpp
-    filemanager.cpp)
+    fileview.cpp
+    filesystem.cpp)
 
 add_custom_target(Headers SOURCES
     mainwindow.h
     terminalgui.h
     viewmanager.h
-    filemanager.h)
+    fileview.h
+    filesystem.h)
 
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)

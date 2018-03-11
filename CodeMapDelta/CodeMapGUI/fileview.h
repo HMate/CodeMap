@@ -1,5 +1,5 @@
-#ifndef FILEMANAGER_H
-#define FILEMANAGER_H
+#ifndef FILEVIEW_H
+#define FILEVIEW_H
 
 #include <QString>
 #include <QTextEdit>
@@ -40,4 +40,4 @@ public slots:
     void fileContentModified(bool changed);
 };
 
-#endif // FILEMANAGER_H
+#endif // FILEVIEW_H
