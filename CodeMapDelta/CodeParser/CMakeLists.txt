@@ -8,9 +8,9 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt5Core)
 
 add_library(${PROJECT_NAME} STATIC
-    parser.cpp)
+    codeparser.cpp)
 
 add_custom_target(CodeParserHeaders SOURCES
-    parser.h)
+    codeparser.h)
 
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
