@@ -16,7 +16,7 @@ add_executable(${PROJECT_NAME}
     fileview.cpp
     filesystem.cpp)
 
-add_custom_target(Headers SOURCES
+add_custom_target(CodeMapGUIHeaders SOURCES
     mainwindow.h
     terminalgui.h
     viewmanager.h

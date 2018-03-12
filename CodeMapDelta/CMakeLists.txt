@@ -6,4 +6,5 @@ set(CMAKE_AUTOMOC ON)
 
 add_definitions(-DQT_DEPRECATED_WARNINGS)
 
+add_subdirectory(CodeParser)
 add_subdirectory(CodeMapGUI)
