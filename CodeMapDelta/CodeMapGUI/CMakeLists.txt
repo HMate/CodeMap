@@ -16,12 +16,5 @@ add_executable(${PROJECT_NAME}
     fileview.cpp
     filesystem.cpp)
 
-add_custom_target(CodeMapGUIHeaders SOURCES
-    mainwindow.h
-    terminalgui.h
-    viewmanager.h
-    fileview.h
-    filesystem.h)
-
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)

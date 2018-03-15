@@ -27,9 +27,6 @@ SET(LLVM_AND_CLANG_DEBUG_LIBS_PATH "D:/prog/llvm_vs2017_x86_64_ver_60/Debug/lib"
 add_library(${PROJECT_NAME} STATIC
     codeparser.cpp)
 
-add_custom_target(CodeParserHeaders SOURCES
-    codeparser.h)
-
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${LLVM_INCLUDE_PATH}
     PRIVATE ${LLVM_GEN_INCLUDE_PATH}
@@ -67,6 +64,6 @@ FIND_LLVM_LIBS(clangLex)
 
 target_link_libraries(${PROJECT_NAME}
     Qt5::Core
-    ${LLVM_LIBRARIES}
-    )
+    ${LLVM_LIBRARIES})
+
 # LINK_DIRECTORIES(LLVM_AND_CLANG_DEBUG_LIBS_PATH)
