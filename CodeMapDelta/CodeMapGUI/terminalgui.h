@@ -7,8 +7,17 @@
 #include <QTextEdit>
 #include <QMdiSubWindow>
 
-class TerminalInput;
-class TerminalHistory;
+class TerminalHistory : public QListWidget
+{
+public:
+    TerminalHistory(QWidget* parent);
+};
+
+class TerminalInput : public QLineEdit
+{
+public:
+    TerminalInput(QWidget* parent);
+};
 
 class TerminalView : public QWidget
 {
@@ -22,25 +31,11 @@ public:
     /* Registers the command that was typed in to the terminal,
      * but doesn't actually execute it. */
     void showMessage(const QString& command);
-    //void resizeAfterParent(const QSize& parentSize); 
 protected:
-//    void closeEvent(QCloseEvent *closeEvent);
     void focusInEvent(QFocusEvent *event);
 
 public slots:
     void handleTerminalCommand();
-};
-
-class TerminalHistory : public QListWidget
-{
-public:
-    TerminalHistory(QWidget* parent);
-};
-
-class TerminalInput : public QLineEdit
-{
-public:
-    TerminalInput(QWidget* parent);
 };
 
 #endif // TERMINALINPUT_H

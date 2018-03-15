@@ -3,7 +3,6 @@
 
 #include <QString>
 #include <QGridLayout>
-//#include <QMdiArea>
 
 #include "fileview.h"
 

@@ -1,7 +1,6 @@
 #include "terminalgui.h"
 
 #include <QBoxLayout>
-//#include <QCloseEvent>
 #include <QAction>
 #include <QListWidgetItem>
 

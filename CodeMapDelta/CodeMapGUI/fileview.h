@@ -4,7 +4,6 @@
 #include <QString>
 #include <QTextEdit>
 #include <QGridLayout>
-//#include <QMdiSubWindow>
 
 /* TODO
  * - Ask to load file again if it was changed outside of editor
