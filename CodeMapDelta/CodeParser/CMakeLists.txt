@@ -64,6 +64,7 @@ FIND_LLVM_LIBS(clangLex)
 
 target_link_libraries(${PROJECT_NAME}
     Qt5::Core
-    ${LLVM_LIBRARIES})
+    ${LLVM_LIBRARIES}
+    version)
 
 # LINK_DIRECTORIES(LLVM_AND_CLANG_DEBUG_LIBS_PATH)

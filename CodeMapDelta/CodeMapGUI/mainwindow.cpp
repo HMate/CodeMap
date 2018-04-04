@@ -12,8 +12,22 @@
  *      - toggled views
  *      - app user options
  * - Control flow diagram
- * - Debugger(lldb?), function interpreter
+ * - Debugger(lldb?)
  * - Dependency graph, parameter/variable dependencies
+ *      - function interpreter: put function to separate file, collect its dependencies, and call it in separate program.
+ *      - this may need to mock input/ouput operations: maybe separate window for them to define them, trap them?
+ *      - Custom includes window for these?
+ *      - Ability to trace a variable's path through the code.
+ *        ie. x was set: x = 7; and sued in function: foo(x)
+ *        then it can show in foo(int p): p will be 7 on that invocation.
+ *      - Also need mechanism to switch between invocations for a function.
+ *        Means right click on function call-> use this invocation.
+ *        Or choose from a visual function invocation graph?
+ *      - This is interpreter like: define variable values in editor for tracing with this functionality?
+ *        Also show code path in the source. Greys out code that wont be run with given variable values
+ *        (unused branches of ann if).
+ * - Fold out defines, includes, preprocessor directives
+ * - Fold out templates
  * -
  */
 

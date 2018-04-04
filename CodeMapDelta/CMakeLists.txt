@@ -9,6 +9,13 @@ message("Cmake system prefix: " ${CMAKE_SYSTEM_PREFIX_PATH} )
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
+if ( MSVC )
+    # turn on all warnings, and fail on them
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W3 /WX")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4100 /wd4141 /wd4146 /wd4267 /wd4291")
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -D_SCL_SECURE_NO_WARNINGS")
+endif()
+
 add_definitions(-DQT_DEPRECATED_WARNINGS)
 
 add_subdirectory(CodeParser)
