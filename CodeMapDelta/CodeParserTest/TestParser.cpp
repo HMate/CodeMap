@@ -8,8 +8,17 @@ class TestParser : public QObject
 private slots:
     void testFoo()
     {
-        QString asd = CodeParser().parseCode("asd");
-        QCOMPARE(asd, "asd");
+        QString code =
+                "#define TEST 2\n"
+                "int add2(int input){\n"
+                "   return input+TEST\n"
+                "}";
+        QString expected =
+                "\nint add2(int input){\n"
+                "   return input+2\n"
+                "}\n";
+        QString result = CodeParser().parseCode(code);
+        QCOMPARE(result, expected);
     }
 };
 
