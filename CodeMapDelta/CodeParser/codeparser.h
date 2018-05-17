@@ -6,7 +6,7 @@
 class CodeParser
 {
 public:
-    QString parseCode(const QString& source);
+    QString getPreprocessedCode(const QString& source);
 };
 
 #endif // PARSER_H

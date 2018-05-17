@@ -28,7 +28,7 @@ public:
     }
 };
 
-QString CodeParser::parseCode(const QString& source)
+QString CodeParser::getPreprocessedCode(const QString& source)
 {
     std::string result;
     PreprocessorEliminatorFrontendAction* ppe = new PreprocessorEliminatorFrontendAction(result);
