@@ -93,3 +93,5 @@ CodeMapAlfa
 CodeMapBeta
 CodeMapGamma
 cmake_test
+manual_CMDelta_build
+CodeMapDelta/.vs
