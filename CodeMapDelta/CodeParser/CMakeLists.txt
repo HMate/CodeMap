@@ -25,6 +25,10 @@ SET(LLVM_SRC_ROOT_PATH "D:/prog/llvm" CACHE PATH "Path to llvm src root director
 SET(LLVM_INCLUDE_PATH "${LLVM_SRC_ROOT_PATH}/include" CACHE PATH "Path to dir which contains the llvm header files")
 SET(CLANG_INCLUDE_PATH "${LLVM_SRC_ROOT_PATH}/tools/clang/include" CACHE PATH "Path to dir which contains the clang header files")
 
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${LLVM_BINARY_DIR_PATH})
+find_package(llvm REQUIRED)
+find_package(clang REQUIRED)
+
 add_library(${PROJECT_NAME} STATIC
     codeparser.cpp)
 
@@ -34,38 +38,17 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE ${CLANG_INCLUDE_PATH}
     PRIVATE ${CLANG_GEN_INCLUDE_PATH})
 
-MACRO(FIND_LLVM_LIBS _libname_)
-    find_library(${_libname_}_LIBRARY ${_libname_} HINTS ${LLVM_AND_CLANG_DEBUG_LIBS_PATH})
-    set(LLVM_LIBRARIES ${LLVM_LIBRARIES} ${${_libname_}_LIBRARY})
-endmacro()
-
-FIND_LLVM_LIBS(LLVMSupport)
-FIND_LLVM_LIBS(LLVMOption)
-FIND_LLVM_LIBS(LLVMBitReader)
-FIND_LLVM_LIBS(LLVMCoverage)
-FIND_LLVM_LIBS(LLVMProfileData)
-FIND_LLVM_LIBS(LLVMMC)
-FIND_LLVM_LIBS(LLVMMCParser)
-FIND_LLVM_LIBS(LLVMCore)
-FIND_LLVM_LIBS(LLVMBinaryFormat)
-
-FIND_LLVM_LIBS(ClangAST)
-FIND_LLVM_LIBS(ClangBasic)
-FIND_LLVM_LIBS(ClangEdit)
-FIND_LLVM_LIBS(clangFrontend)
-FIND_LLVM_LIBS(clangSerialization)
-FIND_LLVM_LIBS(clangDriver)
-FIND_LLVM_LIBS(clangTooling)
-FIND_LLVM_LIBS(clangParse)
-FIND_LLVM_LIBS(clangSema)
-FIND_LLVM_LIBS(clangAnalysis)
-FIND_LLVM_LIBS(clangRewriteFrontend)
-FIND_LLVM_LIBS(clangRewrite)
-FIND_LLVM_LIBS(clangLex)
-
 target_link_libraries(${PROJECT_NAME}
     Qt5::Core
-    ${LLVM_LIBRARIES}
+
+    LLVMCoverage
+    LLVMProfileData
+
+    clangTooling
+    clangParse
+    clangAnalysis
+    clangRewriteFrontend
+
     version)
 
 # LINK_DIRECTORIES(LLVM_AND_CLANG_DEBUG_LIBS_PATH)
