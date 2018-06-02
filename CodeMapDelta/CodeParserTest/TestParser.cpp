@@ -23,22 +23,43 @@ private slots:
 
     void testPreprocessorWithFile()
     {
-        QString code = readFileContent("testPreprocessorWithFile", "test.cpp");
+        QString codePath = getTestPatternPath("testPreprocessorWithFile", "test.cpp");
         QString expected = readFileContent("testPreprocessorWithFile", "result.cpp");
 
-        QString result = CodeParser().getPreprocessedCode(code);
+        QString result = CodeParser().getPreprocessedCodeFromPath(codePath);
+        QCOMPARE(result, expected);
+    }
+
+    void testPreprocessorInclude()
+    {
+        QString codePath = getTestPatternPath("testPreprocessorInclude", "test.cpp");
+        QString expected = readFileContent("testPreprocessorInclude", "result.cpp");
+
+        QString result = CodeParser().getPreprocessedCodeFromPath(codePath);
         QCOMPARE(result, expected);
     }
 
     QString readFileContent(const QString& testName, const QString& fileName)
     {
-        QString current = QDir::currentPath();
-        QString filePath = current+"/TestPatterns/"+testName+"/"+fileName;
+        QString filePath = getTestPatternPath(testName, fileName);
         QFile fileHandler(filePath);
         bool ok = fileHandler.open(QFile::ReadOnly | QFile::Text);
+        if(!ok)
+        {
+            auto errorMessage = QStringLiteral("Failed to open file: %1").arg(filePath);
+            qWarning() << errorMessage << endl;
+            return "";
+        }
         QTextStream fileStream(&fileHandler);
         QString result = fileStream.readAll();
         return result;
+    }
+
+    QString getTestPatternPath(const QString& testName, const QString& fileName)
+    {
+        QString current = QDir::currentPath();
+        QString filePath = current+"/TestPatterns/"+testName+"/"+fileName;
+        return filePath;
     }
 };
 
