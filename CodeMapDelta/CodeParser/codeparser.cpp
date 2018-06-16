@@ -58,3 +58,23 @@ QString CodeParser::getPreprocessedCodeFromPath(const QString& srcPath)
     tool.run(actionFactory.get());
     return QString::fromStdString(result);
 }
+
+QString CodeParser::getPreprocessedCodeFromPath(const QString& srcPath, const std::vector<QString>& includeDirs)
+{
+    std::string result;
+    std::vector<std::string> includes;
+    includes.reserve(includeDirs.size());
+
+    for(auto& dir : includeDirs)
+    {
+        includes.emplace_back(QString("-I%1").arg(dir).toStdString());
+    }
+
+    clang::tooling::FixedCompilationDatabase cdb("/", includes);
+    std::vector<std::string> src{ srcPath.toStdString() };
+    clang::tooling::ClangTool tool(cdb, src);
+
+    std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<PreprocessorFrontendActionFactory>(result);
+    tool.run(actionFactory.get());
+    return QString::fromStdString(result);
+}

@@ -31,13 +31,25 @@ private slots:
         QCOMPARE(result, expected);
     }
 
-    /* Test if preprocessor include substitution is working, when the include is inside the cpp*/
+    /* Test if preprocessor include substitution is working,
+     * when the include is inside the same folder as the cpp*/
     void testPreprocessorInclude()
     {
         QString codePath = getTestPatternPath("testPreprocessorInclude", "test.cpp");
         QString expected = readFileContent(getTestPatternPath("testPreprocessorInclude", "result.cpp"));
 
         QString result = CodeParser().getPreprocessedCodeFromPath(codePath);
+        QCOMPARE(result, expected);
+    }
+
+    /* Test if preprocessor include substitution is working,
+     * when the include is outside of the cpp folder*/
+    void testPreprocessorIncludeOuterDir()
+    {
+        QString codePath = getTestPatternPath("testPreprocessorIncludeOuterDir", "test.cpp");
+        QString expected = readFileContent(getTestPatternPath("testPreprocessorIncludeOuterDir", "result.cpp"));
+
+        QString result = CodeParser().getPreprocessedCodeFromPath(codePath, {getTestPatternPath("testPreprocessorIncludeOuterDir", "externalDependencies")});
         QCOMPARE(result, expected);
     }
 
