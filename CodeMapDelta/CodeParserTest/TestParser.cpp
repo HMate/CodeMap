@@ -21,27 +21,43 @@ private slots:
         QCOMPARE(result, expected);
     }
 
+    /* Test if preprocessor substitution is working*/
     void testPreprocessorWithFile()
     {
         QString codePath = getTestPatternPath("testPreprocessorWithFile", "test.cpp");
-        QString expected = readFileContent("testPreprocessorWithFile", "result.cpp");
+        QString expected = readFileContent(getTestPatternPath("testPreprocessorWithFile", "result.cpp"));
 
         QString result = CodeParser().getPreprocessedCodeFromPath(codePath);
         QCOMPARE(result, expected);
     }
 
+    /* Test if preprocessor include substitution is working, when the include is inside the cpp*/
     void testPreprocessorInclude()
     {
         QString codePath = getTestPatternPath("testPreprocessorInclude", "test.cpp");
-        QString expected = readFileContent("testPreprocessorInclude", "result.cpp");
+        QString expected = readFileContent(getTestPatternPath("testPreprocessorInclude", "result.cpp"));
 
         QString result = CodeParser().getPreprocessedCodeFromPath(codePath);
         QCOMPARE(result, expected);
     }
 
-    QString readFileContent(const QString& testName, const QString& fileName)
+    void testPreprocessorIncludeStdio()
     {
-        QString filePath = getTestPatternPath(testName, fileName);
+        QString codePath = getTestPatternPath("testPreprocessorIncludeStdio", "test.cpp");
+        QString expected = readFileContent(getTestPatternPath("testPreprocessorIncludeStdio", "result.cpp"));
+        writeFileContent(getTestPatternPath("testPreprocessorIncludeStdio", "out.cpp"), expected);
+
+        QString result = CodeParser().getPreprocessedCodeFromPath(codePath);
+        // Its complicated to actually compare the whole file content, because every define is expanded in stdio.h
+        // just see if the method result contains the needed code + some stdio functions
+        QVERIFY(result.contains(expected));
+        QVERIFY(result.contains("__cdecl fopen"));
+    }
+
+    // Helper methods
+
+    QString readFileContent(const QString& filePath)
+    {
         QFile fileHandler(filePath);
         bool ok = fileHandler.open(QFile::ReadOnly | QFile::Text);
         if(!ok)
@@ -60,6 +76,22 @@ private slots:
         QString current = QDir::currentPath();
         QString filePath = current+"/TestPatterns/"+testName+"/"+fileName;
         return filePath;
+    }
+
+
+    bool writeFileContent(const QString& filePath, const QString& content)
+    {
+        QFile fileHandler(filePath);
+        bool ok = fileHandler.open(QFile::WriteOnly);
+        if(!ok)
+        {
+            auto errorMessage = QStringLiteral("Failed to open file: %1").arg(filePath);
+            qWarning() << errorMessage << endl;
+            return false;
+        }
+        QTextStream fileStream(&fileHandler);
+        fileStream << content;
+        return true;
     }
 };
 
