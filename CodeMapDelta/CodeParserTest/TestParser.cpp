@@ -57,13 +57,12 @@ private slots:
     {
         QString codePath = getTestPatternPath("testPreprocessorIncludeStdio", "test.cpp");
         QString expected = readFileContent(getTestPatternPath("testPreprocessorIncludeStdio", "result.cpp"));
-        writeFileContent(getTestPatternPath("testPreprocessorIncludeStdio", "out.cpp"), expected);
 
         QString result = CodeParser().getPreprocessedCodeFromPath(codePath);
         // Its complicated to actually compare the whole file content, because every define is expanded in stdio.h
         // just see if the method result contains the needed code + some stdio functions
         QVERIFY(result.contains(expected));
-        QVERIFY(result.contains("__cdecl fopen"));
+        QVERIFY(result.contains("__cdecl fopen")); // see if result contains something from <stdio.h>
     }
 
     // Helper methods
