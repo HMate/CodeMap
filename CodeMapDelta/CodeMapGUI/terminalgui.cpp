@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 
 #include "mainwindow.h"
+#include "filesystem.h"
 
 TerminalView::TerminalView(QWidget* parent)
     : QWidget(parent)
@@ -46,7 +47,7 @@ void TerminalView::handleTerminalCommand()
 
     if(lcmd == "cwd")
     {
-        QString cwd = MainWindow::instance()->getFileSystemManager()->getCWD();
+        QString cwd = FS::getCWD();
         showMessage(cwd);
     }
 

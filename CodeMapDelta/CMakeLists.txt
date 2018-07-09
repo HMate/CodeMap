@@ -26,5 +26,5 @@ add_definitions(-DQT_DEPRECATED_WARNINGS)
 add_subdirectory(CodeParser)
 add_subdirectory(CodeMapGUI)
 
-
+#Tests
 add_subdirectory(CodeParserTest)

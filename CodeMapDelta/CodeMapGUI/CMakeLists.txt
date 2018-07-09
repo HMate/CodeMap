@@ -14,7 +14,8 @@ add_executable(${PROJECT_NAME}
     terminalgui.cpp
     viewmanager.cpp
     fileview.cpp
-    filesystem.cpp)
+    filesystem.cpp
+    appstate.cpp)
 
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)

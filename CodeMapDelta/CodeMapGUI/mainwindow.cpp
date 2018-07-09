@@ -52,7 +52,7 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
 
     resize(1240, 760);
 
-    fsManager = new FileSystemManager();
+    appState = std::make_unique<AppStateHandler>();
 
     docManager = new DocumentManager(this);
     docManager->setObjectName(QStringLiteral("documentManager"));
@@ -69,6 +69,21 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
 
     show();
     terminalView->setFocus();
+
+    loadAppState();
+}
+
+void MainWindow::loadAppState()
+{
+    auto state = getAppState();
+
+    state.loadStateFromDisk();
+
+    QStringList fileViews = state.getFileViews();
+    for(auto& f : fileViews)
+    {
+        docManager->openFileInFileView(f);
+    }
 }
 
 QAction* MainWindow::addDockedView(const QString& name, QWidget* widget)
@@ -124,6 +139,7 @@ void MainWindow::openFileWithDialog()
     {
         QStringList& files = dialog.selectedFiles();
         docManager->openFileInFileView(files[0]);
+        getAppState().saveStateToDisk();
     }
 }
 
@@ -134,6 +150,4 @@ void MainWindow::quitApp()
 
 MainWindow::~MainWindow()
 {
-    if(fsManager)
-        delete fsManager;
 }

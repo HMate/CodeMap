@@ -28,4 +28,6 @@ void DocumentManager::openFileInFileView(QString& path)
     mainW->getTerminalView()->showMessage("Opening: " + path);
 
     fileView->openFile(path);
+
+    mainW->getAppState().addFileView(path);
 }

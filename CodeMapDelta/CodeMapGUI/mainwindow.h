@@ -6,7 +6,7 @@
 
 #include "viewmanager.h"
 #include "terminalgui.h"
-#include "filesystem.h"
+#include "appstate.h"
 
 class MainWindow : public QMainWindow
 {
@@ -20,15 +20,17 @@ protected:
         QAction* toggleTerminalHistory;
     };
     Actions action;
+
+    std::unique_ptr<AppStateHandler> appState;
     DocumentManager* docManager = nullptr;
     TerminalView* terminalView = nullptr;
-    FileSystemManager* fsManager = nullptr;
 
     QApplication& app;
 
     static MainWindow* instanceP;
     explicit MainWindow(QApplication& app, QWidget *parent = nullptr);
 
+    void loadAppState();
     void createActions();
     void createFileMenu();
     void createViewMenu(QAction* terminalToggle);
@@ -41,9 +43,9 @@ public:
 
     QAction* addDockedView(const QString& name, QWidget* widget);
 
+    AppStateHandler& getAppState() const {return *appState;}
     TerminalView* getTerminalView() const {return terminalView;}
     DocumentManager* getDocumentManager() const {return docManager;}
-    FileSystemManager* getFileSystemManager() const {return fsManager;}
     const Actions& getActions() const {return action;}
 signals:
 

@@ -12,6 +12,12 @@ class FileSystemManager
 {
 public:
     static QString getCWD();
+    static QString concat(const QString& A, const QString& B);
+
+    static bool saveFile(const QString& path, const QString content);
+    static QString readFile(const QString& filePath);
 };
+
+using FS = FileSystemManager;
 
 #endif // FILESYSTEM_H
