@@ -53,6 +53,7 @@ private slots:
         QCOMPARE(result, expected);
     }
 
+    // Test if we can include stdlib code
     void testPreprocessorIncludeStdio()
     {
         QString codePath = getTestPatternPath("testPreprocessorIncludeStdio", "test.cpp");
@@ -63,6 +64,16 @@ private slots:
         // just see if the method result contains the needed code + some stdio functions
         QVERIFY(result.contains(expected));
         QVERIFY(result.contains("__cdecl fopen")); // see if result contains something from <stdio.h>
+    }
+
+    // Test if the file is not a source code
+    void testPreprocessorNonSourceCode()
+    {
+        QString codePath = getTestPatternPath("testPreprocessorNonSourceCode", "test.cpp");
+        QString expected = readFileContent(getTestPatternPath("testPreprocessorNonSourceCode", "test.cpp"));
+
+        QString result = CodeParser().getPreprocessedCodeFromPath(codePath);
+        QVERIFY(result.contains(expected));
     }
 
     // Helper methods
