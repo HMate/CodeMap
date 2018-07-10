@@ -16,10 +16,6 @@ DocumentManager::DocumentManager(QWidget* parent) : QWidget(parent)
 
     layout = new QGridLayout(this);
     layout->setMargin(0);
-
-    fileView = new FileView(this);
-    layout->addWidget(fileView, 0, 0, 1, 1);
-
 }
 
 void DocumentManager::openFileInFileView(QString& path)
@@ -27,7 +23,15 @@ void DocumentManager::openFileInFileView(QString& path)
     const MainWindow* mainW = MainWindow::instance();
     mainW->getTerminalView()->showMessage("Opening: " + path);
 
-    fileView->openFile(path);
+    addNewFileView();
+    fileViews[fileCount-1]->openFile(path);
 
     mainW->getAppState().addFileView(path);
+}
+
+void DocumentManager::addNewFileView()
+{
+    fileViews.push_back(new FileView(this));
+    fileCount++;
+    layout->addWidget(fileViews[fileCount-1], 0, fileCount-1, 1, 1);
 }

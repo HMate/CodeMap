@@ -12,12 +12,15 @@
 class DocumentManager : public QWidget
 {
     QGridLayout* layout;
-    FileView* fileView;
+    std::vector<FileView*> fileViews;
+    int fileCount = 0;
 
 public:
     explicit DocumentManager(QWidget *parent = nullptr);
 
     void openFileInFileView(QString& path);
+protected:
+    void addNewFileView();
 };
 
 #endif // VIEWMANAGER_H

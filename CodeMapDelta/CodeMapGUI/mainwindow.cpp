@@ -7,7 +7,6 @@
 
 /* TODO
  * - Need to save/load appstate:
- *      - last opened files
  *      - last directories searched
  *      - toggled views
  *      - app user options
