@@ -1,3 +1,6 @@
+#ifndef APPSTATE_H
+#define APPSTATE_H
+
 #include <vector>
 #include <QString>
 #include <QStringList>
@@ -24,3 +27,5 @@ public:
     void saveStateToDisk();
     void loadStateFromDisk();
 };
+
+#endif APPSTATE_H
