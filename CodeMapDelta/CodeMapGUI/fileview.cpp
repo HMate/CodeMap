@@ -6,24 +6,31 @@
 #include <QKeyEvent>
 #include <QTextDocumentWriter>
 #include <QGridLayout>
+#include <QToolBar>
 
 #include "mainwindow.h"
 
 FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(this))
 {
-
+    setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     layout = new QGridLayout(this);
     layout->setMargin(0);
+
+    QToolBar* toolbar = new QToolBar("FileView", this);
+    QWidget *spacerWidget = new QWidget(this);
+    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    toolbar->addWidget(spacerWidget);
+    toolbar->addAction("X", [this](){ closeView(); });
+    layout->addWidget(toolbar, 0, 0);
 
     editor.setVisible(true);
     editor.setLineWrapMode(QTextEdit::LineWrapMode::NoWrap);
     editor.setFont(QFont("Consolas"));
-    layout->addWidget(&editor);
+    layout->addWidget(&editor, 1, 0);
 
     connect(editor.document(), &QTextDocument::modificationChanged,
             this, &FileView::fileContentModified);
 
-    setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
 }
 
 void FileView::openFile(const QString& path)
@@ -42,6 +49,11 @@ void FileView::openFile(const QString& path)
 
     QTextStream ReadFile(&file);
     setText(ReadFile.readAll());
+}
+
+void FileView::closeView()
+{
+    this->close();
 }
 
 void FileView::keyPressEvent(QKeyEvent* ke)

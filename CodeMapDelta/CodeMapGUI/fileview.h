@@ -37,6 +37,7 @@ protected:
 
 public slots:
     void fileContentModified(bool changed);
+    void closeView();
 };
 
 #endif // FILEVIEW_H
