@@ -28,9 +28,10 @@ public:
     explicit FileView(QWidget *parent = nullptr);
 
     void setFilePath(const QString& path);
+    const QString& getFilePath();
     void setText(const QString& t);
-    void saveFile();
 
+    void saveFile();
     void openFile(const QString &path);
 protected:
     void keyPressEvent(QKeyEvent* ke);

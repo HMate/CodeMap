@@ -18,9 +18,11 @@ class DocumentManager : public QWidget
 public:
     explicit DocumentManager(QWidget *parent = nullptr);
 
-    void openFileInFileView(QString& path);
+    void openFileView(const QString& path);
+    void closeFileView(const QString& path);
 protected:
     void addNewFileView();
+    size_t getFileViewIndexByName(const QString& path);
 };
 
 #endif // VIEWMANAGER_H

@@ -20,7 +20,9 @@ FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(thi
     QWidget *spacerWidget = new QWidget(this);
     spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolbar->addWidget(spacerWidget);
-    toolbar->addAction("X", [this](){ closeView(); });
+    toolbar->addAction("X", [this](){
+        MainWindow::instance()->getDocumentManager()->closeFileView(filePath);
+    });
     layout->addWidget(toolbar, 0, 0);
 
     editor.setVisible(true);
@@ -35,6 +37,10 @@ FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(thi
 
 void FileView::openFile(const QString& path)
 {
+    // If path is empty, we want to open a new file
+    if(path.isEmpty())
+        return;
+
     // TODO: Show error, or log it somewhere if not exists?
     if(!QFile::exists(path))
         return;
@@ -106,6 +112,11 @@ void FileView::setFilePath(const QString &path)
 {
     filePath = path;
     setWindowTitle("[*]" + filePath);
+}
+
+const QString& FileView::getFilePath()
+{
+    return filePath;
 }
 
 void FileView::fileContentModified(bool changed)

@@ -81,7 +81,7 @@ void MainWindow::loadAppState()
     QStringList fileViews = state.getFileViews();
     for(auto& f : fileViews)
     {
-        docManager->openFileInFileView(f);
+        docManager->openFileView(f);
     }
 }
 
@@ -137,7 +137,7 @@ void MainWindow::openFileWithDialog()
     if(dialog.exec())
     {
         QStringList& files = dialog.selectedFiles();
-        docManager->openFileInFileView(files[0]);
+        docManager->openFileView(files[0]);
         getAppState().saveStateToDisk();
     }
 }

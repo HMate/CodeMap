@@ -1,5 +1,6 @@
 #include "appstate.h"
 
+#include "common_types.h"
 #include "filesystem.h"
 #include "QDebug"
 
@@ -13,6 +14,18 @@ AppStateHandler::AppStateHandler()
 void AppStateHandler::addFileView(const QString& filePath)
 {
     fileViews.append(filePath);
+}
+
+void AppStateHandler::removeFileView(const QString& filePath)
+{
+    for(size_t i = 0; i < fileViews.length(); i++)
+    {
+        if(fileViews[i] == filePath)
+        {
+            fileViews.erase(fileViews.begin()+i);
+            break;
+        }
+    }
 }
 
 const QStringList& AppStateHandler::getFileViews()

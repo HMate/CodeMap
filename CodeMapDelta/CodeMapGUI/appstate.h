@@ -21,6 +21,7 @@ public:
     AppStateHandler();
 
     void addFileView(const QString& filePath);
+    void removeFileView(const QString& filePath);
     const QStringList& getFileViews();
 
     //TODO: error handling for state save/load?
