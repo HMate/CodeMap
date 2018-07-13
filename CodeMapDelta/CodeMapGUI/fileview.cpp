@@ -6,7 +6,6 @@
 #include <QKeyEvent>
 #include <QTextDocumentWriter>
 #include <QGridLayout>
-#include <QToolBar>
 
 #include "mainwindow.h"
 
@@ -16,13 +15,7 @@ FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(thi
     layout = new QGridLayout(this);
     layout->setMargin(0);
 
-    QToolBar* toolbar = new QToolBar("FileView", this);
-    QWidget *spacerWidget = new QWidget(this);
-    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    toolbar->addWidget(spacerWidget);
-    toolbar->addAction("X", [this](){
-        MainWindow::instance()->getDocumentManager()->closeFileView(filePath);
-    });
+    QToolBar* toolbar = createToolbar();
     layout->addWidget(toolbar, 0, 0);
 
     editor.setVisible(true);
@@ -35,11 +28,33 @@ FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(thi
 
 }
 
+QToolBar* FileView::createToolbar()
+{
+    QToolBar* toolbar = new QToolBar("FileView", this);
+    nameLabel = new QLabel(this);
+    nameLabel->setText("{new file}");
+    toolbar->addWidget(nameLabel);
+    QWidget *spacerWidget = new QWidget(this);
+    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    toolbar->addWidget(spacerWidget);
+    toolbar->addAction("X", [this](){
+        MainWindow::instance()->getDocumentManager()->closeFileView(filePath);
+    });
+
+    toolbar->setContentsMargins(0, 0, 0, 0);
+    toolbar->setFixedHeight(15);
+
+    return toolbar;
+}
+
 void FileView::openFile(const QString& path)
 {
     // If path is empty, we want to open a new file
     if(path.isEmpty())
+    {
+        nameLabel->setText("{new file}");
         return;
+    }
 
     // TODO: Show error, or log it somewhere if not exists?
     if(!QFile::exists(path))
@@ -112,6 +127,7 @@ void FileView::setFilePath(const QString &path)
 {
     filePath = path;
     setWindowTitle("[*]" + filePath);
+    nameLabel->setText(path);
 }
 
 const QString& FileView::getFilePath()

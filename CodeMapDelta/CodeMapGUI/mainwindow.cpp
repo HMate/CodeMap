@@ -25,6 +25,7 @@
  *      - This is interpreter like: define variable values in editor for tracing with this functionality?
  *        Also show code path in the source. Greys out code that wont be run with given variable values
  *        (unused branches of ann if).
+ * - Draw own module graph, compare to generated
  * - Fold out defines, includes, preprocessor directives
  * - Fold out templates
  * -

@@ -54,5 +54,6 @@ void AppStateHandler::loadStateFromDisk()
     QString state = FS::readFile(stateFilePath);
     qDebug() << "Loading state: \n"<< state;
     QStringList parts = state.split('\n', QString::SkipEmptyParts);
+    // TODO: error handling, input validation
     fileViews = parts.mid(1);
 }

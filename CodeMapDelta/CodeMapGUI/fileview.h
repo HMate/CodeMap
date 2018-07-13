@@ -4,6 +4,8 @@
 #include <QString>
 #include <QTextEdit>
 #include <QGridLayout>
+#include <QLabel>
+#include <QToolBar>
 
 /* TODO
  * - Ask to load file again if it was changed outside of editor
@@ -20,6 +22,7 @@ class FileView : public QWidget
     Q_OBJECT
 
     QGridLayout* layout;
+    QLabel* nameLabel;
 protected:
     QString filePath;
     QTextEdit& editor;
@@ -34,6 +37,7 @@ public:
     void saveFile();
     void openFile(const QString &path);
 protected:
+    QToolBar* createToolbar();
     void keyPressEvent(QKeyEvent* ke);
 
 public slots:
