@@ -1,6 +1,11 @@
 #include "appstate.h"
 
 #include <QDebug>
+
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QJsonDocument>
+
 #include "common_types.h"
 #include "filesystem.h"
 
@@ -33,7 +38,17 @@ const QStringList& AppStateHandler::getFileViews()
     return fileViews;
 }
 
-QString serialize(const QStringList& strings)
+const QString& AppStateHandler::getLastOpenedDirectory()
+{
+    return lastOpenedDirPath;
+}
+
+void AppStateHandler::setLastOpenedDirectory(const QString& path)
+{
+    lastOpenedDirPath = path;
+}
+
+QString serialize(const QString& segmentName, const QStringList& strings)
 {
     QString result = strings.join('\n');
     return result;
@@ -42,10 +57,18 @@ QString serialize(const QStringList& strings)
 void AppStateHandler::saveStateToDisk()
 {
     QString stateFilePath = FS::concat(dataDirPath, STATE_FILE_NAME);
-    QString version = "1\n";
-    QString state = serialize(fileViews);
-    bool succeed = FS::saveFile(stateFilePath, version+state);
-    qDebug() << "Writing state result: " << succeed << "\n" << (version+state);
+
+    QJsonObject stateJson{{"version", 2}};
+    QJsonArray fileViewsJson;
+    for(auto& f : fileViews)
+    {
+        fileViewsJson.push_back(f);
+    }
+    stateJson.insert("fileViews", fileViewsJson);
+
+    const QString serialized = QJsonDocument(stateJson).toJson();
+    bool succeed = FS::saveFile(stateFilePath, serialized);
+    qDebug() << "Writing state result: " << succeed << "\n" << serialized;
 }
 
 void AppStateHandler::loadStateFromDisk()
@@ -53,7 +76,31 @@ void AppStateHandler::loadStateFromDisk()
     QString stateFilePath = FS::concat(dataDirPath, STATE_FILE_NAME);
     QString state = FS::readFile(stateFilePath);
     qDebug() << "Loading state: \n"<< state;
-    QStringList parts = state.split('\n', QString::SkipEmptyParts);
+
     // TODO: error handling, input validation
-    fileViews = parts.mid(1);
+    QJsonDocument doc = QJsonDocument::fromJson(state.toLocal8Bit());
+    if(!doc.isNull() && doc.isObject())
+    {
+        auto& stateJson = doc.object();
+        QJsonValueRef versionJson = stateJson["version"];
+        if(versionJson != QJsonValue::Undefined && versionJson.isDouble())
+        {
+            int version = versionJson.toInt();
+            QJsonValueRef fileViewsValueRef = stateJson["fileViews"];
+            if(fileViewsValueRef.isArray())
+            {
+                QJsonArray fileViewsJson = fileViewsValueRef.toArray();
+                fileViews.clear();
+                for(auto& f : fileViewsJson)
+                {
+                    if(f.isString())
+                        fileViews.append(f.toString());
+                }
+            }
+        }
+    }
+    else
+    {
+        qDebug() << "Failed to load app state!";
+    }
 }

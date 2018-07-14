@@ -16,6 +16,7 @@
 class AppStateHandler
 {
     QString dataDirPath;
+    QString lastOpenedDirPath;
     QStringList fileViews;
 public:
     AppStateHandler();
@@ -23,6 +24,9 @@ public:
     void addFileView(const QString& filePath);
     void removeFileView(const QString& filePath);
     const QStringList& getFileViews();
+
+    const QString& getLastOpenedDirectory();
+    void setLastOpenedDirectory(const QString& path);
 
     //TODO: error handling for state save/load?
     void saveStateToDisk();

@@ -2,6 +2,7 @@
 #define FILESYSTEM_H
 
 #include <QString>
+#include <QDir>
 
 /*
  * Manages where are we in the filesystem,
@@ -12,6 +13,7 @@ class FileSystemManager
 {
 public:
     static QString getCWD();
+    static QDir getDirectory(const QString& path);
     static QString concat(const QString& A, const QString& B);
 
     static bool saveFile(const QString& path, const QString content);

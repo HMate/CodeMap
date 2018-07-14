@@ -5,6 +5,8 @@
 #include <QDockWidget>
 #include <QResizeEvent>
 
+#include "filesystem.h"
+
 /* TODO
  * - Need to save/load appstate:
  *      - last directories searched
@@ -138,11 +140,21 @@ void MainWindow::toggleViewTerminalHistory(bool onoff)
 void MainWindow::openFileWithDialog()
 {
     QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::ExistingFile);
+
+    const QString& lastDir = getAppState().getLastOpenedDirectory();
+    if(QDir(lastDir).exists())
+        dialog.setDirectory(lastDir);
     if(dialog.exec())
     {
         QStringList& files = dialog.selectedFiles();
-        docManager->openFileView(files[0]);
-        getAppState().saveStateToDisk();
+        QString& f = files[0];
+        if(QFile::exists(f))
+        {
+            docManager->openFileView(f);
+            getAppState().setLastOpenedDirectory(FS::getDirectory(f).absolutePath());
+            getAppState().saveStateToDisk();
+        }
     }
 }
 

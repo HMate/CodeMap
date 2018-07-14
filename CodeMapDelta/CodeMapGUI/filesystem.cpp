@@ -1,6 +1,5 @@
 #include "filesystem.h"
 
-#include <QDir>
 #include <QTextStream>
 #include <QDebug>
 
@@ -15,10 +14,14 @@ QString FileSystemManager::concat(const QString& A, const QString& B)
     return QDir(A).filePath(B);
 }
 
+QDir FileSystemManager::getDirectory(const QString& path)
+{
+    return QFileInfo(path).absoluteDir();
+}
+
 bool FileSystemManager::saveFile(const QString& filePath, const QString content)
 {
-    QFileInfo info(filePath);
-    QDir dir = info.absoluteDir();
+    QDir dir = getDirectory(filePath);
     qWarning() << "checking path " << dir.absolutePath() << endl;
     if(!dir.exists())
     {
