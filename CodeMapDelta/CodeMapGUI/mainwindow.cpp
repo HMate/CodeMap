@@ -9,7 +9,6 @@
 
 /* TODO
  * - Need to save/load appstate:
- *      - last directories searched
  *      - toggled views
  *      - app user options
  * - Project recognizer:
