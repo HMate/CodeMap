@@ -10,8 +10,12 @@
  *      - last directories searched
  *      - toggled views
  *      - app user options
+ * - Project recognizer:
+ *      - First allow users to add files by hand to a project
+ *      - Walk includes and try to find them?
+ *      - Parse cmake/sln descriptor and build project from that
+ * - Fold out defines, includes, preprocessor directives
  * - Control flow diagram
- * - Debugger(lldb?)
  * - Dependency graph, parameter/variable dependencies
  *      - function interpreter: put function to separate file, collect its dependencies, and call it in separate program.
  *      - this may need to mock input/ouput operations: maybe separate window for them to define them, trap them?
@@ -26,9 +30,8 @@
  *        Also show code path in the source. Greys out code that wont be run with given variable values
  *        (unused branches of ann if).
  * - Draw own module graph, compare to generated
- * - Fold out defines, includes, preprocessor directives
  * - Fold out templates
- * -
+ * - Debugger(lldb?)
  */
 
 MainWindow* MainWindow::instanceP = nullptr;

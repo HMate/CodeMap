@@ -1,8 +1,8 @@
 #include "appstate.h"
 
+#include <QDebug>
 #include "common_types.h"
 #include "filesystem.h"
-#include "QDebug"
 
 const QString STATE_FILE_NAME = "state.cms";
 

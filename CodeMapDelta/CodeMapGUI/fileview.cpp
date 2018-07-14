@@ -14,6 +14,7 @@ FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(thi
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     layout = new QGridLayout(this);
     layout->setMargin(0);
+    layout->setSpacing(0);
 
     QToolBar* toolbar = createToolbar();
     layout->addWidget(toolbar, 0, 0);
@@ -41,8 +42,7 @@ QToolBar* FileView::createToolbar()
         MainWindow::instance()->getDocumentManager()->closeFileView(filePath);
     });
 
-    toolbar->setContentsMargins(0, 0, 0, 0);
-    toolbar->setFixedHeight(15);
+    toolbar->setFixedHeight(20);
 
     return toolbar;
 }

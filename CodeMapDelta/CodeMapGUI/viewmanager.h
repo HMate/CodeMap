@@ -13,7 +13,6 @@ class DocumentManager : public QWidget
 {
     QGridLayout* layout;
     std::vector<FileView*> fileViews;
-    int fileCount = 0;
 
 public:
     explicit DocumentManager(QWidget *parent = nullptr);

@@ -1,7 +1,6 @@
 #include "viewmanager.h"
 
 #include <QDebug>
-
 #include <QGridLayout>
 
 #include "common_types.h"
@@ -25,7 +24,7 @@ void DocumentManager::openFileView(const QString& path)
     mainW->getTerminalView()->showMessage("Opening: " + path);
 
     addNewFileView();
-    fileViews[fileCount-1]->openFile(path);
+    fileViews.back()->openFile(path);
     mainW->getAppState().addFileView(path);
 
     // TODO: check if file is already open? allow to open it twice?
@@ -37,8 +36,23 @@ void DocumentManager::closeFileView(const QString& path)
     size_t index = getFileViewIndexByName(path);
     if(index != INVALID_INDEX)
     {
-        fileViews[index]->closeView();
+        FileView* toRemove = fileViews[index];
+        toRemove->closeView();
+        layout->removeWidget(toRemove);
         fileViews.erase(fileViews.begin()+index);
+
+        // Readd every widget to avoid empty columns in the layout
+        int layoutMemberCount = layout->count();
+        for(int i=0; i<layoutMemberCount; i++)
+        {
+            QLayoutItem* it = layout->takeAt(i);
+        }
+
+        for(int i=0; i<fileViews.size(); i++)
+        {
+            layout->addWidget(fileViews[i], 0, i, 1, 1);
+        }
+
         auto& state = MainWindow::instance()->getAppState();
         state.removeFileView(path);
         state.saveStateToDisk();
@@ -48,8 +62,9 @@ void DocumentManager::closeFileView(const QString& path)
 void DocumentManager::addNewFileView()
 {
     fileViews.push_back(new FileView(this));
-    fileCount++;
-    layout->addWidget(fileViews[fileCount-1], 0, fileCount-1, 1, 1);
+    int fileIndex = fileViews.size()-1;
+    qDebug() << "addWidget to pos " << fileIndex;
+    layout->addWidget(fileViews[fileIndex], 0, fileIndex, 1, 1);
 }
 
 size_t DocumentManager::getFileViewIndexByName(const QString& path)
