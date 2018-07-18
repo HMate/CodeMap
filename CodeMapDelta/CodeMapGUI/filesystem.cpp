@@ -19,7 +19,7 @@ QDir FileSystemManager::getDirectory(const QString& path)
     return QFileInfo(path).absoluteDir();
 }
 
-bool FileSystemManager::saveFile(const QString& filePath, const QString content)
+bool FileSystemManager::saveFile(const QString& filePath, const QString& content)
 {
     QDir dir = getDirectory(filePath);
     qWarning() << "checking path " << dir.absolutePath() << endl;

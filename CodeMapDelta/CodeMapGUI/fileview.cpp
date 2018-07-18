@@ -11,6 +11,7 @@
 
 FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(this))
 {
+    nameLabel = new QLabel(this);
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     layout = new QGridLayout(this);
     layout->setMargin(0);
@@ -32,7 +33,6 @@ FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(thi
 QToolBar* FileView::createToolbar()
 {
     QToolBar* toolbar = new QToolBar("FileView", this);
-    nameLabel = new QLabel(this);
     nameLabel->setText("{new file}");
     toolbar->addWidget(nameLabel);
     QWidget *spacerWidget = new QWidget(this);

@@ -14,7 +14,7 @@ public:
     PreprocessorEliminatorFrontendAction(std::string& preprocessedOutputDest) :
         preprocessedOutput(preprocessedOutputDest){}
 
-    void ExecuteAction()
+    void ExecuteAction() override
     {
         clang::CompilerInstance &CI = getCompilerInstance();
         llvm::raw_string_ostream OS(preprocessedOutput);
@@ -41,7 +41,7 @@ public:
 QString CodeParser::getPreprocessedCode(const QString& source)
 {
     std::string result;
-    PreprocessorEliminatorFrontendAction* ppe = new PreprocessorEliminatorFrontendAction(result);
+    auto ppe = new PreprocessorEliminatorFrontendAction(result);
     clang::tooling::runToolOnCode(ppe, source.toStdString());
     return QString::fromStdString(result);
 }
