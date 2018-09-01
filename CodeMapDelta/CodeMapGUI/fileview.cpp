@@ -82,7 +82,7 @@ void FileView::keyPressEvent(QKeyEvent* ke)
     if(ke->key() == Qt::Key_S && ke->modifiers().testFlag(Qt::ControlModifier))
     {
         auto terminal = MainWindow::instance()->getTerminalView();
-        terminal->showMessage("Saving " + filePath);
+        terminal->showMessage(tr("Saving \"%1\"").arg(filePath));
         ke->setAccepted(true);
         saveFile();
     }
@@ -113,20 +113,20 @@ void FileView::saveFile()
     }
 
     QTextDocumentWriter writer(filePath);
+    writer.setFormat("plaintext");
     bool success = writer.write(editor.document());
     if (success) {
         editor.document()->setModified(false);
-        terminal->showMessage(tr("Saved \"%1\"").arg(QDir::toNativeSeparators(filePath)));
+        terminal->showMessage(tr("Saved \"%1\"").arg(filePath));
     } else {
         terminal->showMessage(tr("Saving failed. Could not write to file \"%1\"")
-                                 .arg(QDir::toNativeSeparators(filePath)));
+                                 .arg(filePath));
     }
 }
 
 void FileView::setFilePath(const QString &path)
 {
-    filePath = path;
-    setWindowTitle("[*]" + filePath);
+    filePath = QDir::toNativeSeparators(path);
     nameLabel->setText(path);
 }
 
@@ -137,12 +137,14 @@ const QString& FileView::getFilePath()
 
 void FileView::fileContentModified(bool changed)
 {
-    setWindowModified(changed);
+    if(changed)
+        nameLabel->setText(filePath+"*");
+    else
+        nameLabel->setText(filePath);
 }
 
 void FileView::setText(const QString& t)
 {
     editor.setText(t);
     editor.document()->setModified(false);
-    setWindowModified(false);
 }
