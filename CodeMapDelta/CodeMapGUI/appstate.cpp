@@ -23,7 +23,7 @@ void AppStateHandler::addFileView(const QString& filePath)
 
 void AppStateHandler::removeFileView(const QString& filePath)
 {
-    for(size_t i = 0; i < fileViews.length(); i++)
+    for(int i = 0; i < fileViews.length(); i++)
     {
         if(fileViews[i] == filePath)
         {
@@ -46,12 +46,6 @@ const QString& AppStateHandler::getLastOpenedDirectory()
 void AppStateHandler::setLastOpenedDirectory(const QString& path)
 {
     lastOpenedDirPath = path;
-}
-
-QString serialize(const QString& segmentName, const QStringList& strings)
-{
-    QString result = strings.join('\n');
-    return result;
 }
 
 void AppStateHandler::saveStateToDisk()
@@ -81,17 +75,19 @@ void AppStateHandler::loadStateFromDisk()
     QJsonDocument doc = QJsonDocument::fromJson(state.toLocal8Bit());
     if(!doc.isNull() && doc.isObject())
     {
-        auto& stateJson = doc.object();
-        QJsonValueRef versionJson = stateJson["version"];
+        const auto& stateJson = doc.object();
+        const QJsonValue& versionJson = stateJson["version"];
         if(versionJson != QJsonValue::Undefined && versionJson.isDouble())
         {
             int version = versionJson.toInt();
-            QJsonValueRef fileViewsValueRef = stateJson["fileViews"];
+            if(version != 2)
+                qDebug() << "State version is unknown: "<< state << "!";
+            const QJsonValue& fileViewsValueRef = stateJson["fileViews"];
             if(fileViewsValueRef.isArray())
             {
                 QJsonArray fileViewsJson = fileViewsValueRef.toArray();
                 fileViews.clear();
-                for(auto& f : fileViewsJson)
+                for(const auto f : fileViewsJson)
                 {
                     if(f.isString())
                         fileViews.append(f.toString());
