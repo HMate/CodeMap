@@ -9,6 +9,7 @@
 
 /* TODO
  * - Need to save/load appstate:
+ *      - opened project
  *      - toggled views
  *      - app user options
  * - Project recognizer:
@@ -16,6 +17,7 @@
  *      - Walk includes and try to find them?
  *      - Parse cmake/sln descriptor and build project from that
  * - Fold out defines, includes, preprocessor directives
+ *      - open view for it
  * - Control flow diagram
  * - Dependency graph, parameter/variable dependencies
  *      - function interpreter: put function to separate file, collect its dependencies, and call it in separate program.
