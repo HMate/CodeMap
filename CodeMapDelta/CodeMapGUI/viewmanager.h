@@ -21,7 +21,7 @@ public:
     void closeFileView(const QString& path);
 protected:
     void addNewFileView();
-    size_t getFileViewIndexByName(const QString& path);
+    long long getFileViewIndexByName(const QString& path);
 };
 
 #endif // VIEWMANAGER_H

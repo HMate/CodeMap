@@ -126,7 +126,7 @@ void FileView::saveFile()
 
 void FileView::setFilePath(const QString &path)
 {
-    filePath = QDir::toNativeSeparators(path);
+    filePath = path;
     nameLabel->setText(path);
 }
 

@@ -33,24 +33,17 @@ void DocumentManager::openFileView(const QString& path)
 
 void DocumentManager::closeFileView(const QString& path)
 {
-    size_t index = getFileViewIndexByName(path);
+    long long index = getFileViewIndexByName(path);
     if(index != INVALID_INDEX)
     {
-        FileView* toRemove = fileViews[index];
+        FileView* toRemove = fileViews[static_cast<unsigned long long>(index)];
         toRemove->closeView();
         layout->removeWidget(toRemove);
         fileViews.erase(fileViews.begin()+index);
 
-        // Readd every widget to avoid empty columns in the layout
-        int layoutMemberCount = layout->count();
-        for(int i=0; i<layoutMemberCount; i++)
+        for(size_t i=0; i<fileViews.size(); i++)
         {
-            QLayoutItem* it = layout->takeAt(i);
-        }
-
-        for(int i=0; i<fileViews.size(); i++)
-        {
-            layout->addWidget(fileViews[i], 0, i, 1, 1);
+            layout->addWidget(fileViews[i], 0, static_cast<int>(i), 1, 1);
         }
 
         auto& state = MainWindow::instance()->getAppState();
@@ -62,14 +55,14 @@ void DocumentManager::closeFileView(const QString& path)
 void DocumentManager::addNewFileView()
 {
     fileViews.push_back(new FileView(this));
-    int fileIndex = fileViews.size()-1;
+    auto fileIndex = fileViews.size()-1;
     qDebug() << "addWidget to pos " << fileIndex;
-    layout->addWidget(fileViews[fileIndex], 0, fileIndex, 1, 1);
+    layout->addWidget(fileViews[fileIndex], 0, static_cast<int>(fileIndex), 1, 1);
 }
 
-size_t DocumentManager::getFileViewIndexByName(const QString& path)
+long long DocumentManager::getFileViewIndexByName(const QString& path)
 {
-    size_t index = 0;
+    long long index = 0;
     for(auto& f : fileViews)
     {
         if(f->getFilePath() == path)

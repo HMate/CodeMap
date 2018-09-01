@@ -88,7 +88,7 @@ void MainWindow::loadAppState()
     QStringList fileViews = state.getFileViews();
     for(auto& f : fileViews)
     {
-        docManager->openFileView(f);
+        docManager->openFileView(QDir::toNativeSeparators(f));
     }
 }
 
@@ -148,11 +148,11 @@ void MainWindow::openFileWithDialog()
         dialog.setDirectory(lastDir);
     if(dialog.exec())
     {
-        QStringList& files = dialog.selectedFiles();
-        QString& f = files[0];
+        const QStringList& files = dialog.selectedFiles();
+        const QString& f = files[0];
         if(QFile::exists(f))
         {
-            docManager->openFileView(f);
+            docManager->openFileView(QDir::toNativeSeparators(f));
             getAppState().setLastOpenedDirectory(FS::getDirectory(f).absolutePath());
             getAppState().saveStateToDisk();
         }
