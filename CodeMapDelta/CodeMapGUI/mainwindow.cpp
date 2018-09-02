@@ -12,8 +12,10 @@
  *      - opened project
  *      - toggled views
  *      - app user options
+ * - Views:
+ *      - project / opened files view
  * - Project recognizer:
- *      - First allow users to add files by hand to a project
+ *      - First allow users to add files by hand to a project (call it workspace?)
  *      - Walk includes and try to find them?
  *      - Parse cmake/sln descriptor and build project from that
  * - Fold out defines, includes, preprocessor directives
