@@ -44,6 +44,7 @@ MainWindow* MainWindow::instanceP = nullptr;
 void MainWindow::createInstance(QApplication& app, QWidget *parent)
 {
     if(!instanceP)
+        // TODO: Set instanceP only one place.
         instanceP = new MainWindow(app, parent);
 }
 
@@ -75,7 +76,6 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
 
     terminalView = new TerminalView(this);
     auto terminalToggleAction = addDockedView(tr("Terminal"), terminalView, Qt::DockWidgetArea::BottomDockWidgetArea);
-
 
     // Create actions and menu after creating widgets,
     // as actions may use a child widget.
