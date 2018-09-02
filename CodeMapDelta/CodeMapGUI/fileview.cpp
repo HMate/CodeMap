@@ -9,7 +9,7 @@
 
 #include "mainwindow.h"
 
-FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(this))
+FileView::FileView(QWidget *parent) : QWidget(parent)
 {
     nameLabel = new QLabel(this);
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
@@ -20,13 +20,14 @@ FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(thi
     QToolBar* toolbar = createToolbar();
     layout->addWidget(toolbar, 0, 0);
 
-    editor.setVisible(true);
-    editor.setLineWrapMode(QTextEdit::LineWrapMode::NoWrap);
-    editor.setFont(QFont("Consolas"));
-    setFocusProxy(&editor);
-    layout->addWidget(&editor, 1, 0);
+    editor = new QTextEdit(this);
+    editor->setVisible(true);
+    editor->setLineWrapMode(QTextEdit::LineWrapMode::NoWrap);
+    editor->setFont(QFont("Consolas"));
+    setFocusProxy(editor);
+    layout->addWidget(editor, 1, 0);
 
-    connect(editor.document(), &QTextDocument::modificationChanged,
+    connect(editor->document(), &QTextDocument::modificationChanged,
             this, &FileView::fileContentModified);
 
 }
@@ -115,9 +116,9 @@ void FileView::saveFile()
 
     QTextDocumentWriter writer(filePath);
     writer.setFormat("plaintext");
-    bool success = writer.write(editor.document());
+    bool success = writer.write(editor->document());
     if (success) {
-        editor.document()->setModified(false);
+        editor->document()->setModified(false);
         terminal->showMessage(tr("Saved \"%1\"").arg(filePath));
     } else {
         terminal->showMessage(tr("Saving failed. Could not write to file \"%1\"")
@@ -146,6 +147,6 @@ void FileView::fileContentModified(bool changed)
 
 void FileView::setText(const QString& t)
 {
-    editor.setText(t);
-    editor.document()->setModified(false);
+    editor->setText(t);
+    editor->document()->setModified(false);
 }

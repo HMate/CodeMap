@@ -22,10 +22,10 @@ class FileView : public QWidget
     Q_OBJECT
 
     QGridLayout* layout;
+    QTextEdit* editor;
     QLabel* nameLabel;
 protected:
     QString filePath;
-    QTextEdit& editor;
 
 public:
     explicit FileView(QWidget *parent = nullptr);
