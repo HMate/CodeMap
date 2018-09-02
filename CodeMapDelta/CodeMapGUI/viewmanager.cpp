@@ -14,7 +14,8 @@ DocumentListView::DocumentListView(QWidget* parent) : QWidget(parent)
     listView = new QListWidget(this);
     layout->addWidget(listView);
 
-    //signal listView void QListWidget::currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+    connect(listView, &QListWidget::itemDoubleClicked,
+            this, &DocumentListView::selectionChanged);
 }
 
 QSize DocumentListView::sizeHint() const
@@ -52,9 +53,10 @@ void DocumentListView::removeFile(const QString& path)
     }
 }
 
-void DocumentListView::selectionChanged(QListWidgetItem *current, QListWidgetItem *previous)
+void DocumentListView::selectionChanged(QListWidgetItem *current)
 {
-
+    auto dm = MainWindow::instance()->getDocumentManager();
+    dm->openFileView(current->text());
 }
 
 
@@ -103,11 +105,6 @@ void DocumentManager::closeFileView(const QString& path)
         FileView* toRemove = fileViews[static_cast<unsigned long long>(index)];
         toRemove->closeView();
         fileViews.erase(fileViews.begin()+index);
-
-        for(size_t i=0; i<fileViews.size(); i++)
-        {
-            splitter->addWidget(fileViews[i]);
-        }
 
         auto& state = MainWindow::instance()->getAppState();
         state.removeFileView(path);

@@ -59,7 +59,7 @@ void TerminalView::handleTerminalCommand()
 
     if(lcmd == "asd")
     {
-        auto& s = MainWindow::instance()->getDocumentManager()->size();
+        auto s = MainWindow::instance()->getDocumentManager()->size();
         showMessage(QStringLiteral("Size: %1x%2 r: %3x%4").arg(s.width()).arg(s.height()).arg(s.rwidth()).arg(s.rheight()));
     }
 

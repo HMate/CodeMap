@@ -167,8 +167,10 @@ void MainWindow::openFileWithDialog()
         const QString& f = files[0];
         if(QFile::exists(f))
         {
-            docManager->openFileView(QDir::toNativeSeparators(f));
-            getAppState().setLastOpenedDirectory(FS::getDirectory(f).absolutePath());
+            const auto path = QDir::toNativeSeparators(f);
+            docManager->openFileView(path);
+            docList->registerFile(path);
+            getAppState().setLastOpenedDirectory(FS::getDirectory(path).absolutePath());
             getAppState().saveStateToDisk();
         }
     }

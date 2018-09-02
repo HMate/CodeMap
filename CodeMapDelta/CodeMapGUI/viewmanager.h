@@ -25,7 +25,7 @@ public:
 protected:
     virtual QSize sizeHint() const;
 public slots:
-   void selectionChanged(QListWidgetItem *current, QListWidgetItem *previous);
+   void selectionChanged(QListWidgetItem *current);
 };
 
 /*
