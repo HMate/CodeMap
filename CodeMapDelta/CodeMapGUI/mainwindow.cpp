@@ -66,7 +66,7 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
     // set docknesting so I can dragndrop a widget without tabifying it
     setDockNestingEnabled(true);
 
-    docManager = new DocumentManager(this);
+    docManager = new SplitDocumentView(this);
     docManager->setObjectName(QStringLiteral("documentManager"));
     auto documentsToggleAction = addDockedView(tr("Documents"), docManager, Qt::DockWidgetArea::RightDockWidgetArea);
 

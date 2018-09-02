@@ -68,7 +68,7 @@ void TerminalView::handleTerminalCommand()
 
 void TerminalView::showMessage(const QString& command)
 {
-    tHistory->insertItem(tHistory->count(), new QListWidgetItem(command, tHistory));
+    tHistory->addItem(command);
 }
 
 void TerminalView::focusInEvent(QFocusEvent *event)

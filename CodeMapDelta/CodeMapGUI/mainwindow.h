@@ -22,7 +22,7 @@ protected:
     Actions action;
 
     std::unique_ptr<AppStateHandler> appState;
-    DocumentManager* docManager = nullptr;
+    SplitDocumentView* docManager = nullptr;
     DocumentListView* docList =  nullptr;
     TerminalView* terminalView = nullptr;
 
@@ -46,7 +46,7 @@ public:
 
     AppStateHandler& getAppState() const {return *appState;}
     TerminalView* getTerminalView() const {return terminalView;}
-    DocumentManager* getDocumentManager() const {return docManager;}
+    SplitDocumentView* getDocumentManager() const {return docManager;}
     const Actions& getActions() const {return action;}
 signals:
 

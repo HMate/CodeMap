@@ -59,10 +59,91 @@ void DocumentListView::selectionChanged(QListWidgetItem *current)
     dm->openFileView(current->text())->setFocus();
 }
 
+// ------------------------------------------
+
+TabbedDocumentView::TabbedDocumentView(QWidget* parent) : QWidget(parent)
+{
+    //setBackground(QBrush(QColor(50, 120, 50)));
+    setStyleSheet("QTextEdit { background-color: rgb(120, 180, 120) }");
+
+    setSizePolicy(QSizePolicy(QSizePolicy::Policy::Expanding,
+                              QSizePolicy::Policy::Expanding));
+
+    layout = new QHBoxLayout(this);
+    layout->setMargin(0);
+
+    tabs = new QTabWidget(this);
+    tabs->show();
+    layout->addWidget(tabs);
+}
+
+QSize TabbedDocumentView::sizeHint() const
+{
+    QSize s = MainWindow::instance()->size();
+    return QSize(s.rwidth()*8/10, s.rheight()*8/10);
+}
+
+FileView* TabbedDocumentView::openFileView(const QString& path)
+{
+    const MainWindow* mainW = MainWindow::instance();
+    mainW->getTerminalView()->showMessage("Opening: " + path);
+
+    FileView* v = addNewFileView(path);
+    v->openFile(path);
+    mainW->getAppState().addFileView(path);
+
+    // TODO: check if file is already open? allow to open it twice?
+    // TODO: set app focus to this file view here.
+    return v;
+}
+
+void TabbedDocumentView::closeFileView(const QString& path)
+{
+    long long index = getFileViewIndexByName(path);
+    if(index != INVALID_INDEX)
+    {
+        FileView* toRemove = fileViews[static_cast<size_t>(index)];
+        toRemove->closeView();
+        tabs->removeTab(static_cast<int>(index));
+        fileViews.erase(fileViews.begin()+index);
+
+        auto& state = MainWindow::instance()->getAppState();
+        state.removeFileView(path);
+        state.saveStateToDisk();
+    }
+}
+
+FileView* TabbedDocumentView::addNewFileView(const QString& name)
+{
+    auto view = new FileView();
+    fileViews.push_back(view);
+    tabs->addTab(view, name);
+    return view;
+}
+
+bool TabbedDocumentView::hasFileView(const QString& path)
+{
+    return getFileViewIndexByName(path) != INVALID_INDEX;
+}
+
+long long TabbedDocumentView::getFileViewIndexByName(const QString& path)
+{
+    long long index = 0;
+    for(auto& f : fileViews)
+    {
+        if(f->getFilePath() == path)
+        {
+            return index;
+        }
+        index++;
+    }
+    return INVALID_INDEX;
+}
+
 
 // ----------------------------------------
 
-DocumentManager::DocumentManager(QWidget* parent) : QWidget(parent)
+SplitDocumentView::SplitDocumentView(QWidget* parent) : QWidget(parent)
 {
     //setBackground(QBrush(QColor(50, 120, 50)));
     setStyleSheet("QTextEdit { background-color: rgb(120, 180, 120) }");
@@ -76,57 +157,42 @@ DocumentManager::DocumentManager(QWidget* parent) : QWidget(parent)
     splitter = new QSplitter(this);
     splitter->show();
     layout->addWidget(splitter);
+
+    auto v = new TabbedDocumentView(this);
+    tabbedViews.emplace_back(v);
+    splitter->addWidget(v);
 }
 
-QSize DocumentManager::sizeHint() const
+QSize SplitDocumentView::sizeHint() const
 {
     QSize s = MainWindow::instance()->size();
     return QSize(s.rwidth()*8/10, s.rheight()*8/10);
 }
 
-FileView* DocumentManager::openFileView(const QString& path)
+FileView* SplitDocumentView::openFileView(const QString& path)
 {
-    const MainWindow* mainW = MainWindow::instance();
-    mainW->getTerminalView()->showMessage("Opening: " + path);
-
-    FileView* v = addNewFileView();
-    v->openFile(path);
-    mainW->getAppState().addFileView(path);
+    FileView* v = tabbedViews[0]->openFileView(path);
 
     // TODO: check if file is already open? allow to open it twice?
     // TODO: set app focus to this file view here.
     return v;
 }
 
-void DocumentManager::closeFileView(const QString& path)
+void SplitDocumentView::closeFileView(const QString& path)
 {
-    long long index = getFileViewIndexByName(path);
+    long long index = getDocumentViewIndexFromFileName(path);
     if(index != INVALID_INDEX)
     {
-        FileView* toRemove = fileViews[static_cast<unsigned long long>(index)];
-        toRemove->closeView();
-        fileViews.erase(fileViews.begin()+index);
-
-        auto& state = MainWindow::instance()->getAppState();
-        state.removeFileView(path);
-        state.saveStateToDisk();
+        tabbedViews[static_cast<size_t>(index)]->closeFileView(path);
     }
 }
 
-FileView* DocumentManager::addNewFileView()
-{
-    auto view = new FileView(this);
-    fileViews.push_back(view);
-    splitter->addWidget(view);
-    return view;
-}
-
-long long DocumentManager::getFileViewIndexByName(const QString& path)
+long long SplitDocumentView::getDocumentViewIndexFromFileName(const QString& path)
 {
     long long index = 0;
-    for(auto& f : fileViews)
+    for(auto& view : tabbedViews)
     {
-        if(f->getFilePath() == path)
+        if(view->hasFileView(path))
         {
             return index;
         }

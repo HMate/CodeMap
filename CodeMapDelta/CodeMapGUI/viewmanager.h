@@ -31,22 +31,47 @@ public slots:
 /*
  * Handles document views, that are editors or usually do something for files.
  * */
-class DocumentManager : public QWidget
+class TabbedDocumentView : public QWidget
+{
+    Q_OBJECT
+
+    QLayout* layout;
+    QTabWidget* tabs;
+    std::vector<FileView*> fileViews;
+
+public:
+    explicit TabbedDocumentView(QWidget *parent = nullptr);
+    virtual ~TabbedDocumentView(){}
+
+    FileView* openFileView(const QString& path);
+    void closeFileView(const QString& path);
+    bool hasFileView(const QString& path);
+protected:
+    FileView* addNewFileView(const QString& name);
+    long long getFileViewIndexByName(const QString& path);
+
+    virtual QSize sizeHint() const;
+};
+
+/*
+ * Contains TabbedDocumentViews
+ * */
+class SplitDocumentView : public QWidget
 {
     Q_OBJECT
 
     QLayout* layout;
     QSplitter* splitter;
-    std::vector<FileView*> fileViews;
+    std::vector<TabbedDocumentView*> tabbedViews;
 
 public:
-    explicit DocumentManager(QWidget *parent = nullptr);
+    explicit SplitDocumentView(QWidget *parent = nullptr);
+    virtual ~SplitDocumentView(){}
 
     FileView* openFileView(const QString& path);
     void closeFileView(const QString& path);
 protected:
-    FileView* addNewFileView();
-    long long getFileViewIndexByName(const QString& path);
+    long long getDocumentViewIndexFromFileName(const QString& path);
 
     virtual QSize sizeHint() const;
 };
