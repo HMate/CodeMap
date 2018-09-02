@@ -68,14 +68,14 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
 
     docManager = new DocumentManager(this);
     docManager->setObjectName(QStringLiteral("documentManager"));
-    auto documentsToggleAction = addDockedView(tr("Documents"), docManager, Qt::DockWidgetArea::TopDockWidgetArea);
+    auto documentsToggleAction = addDockedView(tr("Documents"), docManager, Qt::DockWidgetArea::RightDockWidgetArea);
+
+    terminalView = new TerminalView(this);
+    auto terminalToggleAction = addDockedView(tr("Terminal"), terminalView, Qt::DockWidgetArea::RightDockWidgetArea);
 
     docList = new DocumentListView(this);
     docList->setObjectName(QStringLiteral("documentList"));
     auto documentListToggleAction = addDockedView(tr("Opened Documents"), docList, Qt::DockWidgetArea::LeftDockWidgetArea);
-
-    terminalView = new TerminalView(this);
-    auto terminalToggleAction = addDockedView(tr("Terminal"), terminalView, Qt::DockWidgetArea::BottomDockWidgetArea);
 
     // Create actions and menu after creating widgets,
     // as actions may use a child widget.
