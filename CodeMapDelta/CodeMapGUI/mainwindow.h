@@ -33,7 +33,7 @@ protected:
     void loadAppState();
     void createActions();
     void createFileMenu();
-    void createViewMenu(QAction* terminalToggle);
+    void createViewMenu(QAction* documentsToggle, QAction* terminalToggle);
     virtual void resizeEvent(QResizeEvent *resizeEvent) override;
 
 public:
@@ -41,7 +41,7 @@ public:
     static const MainWindow* instance();
     ~MainWindow();
 
-    QAction* addDockedView(const QString& name, QWidget* widget);
+    QAction* addDockedView(const QString& name, QWidget* widget, Qt::DockWidgetArea area);
 
     AppStateHandler& getAppState() const {return *appState;}
     TerminalView* getTerminalView() const {return terminalView;}

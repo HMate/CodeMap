@@ -64,16 +64,16 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
 
     docManager = new DocumentManager(this);
     docManager->setObjectName(QStringLiteral("documentManager"));
-    setCentralWidget(docManager);
+    auto documentsToggleAction = addDockedView(tr("Documents"), docManager, Qt::DockWidgetArea::TopDockWidgetArea);
 
     terminalView = new TerminalView(this);
-    auto d = addDockedView(tr("Terminal"), terminalView);
+    auto terminalToggleAction = addDockedView(tr("Terminal"), terminalView, Qt::DockWidgetArea::BottomDockWidgetArea);
 
     // Create actions and menu after creating widgets,
     // as actions may use a child widget.
     createActions();
     createFileMenu();
-    createViewMenu(d);
+    createViewMenu(documentsToggleAction, terminalToggleAction);
 
     show();
     terminalView->setFocus();
@@ -94,11 +94,11 @@ void MainWindow::loadAppState()
     }
 }
 
-QAction* MainWindow::addDockedView(const QString& name, QWidget* widget)
+QAction* MainWindow::addDockedView(const QString& name, QWidget* widget, Qt::DockWidgetArea area)
 {
-    QDockWidget* d = new QDockWidget(name, this);
+    auto d = new QDockWidget(name, this);
     d->setWidget(widget);
-    addDockWidget(Qt::DockWidgetArea::BottomDockWidgetArea, d);
+    addDockWidget(area, d);
     return d->toggleViewAction();
 }
 
@@ -113,7 +113,8 @@ void MainWindow::resizeEvent(QResizeEvent *resizeEvent)
 void MainWindow::createActions()
 {
     action.openFile = new QAction(tr("Open File"), this);
-    connect(action.openFile, &QAction::triggered, this, &MainWindow::openFileWithDialog);
+    connect(action.openFile, &QAction::triggered,
+            this, &MainWindow::openFileWithDialog);
 
     action.quit = new QAction(tr("Quit"), this);
     connect(action.quit, &QAction::triggered,
@@ -127,11 +128,11 @@ void MainWindow::createFileMenu()
     fileMenu->addAction(action.quit);
 }
 
-void MainWindow::createViewMenu(QAction* terminalToggle)
+void MainWindow::createViewMenu(QAction* documentsToggle, QAction* terminalToggle)
 {
     QMenu* viewMenu = menuBar()->addMenu(tr("View"));
+    viewMenu->addAction(documentsToggle);
     viewMenu->addAction(terminalToggle);
-
 }
 
 void MainWindow::toggleViewTerminalHistory(bool onoff)
