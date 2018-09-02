@@ -23,6 +23,7 @@ FileView::FileView(QWidget *parent) : QWidget(parent), editor(*new QTextEdit(thi
     editor.setVisible(true);
     editor.setLineWrapMode(QTextEdit::LineWrapMode::NoWrap);
     editor.setFont(QFont("Consolas"));
+    setFocusProxy(&editor);
     layout->addWidget(&editor, 1, 0);
 
     connect(editor.document(), &QTextDocument::modificationChanged,

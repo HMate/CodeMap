@@ -56,7 +56,7 @@ void DocumentListView::removeFile(const QString& path)
 void DocumentListView::selectionChanged(QListWidgetItem *current)
 {
     auto dm = MainWindow::instance()->getDocumentManager();
-    dm->openFileView(current->text());
+    dm->openFileView(current->text())->setFocus();
 }
 
 
@@ -84,17 +84,18 @@ QSize DocumentManager::sizeHint() const
     return QSize(s.rwidth()*8/10, s.rheight()*8/10);
 }
 
-void DocumentManager::openFileView(const QString& path)
+FileView* DocumentManager::openFileView(const QString& path)
 {
     const MainWindow* mainW = MainWindow::instance();
     mainW->getTerminalView()->showMessage("Opening: " + path);
 
-    addNewFileView();
-    fileViews.back()->openFile(path);
+    FileView* v = addNewFileView();
+    v->openFile(path);
     mainW->getAppState().addFileView(path);
 
     // TODO: check if file is already open? allow to open it twice?
     // TODO: set app focus to this file view here.
+    return v;
 }
 
 void DocumentManager::closeFileView(const QString& path)
@@ -112,12 +113,12 @@ void DocumentManager::closeFileView(const QString& path)
     }
 }
 
-void DocumentManager::addNewFileView()
+FileView* DocumentManager::addNewFileView()
 {
-    fileViews.push_back(new FileView(this));
-    auto fileIndex = fileViews.size()-1;
-    qDebug() << "addWidget to pos " << fileIndex;
-    splitter->addWidget(fileViews[fileIndex]);
+    auto view = new FileView(this);
+    fileViews.push_back(view);
+    splitter->addWidget(view);
+    return view;
 }
 
 long long DocumentManager::getFileViewIndexByName(const QString& path)

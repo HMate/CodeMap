@@ -42,10 +42,10 @@ class DocumentManager : public QWidget
 public:
     explicit DocumentManager(QWidget *parent = nullptr);
 
-    void openFileView(const QString& path);
+    FileView* openFileView(const QString& path);
     void closeFileView(const QString& path);
 protected:
-    void addNewFileView();
+    FileView* addNewFileView();
     long long getFileViewIndexByName(const QString& path);
 
     virtual QSize sizeHint() const;
