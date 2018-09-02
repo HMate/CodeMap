@@ -62,21 +62,26 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
 
     appState = std::make_unique<AppStateHandler>();
 
+    // set docknesting so I can dragndrop a widget without tabifying it
+    setDockNestingEnabled(true);
+
     docManager = new DocumentManager(this);
     docManager->setObjectName(QStringLiteral("documentManager"));
     auto documentsToggleAction = addDockedView(tr("Documents"), docManager, Qt::DockWidgetArea::TopDockWidgetArea);
 
+    docList = new DocumentListView(this);
+    docList->setObjectName(QStringLiteral("documentList"));
+    auto documentListToggleAction = addDockedView(tr("Opened Documents"), docList, Qt::DockWidgetArea::LeftDockWidgetArea);
+
     terminalView = new TerminalView(this);
     auto terminalToggleAction = addDockedView(tr("Terminal"), terminalView, Qt::DockWidgetArea::BottomDockWidgetArea);
 
-    // set docknesting so I can dragndrop a widget without tabifying it
-    setDockNestingEnabled(true);
 
     // Create actions and menu after creating widgets,
     // as actions may use a child widget.
     createActions();
     createFileMenu();
-    createViewMenu(documentsToggleAction, terminalToggleAction);
+    createViewMenu(documentsToggleAction, documentListToggleAction, terminalToggleAction);
 
     show();
     terminalView->setFocus();
@@ -93,7 +98,9 @@ void MainWindow::loadAppState()
     QStringList fileViews = state.getFileViews();
     for(auto& f : fileViews)
     {
-        docManager->openFileView(QDir::toNativeSeparators(f));
+        const auto path = QDir::toNativeSeparators(f);
+        docList->registerFile(path);
+        docManager->openFileView(path);
     }
 }
 
@@ -131,10 +138,11 @@ void MainWindow::createFileMenu()
     fileMenu->addAction(action.quit);
 }
 
-void MainWindow::createViewMenu(QAction* documentsToggle, QAction* terminalToggle)
+void MainWindow::createViewMenu(QAction* documentsToggle, QAction* documentListToggleAction, QAction* terminalToggle)
 {
     QMenu* viewMenu = menuBar()->addMenu(tr("View"));
     viewMenu->addAction(documentsToggle);
+    viewMenu->addAction(documentListToggleAction);
     viewMenu->addAction(terminalToggle);
 }
 

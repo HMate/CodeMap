@@ -3,15 +3,37 @@
 
 #include <QString>
 #include <QLayout>
+#include <QListWidget>
+#include <QListWidgetItem>
 #include <QSplitter>
 
 #include "fileview.h"
+
+class DocumentListView : public QWidget
+{
+    Q_OBJECT
+
+    QLayout* layout;
+    QListWidget* listView;
+    std::vector<QString> files;
+public:
+    explicit DocumentListView(QWidget *parent = nullptr);
+
+    void registerFile(const QString& path);
+    void removeFile(const QString& path);
+    bool isFilepathRegistered(const QString& path);
+
+public slots:
+   void selectionChanged(QListWidgetItem *current, QListWidgetItem *previous);
+};
 
 /*
  * Handles document views, that are editors or usually do something for files.
  * */
 class DocumentManager : public QWidget
 {
+    Q_OBJECT
+
     QLayout* layout;
     QSplitter* splitter;
     std::vector<FileView*> fileViews;

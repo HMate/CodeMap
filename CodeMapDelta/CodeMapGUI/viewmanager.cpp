@@ -6,6 +6,54 @@
 #include "common_types.h"
 #include "mainwindow.h"
 
+DocumentListView::DocumentListView(QWidget* parent) : QWidget(parent)
+{
+    layout = new QVBoxLayout(this);
+    layout->setMargin(0);
+
+    listView = new QListWidget(this);
+    layout->addWidget(listView);
+
+    //signal listView void QListWidget::currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+}
+
+void DocumentListView::registerFile(const QString& path)
+{
+    if(!isFilepathRegistered(path))
+    {
+        files.emplace_back(path);
+        listView->addItem(path);
+    }
+}
+
+bool DocumentListView::isFilepathRegistered(const QString& path)
+{
+    return std::find(files.begin(), files.end(), path) != files.end();
+}
+
+void DocumentListView::removeFile(const QString& path)
+{
+    if(isFilepathRegistered(path))
+    {
+        auto items = listView->findItems(path, Qt::MatchFixedString);
+        for(const auto& i : items)
+        {
+            listView->takeItem(listView->row(i));
+        }
+
+        auto it = std::find(files.begin(), files.end(), path);
+        files.erase(it);
+    }
+}
+
+void DocumentListView::selectionChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+
+}
+
+
+// ----------------------------------------
+
 DocumentManager::DocumentManager(QWidget* parent) : QWidget(parent)
 {
     //setBackground(QBrush(QColor(50, 120, 50)));

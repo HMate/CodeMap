@@ -23,6 +23,7 @@ protected:
 
     std::unique_ptr<AppStateHandler> appState;
     DocumentManager* docManager = nullptr;
+    DocumentListView* docList =  nullptr;
     TerminalView* terminalView = nullptr;
 
     QApplication& app;
@@ -33,7 +34,7 @@ protected:
     void loadAppState();
     void createActions();
     void createFileMenu();
-    void createViewMenu(QAction* documentsToggle, QAction* terminalToggle);
+    void createViewMenu(QAction* documentsToggle, QAction* documentListToggleAction, QAction* terminalToggle);
     virtual void resizeEvent(QResizeEvent *resizeEvent) override;
 
 public:
