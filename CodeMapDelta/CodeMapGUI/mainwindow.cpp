@@ -69,6 +69,9 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
     terminalView = new TerminalView(this);
     auto terminalToggleAction = addDockedView(tr("Terminal"), terminalView, Qt::DockWidgetArea::BottomDockWidgetArea);
 
+    // set docknesting so I can dragndrop a widget without tabifying it
+    setDockNestingEnabled(true);
+
     // Create actions and menu after creating widgets,
     // as actions may use a child widget.
     createActions();

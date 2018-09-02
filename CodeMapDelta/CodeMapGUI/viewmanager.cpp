@@ -1,7 +1,7 @@
 #include "viewmanager.h"
 
 #include <QDebug>
-#include <QGridLayout>
+#include <QStackedLayout>
 
 #include "common_types.h"
 #include "mainwindow.h"
@@ -14,8 +14,12 @@ DocumentManager::DocumentManager(QWidget* parent) : QWidget(parent)
     setSizePolicy(QSizePolicy(QSizePolicy::Policy::Expanding,
                               QSizePolicy::Policy::Expanding));
 
-    layout = new QGridLayout(this);
+    layout = new QHBoxLayout(this);
     layout->setMargin(0);
+
+    splitter = new QSplitter(this);
+    splitter->show();
+    layout->addWidget(splitter);
 }
 
 void DocumentManager::openFileView(const QString& path)
@@ -38,12 +42,11 @@ void DocumentManager::closeFileView(const QString& path)
     {
         FileView* toRemove = fileViews[static_cast<unsigned long long>(index)];
         toRemove->closeView();
-        layout->removeWidget(toRemove);
         fileViews.erase(fileViews.begin()+index);
 
         for(size_t i=0; i<fileViews.size(); i++)
         {
-            layout->addWidget(fileViews[i], 0, static_cast<int>(i), 1, 1);
+            splitter->addWidget(fileViews[i]);
         }
 
         auto& state = MainWindow::instance()->getAppState();
@@ -57,7 +60,7 @@ void DocumentManager::addNewFileView()
     fileViews.push_back(new FileView(this));
     auto fileIndex = fileViews.size()-1;
     qDebug() << "addWidget to pos " << fileIndex;
-    layout->addWidget(fileViews[fileIndex], 0, static_cast<int>(fileIndex), 1, 1);
+    splitter->addWidget(fileViews[fileIndex]);
 }
 
 long long DocumentManager::getFileViewIndexByName(const QString& path)

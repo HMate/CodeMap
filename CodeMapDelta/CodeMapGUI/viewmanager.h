@@ -2,7 +2,8 @@
 #define VIEWMANAGER_H
 
 #include <QString>
-#include <QGridLayout>
+#include <QLayout>
+#include <QSplitter>
 
 #include "fileview.h"
 
@@ -11,7 +12,8 @@
  * */
 class DocumentManager : public QWidget
 {
-    QGridLayout* layout;
+    QLayout* layout;
+    QSplitter* splitter;
     std::vector<FileView*> fileViews;
 
 public:
