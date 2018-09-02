@@ -33,6 +33,7 @@ public:
     void showMessage(const QString& command);
 protected:
     void focusInEvent(QFocusEvent *event);
+    virtual QSize sizeHint() const;
 
 public slots:
     void handleTerminalCommand();

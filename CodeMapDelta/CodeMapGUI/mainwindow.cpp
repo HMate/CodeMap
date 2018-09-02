@@ -91,6 +91,7 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
 
 void MainWindow::loadAppState()
 {
+    // TODO: look into QMainWindow::saveState for saving dockwidget state
     auto state = getAppState();
 
     state.loadStateFromDisk();

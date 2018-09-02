@@ -22,7 +22,8 @@ public:
     void registerFile(const QString& path);
     void removeFile(const QString& path);
     bool isFilepathRegistered(const QString& path);
-
+protected:
+    virtual QSize sizeHint() const;
 public slots:
    void selectionChanged(QListWidgetItem *current, QListWidgetItem *previous);
 };
@@ -46,6 +47,8 @@ public:
 protected:
     void addNewFileView();
     long long getFileViewIndexByName(const QString& path);
+
+    virtual QSize sizeHint() const;
 };
 
 #endif // VIEWMANAGER_H

@@ -17,6 +17,12 @@ DocumentListView::DocumentListView(QWidget* parent) : QWidget(parent)
     //signal listView void QListWidget::currentItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
 }
 
+QSize DocumentListView::sizeHint() const
+{
+    QSize s = MainWindow::instance()->size();
+    return QSize(s.rwidth()*2/10, s.rheight());
+}
+
 void DocumentListView::registerFile(const QString& path)
 {
     if(!isFilepathRegistered(path))
@@ -68,6 +74,12 @@ DocumentManager::DocumentManager(QWidget* parent) : QWidget(parent)
     splitter = new QSplitter(this);
     splitter->show();
     layout->addWidget(splitter);
+}
+
+QSize DocumentManager::sizeHint() const
+{
+    QSize s = MainWindow::instance()->size();
+    return QSize(s.rwidth()*8/10, s.rheight()*8/10);
 }
 
 void DocumentManager::openFileView(const QString& path)

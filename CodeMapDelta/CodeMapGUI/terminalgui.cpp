@@ -14,7 +14,7 @@ TerminalView::TerminalView(QWidget* parent)
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setMargin(0);
-    layout->setContentsMargins(0,0,0,0);
+    layout->setContentsMargins(0,0,5,5);
 
     tHistory = new TerminalHistory(this);
     layout->addWidget(tHistory);
@@ -24,6 +24,12 @@ TerminalView::TerminalView(QWidget* parent)
 
     connect(tInput, &QLineEdit::returnPressed,
             this, &TerminalView::handleTerminalCommand);
+}
+
+QSize TerminalView::sizeHint() const
+{
+    QSize s = MainWindow::instance()->size();
+    return QSize(s.rwidth()*7/10, s.rheight()*2/10);
 }
 
 void TerminalView::handleTerminalCommand()
