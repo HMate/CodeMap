@@ -1,6 +1,7 @@
 #include "viewmanager.h"
 
 #include <QDebug>
+#include <QPushButton>
 #include <QStackedLayout>
 
 #include "common_types.h"
@@ -85,15 +86,8 @@ QSize TabbedDocumentView::sizeHint() const
 
 FileView* TabbedDocumentView::openFileView(const QString& path)
 {
-    const MainWindow* mainW = MainWindow::instance();
-    mainW->getTerminalView()->showMessage("Opening: " + path);
-
     FileView* v = addNewFileView(path);
     v->openFile(path);
-    mainW->getAppState().addFileView(path);
-
-    // TODO: check if file is already open? allow to open it twice?
-    // TODO: set app focus to this file view here.
     return v;
 }
 
@@ -106,10 +100,6 @@ void TabbedDocumentView::closeFileView(const QString& path)
         toRemove->closeView();
         tabs->removeTab(static_cast<int>(index));
         fileViews.erase(fileViews.begin()+index);
-
-        auto& state = MainWindow::instance()->getAppState();
-        state.removeFileView(path);
-        state.saveStateToDisk();
     }
 }
 
@@ -143,6 +133,37 @@ long long TabbedDocumentView::getFileViewIndexByName(const QString& path)
 
 // ----------------------------------------
 
+SplitDocumentViewHolder::SplitDocumentViewHolder(QWidget* parent) : QDockWidget (tr("Documents"), parent)
+{
+    view = new SplitDocumentView(this);
+    this->setWidget(view);
+
+    auto titleBar = new SplitDocumentViewTitleBar(this);
+    titleBar->show();
+    setTitleBarWidget(titleBar);
+}
+
+SplitDocumentViewTitleBar::SplitDocumentViewTitleBar(SplitDocumentViewHolder* parent) : QWidget (parent)
+{
+    parentDocHolder = parent;
+    auto layout = new QHBoxLayout();
+    setLayout(layout);
+    layout->addWidget(new QLabel("Documents", this));
+
+    auto addDocumentViewButton = new QPushButton("++", this);
+    layout->addWidget(addDocumentViewButton);
+
+
+
+    connect(addDocumentViewButton, &QPushButton::clicked,
+            this, &SplitDocumentViewTitleBar::addDocumentViewPushed);
+}
+
+void SplitDocumentViewTitleBar::addDocumentViewPushed()
+{
+    parentDocHolder->getView()->addTabbedDocumentView();
+};
+
 SplitDocumentView::SplitDocumentView(QWidget* parent) : QWidget(parent)
 {
     //setBackground(QBrush(QColor(50, 120, 50)));
@@ -158,9 +179,7 @@ SplitDocumentView::SplitDocumentView(QWidget* parent) : QWidget(parent)
     splitter->show();
     layout->addWidget(splitter);
 
-    auto v = new TabbedDocumentView(this);
-    tabbedViews.emplace_back(v);
-    splitter->addWidget(v);
+    addTabbedDocumentView();
 }
 
 QSize SplitDocumentView::sizeHint() const
@@ -169,9 +188,20 @@ QSize SplitDocumentView::sizeHint() const
     return QSize(s.rwidth()*8/10, s.rheight()*8/10);
 }
 
+void SplitDocumentView::addTabbedDocumentView()
+{
+    auto v = new TabbedDocumentView(this);
+    tabbedViews.emplace_back(v);
+    splitter->addWidget(v);
+}
+
 FileView* SplitDocumentView::openFileView(const QString& path)
 {
+    const MainWindow* mainW = MainWindow::instance();
+    mainW->getTerminalView()->showMessage("Opening: " + path);
+
     FileView* v = tabbedViews[0]->openFileView(path);
+    mainW->getAppState().addFileView(path);
 
     // TODO: check if file is already open? allow to open it twice?
     // TODO: set app focus to this file view here.
@@ -184,6 +214,10 @@ void SplitDocumentView::closeFileView(const QString& path)
     if(index != INVALID_INDEX)
     {
         tabbedViews[static_cast<size_t>(index)]->closeFileView(path);
+
+        auto& state = MainWindow::instance()->getAppState();
+        state.removeFileView(path);
+        state.saveStateToDisk();
     }
 }
 

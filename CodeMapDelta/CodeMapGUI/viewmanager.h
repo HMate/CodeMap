@@ -6,6 +6,7 @@
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QSplitter>
+#include <QDockWidget>
 
 #include "fileview.h"
 
@@ -68,12 +69,34 @@ public:
     explicit SplitDocumentView(QWidget *parent = nullptr);
     virtual ~SplitDocumentView(){}
 
+    void addTabbedDocumentView();
     FileView* openFileView(const QString& path);
     void closeFileView(const QString& path);
 protected:
     long long getDocumentViewIndexFromFileName(const QString& path);
 
     virtual QSize sizeHint() const;
+};
+
+class SplitDocumentViewHolder : public QDockWidget
+{
+    SplitDocumentView* view;
+public:
+    SplitDocumentViewHolder(QWidget* parent);
+    SplitDocumentView* getView() {return view;}
+};
+
+
+class SplitDocumentViewTitleBar : public QWidget
+{
+    Q_OBJECT
+
+    SplitDocumentViewHolder* parentDocHolder;
+public:
+    SplitDocumentViewTitleBar(SplitDocumentViewHolder* parent);
+
+public slots:
+   void addDocumentViewPushed();
 };
 
 #endif // VIEWMANAGER_H

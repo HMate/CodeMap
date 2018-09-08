@@ -66,16 +66,16 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
     // set docknesting so I can dragndrop a widget without tabifying it
     setDockNestingEnabled(true);
 
-    docManager = new SplitDocumentView(this);
+    docManager = new SplitDocumentViewHolder(this);
     docManager->setObjectName(QStringLiteral("documentManager"));
-    auto documentsToggleAction = addDockedView(tr("Documents"), docManager, Qt::DockWidgetArea::RightDockWidgetArea);
+    auto documentsToggleAction = addDockedView(docManager, Qt::DockWidgetArea::RightDockWidgetArea);
 
     terminalView = new TerminalView(this);
-    auto terminalToggleAction = addDockedView(tr("Terminal"), terminalView, Qt::DockWidgetArea::RightDockWidgetArea);
+    auto terminalToggleAction = createAddDockedView(tr("Terminal"), terminalView, Qt::DockWidgetArea::RightDockWidgetArea);
 
     docList = new DocumentListView(this);
     docList->setObjectName(QStringLiteral("documentList"));
-    auto documentListToggleAction = addDockedView(tr("Opened Documents"), docList, Qt::DockWidgetArea::LeftDockWidgetArea);
+    auto documentListToggleAction = createAddDockedView(tr("Opened Documents"), docList, Qt::DockWidgetArea::LeftDockWidgetArea);
 
     // Create actions and menu after creating widgets,
     // as actions may use a child widget.
@@ -101,16 +101,21 @@ void MainWindow::loadAppState()
     {
         const auto path = QDir::toNativeSeparators(f);
         docList->registerFile(path);
-        docManager->openFileView(path);
+        getDocumentManager()->openFileView(path);
     }
 }
 
-QAction* MainWindow::addDockedView(const QString& name, QWidget* widget, Qt::DockWidgetArea area)
+QAction* MainWindow::createAddDockedView(const QString& name, QWidget* widget, Qt::DockWidgetArea area)
 {
     auto d = new QDockWidget(name, this);
     d->setWidget(widget);
-    addDockWidget(area, d);
-    return d->toggleViewAction();
+    return addDockedView(d, area);
+}
+
+QAction* MainWindow::addDockedView(QDockWidget* widget, Qt::DockWidgetArea area)
+{
+    addDockWidget(area, widget);
+    return widget->toggleViewAction();
 }
 
 void MainWindow::resizeEvent(QResizeEvent *resizeEvent)
@@ -168,7 +173,7 @@ void MainWindow::openFileWithDialog()
         if(QFile::exists(f))
         {
             const auto path = QDir::toNativeSeparators(f);
-            docManager->openFileView(path);
+            getDocumentManager()->openFileView(path);
             docList->registerFile(path);
             getAppState().setLastOpenedDirectory(FS::getDirectory(path).absolutePath());
             getAppState().saveStateToDisk();

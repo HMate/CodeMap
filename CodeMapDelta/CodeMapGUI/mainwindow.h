@@ -22,7 +22,7 @@ protected:
     Actions action;
 
     std::unique_ptr<AppStateHandler> appState;
-    SplitDocumentView* docManager = nullptr;
+    SplitDocumentViewHolder* docManager = nullptr;
     DocumentListView* docList =  nullptr;
     TerminalView* terminalView = nullptr;
 
@@ -42,11 +42,12 @@ public:
     static const MainWindow* instance();
     ~MainWindow();
 
-    QAction* addDockedView(const QString& name, QWidget* widget, Qt::DockWidgetArea area);
+    QAction* createAddDockedView(const QString& name, QWidget* widget, Qt::DockWidgetArea area);
+    QAction* addDockedView(QDockWidget* widget, Qt::DockWidgetArea area);
 
     AppStateHandler& getAppState() const {return *appState;}
     TerminalView* getTerminalView() const {return terminalView;}
-    SplitDocumentView* getDocumentManager() const {return docManager;}
+    SplitDocumentView* getDocumentManager() const {return docManager->getView();}
     const Actions& getActions() const {return action;}
 signals:
 
