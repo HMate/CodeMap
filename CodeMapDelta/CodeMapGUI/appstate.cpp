@@ -23,7 +23,7 @@ void AppStateHandler::addFileView(const QString& filePath)
 
 void AppStateHandler::addFileView(const QString& filePath, long long tabViewIndex)
 {
-    // TODO save tje tabViewIndex to the state
+    // TODO save the tabViewIndex to the state
     fileViews.append(filePath);
 }
 
