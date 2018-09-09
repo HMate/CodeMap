@@ -2,10 +2,11 @@
 #define FILEVIEW_H
 
 #include <QString>
-#include <QTextEdit>
 #include <QGridLayout>
 #include <QLabel>
 #include <QToolBar>
+
+#include <fileedit.h>
 
 /* TODO
  * - Ask to load file again if it was changed outside of editor
@@ -22,7 +23,7 @@ class FileView : public QWidget
     Q_OBJECT
 
     QGridLayout* layout;
-    QTextEdit* editor;
+    FileEdit* editor;
     QLabel* nameLabel;
 protected:
     QString filePath;

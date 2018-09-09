@@ -20,16 +20,12 @@ FileView::FileView(QWidget *parent) : QWidget(parent)
     QToolBar* toolbar = createToolbar();
     layout->addWidget(toolbar, 0, 0);
 
-    editor = new QTextEdit(this);
-    editor->setVisible(true);
-    editor->setLineWrapMode(QTextEdit::LineWrapMode::NoWrap);
-    editor->setFont(QFont("Consolas"));
+    editor = new FileEdit(this);
     setFocusProxy(editor);
     layout->addWidget(editor, 1, 0);
 
     connect(editor->document(), &QTextDocument::modificationChanged,
             this, &FileView::fileContentModified);
-
 }
 
 QToolBar* FileView::createToolbar()
