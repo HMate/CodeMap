@@ -22,7 +22,9 @@ public:
     AppStateHandler();
 
     void addFileView(const QString& filePath);
+    void addFileView(const QString& filePath, long long tabViewIndex);
     void removeFileView(const QString& filePath);
+    void removeFileView(const QString& filePath, long long tabViewIndex);
     const QStringList& getFileViews();
 
     const QString& getLastOpenedDirectory();

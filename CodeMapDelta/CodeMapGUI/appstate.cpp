@@ -21,7 +21,25 @@ void AppStateHandler::addFileView(const QString& filePath)
     fileViews.append(filePath);
 }
 
+void AppStateHandler::addFileView(const QString& filePath, long long tabViewIndex)
+{
+    // TODO save tje tabViewIndex to the state
+    fileViews.append(filePath);
+}
+
 void AppStateHandler::removeFileView(const QString& filePath)
+{
+    for(int i = 0; i < fileViews.length(); i++)
+    {
+        if(fileViews[i] == filePath)
+        {
+            fileViews.erase(fileViews.begin()+i);
+            break;
+        }
+    }
+}
+
+void AppStateHandler::removeFileView(const QString& filePath, long long tabViewIndex)
 {
     for(int i = 0; i < fileViews.length(); i++)
     {

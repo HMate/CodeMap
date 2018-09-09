@@ -107,9 +107,9 @@ FileView* TabbedDocumentView::addNewFileView(const QString& name)
     return view;
 }
 
-void TabbedDocumentView::closeFileView(const QString& path)
+void TabbedDocumentView::closeFileView(FileView* const view)
 {
-    long long index = getFileViewIndexByName(path);
+    long long index = getFileViewIndexByAddress(view);
     if(index != INVALID_INDEX)
     {
         FileView* toRemove = fileViews[static_cast<size_t>(index)];
@@ -119,17 +119,17 @@ void TabbedDocumentView::closeFileView(const QString& path)
     }
 }
 
-bool TabbedDocumentView::hasFileView(const QString& path)
+bool TabbedDocumentView::hasFileView(FileView* const view)
 {
-    return getFileViewIndexByName(path) != INVALID_INDEX;
+    return getFileViewIndexByAddress(view) != INVALID_INDEX;
 }
 
-long long TabbedDocumentView::getFileViewIndexByName(const QString& path)
+long long TabbedDocumentView::getFileViewIndexByAddress(FileView* const view)
 {
     long long index = 0;
-    for(auto& f : fileViews)
+    for(auto f : fileViews)
     {
-        if(f->getFilePath() == path)
+        if(f == view)
         {
             return index;
         }
@@ -229,25 +229,25 @@ FileView* SplitDocumentView::openStringFileView(const QString& path,
     return v;
 }
 
-void SplitDocumentView::closeFileView(const QString& path)
+void SplitDocumentView::closeFileView(FileView* const view)
 {
-    long long index = getDocumentViewIndexFromFileName(path);
+    long long index = getDocumentViewIndexFromAddress(view);
     if(index != INVALID_INDEX)
     {
-        tabbedViews[static_cast<size_t>(index)]->closeFileView(path);
+        tabbedViews[static_cast<size_t>(index)]->closeFileView(view);
 
         auto& state = MainWindow::instance()->getAppState();
-        state.removeFileView(path);
+        state.removeFileView(view->getFilePath(), index);
         state.saveStateToDisk();
     }
 }
 
-long long SplitDocumentView::getDocumentViewIndexFromFileName(const QString& path)
+long long SplitDocumentView::getDocumentViewIndexFromAddress(FileView* const view)
 {
     long long index = 0;
-    for(auto& view : tabbedViews)
+    for(auto& t : tabbedViews)
     {
-        if(view->hasFileView(path))
+        if(t->hasFileView(view))
         {
             return index;
         }

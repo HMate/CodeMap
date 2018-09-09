@@ -36,7 +36,7 @@ QToolBar* FileView::createToolbar()
     spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolbar->addWidget(spacerWidget);
     toolbar->addAction("X", [this](){
-        MainWindow::instance()->getDocumentManager()->closeFileView(filePath);
+        MainWindow::instance()->getDocumentManager()->closeFileView(this);
     });
 
     toolbar->setFixedHeight(20);

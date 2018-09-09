@@ -46,12 +46,12 @@ public:
 
     FileView* openFileView(const QString& path);
     FileView* openStringFileView(const QString& path, const QString& content);
-    void closeFileView(const QString& path);
-    bool hasFileView(const QString& path);
+    void closeFileView(FileView* const view);
+    bool hasFileView(FileView* const view);
 
 protected:
     FileView* addNewFileView(const QString& name);
-    long long getFileViewIndexByName(const QString& path);
+    long long getFileViewIndexByAddress(FileView* const view);
 
     virtual QSize sizeHint() const;
 };
@@ -73,10 +73,10 @@ public:
 
     void addTabbedDocumentView();
     FileView* openFileView(const QString& path);
-    void closeFileView(const QString& path);
+    void closeFileView(FileView* const view);
     FileView* openStringFileView(const QString& path, const QString& content);
 protected:
-    long long getDocumentViewIndexFromFileName(const QString& path);
+    long long getDocumentViewIndexFromAddress(FileView* const view);
 
     virtual QSize sizeHint() const;
 };
