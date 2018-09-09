@@ -4,7 +4,7 @@
 #include <QContextMenuEvent>
 
 #include "mainwindow.h"
-
+#include "../CodeParser/codeparser.h"
 
 FileEdit::FileEdit(QWidget* parent) : QTextEdit(parent)
 {
@@ -21,6 +21,21 @@ void FileEdit::contextMenuEvent(QContextMenuEvent* event)
 
 void FileEdit::foldDefines()
 {
+    // TODO: put check to centext menu disable action if not availabe
+    // TODO: write help in context menu, show what is missing
+    // in case action is not available
+    if(filePath == "")
+        return;
     MainWindow::instance()->getTerminalView()->showMessage("foldDefines");
-    //CodeParser().getPreprocessedCodeFromPath(codePath);
+    QString processed = CodeParser().getPreprocessedCodeFromPath(filePath);
+    // TODO Handle errors? How exactly?
+
+    QString name = tr("Folded defines for: %1").arg(filePath);
+    MainWindow::instance()->getDocumentManager()->openStringFileView(name, processed);
+
+}
+
+void FileEdit::setFilePath(const QString& path)
+{
+    filePath = path;
 }

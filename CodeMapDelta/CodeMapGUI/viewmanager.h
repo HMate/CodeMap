@@ -45,8 +45,10 @@ public:
     virtual ~TabbedDocumentView(){}
 
     FileView* openFileView(const QString& path);
+    FileView* openStringFileView(const QString& path, const QString& content);
     void closeFileView(const QString& path);
     bool hasFileView(const QString& path);
+
 protected:
     FileView* addNewFileView(const QString& name);
     long long getFileViewIndexByName(const QString& path);
@@ -72,6 +74,7 @@ public:
     void addTabbedDocumentView();
     FileView* openFileView(const QString& path);
     void closeFileView(const QString& path);
+    FileView* openStringFileView(const QString& path, const QString& content);
 protected:
     long long getDocumentViewIndexFromFileName(const QString& path);
 

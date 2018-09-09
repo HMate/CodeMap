@@ -91,6 +91,22 @@ FileView* TabbedDocumentView::openFileView(const QString& path)
     return v;
 }
 
+FileView* TabbedDocumentView::openStringFileView(const QString& path,
+                                                const QString& content)
+{
+    FileView* v = addNewFileView(path);
+    v->setText(content);
+    return v;
+}
+
+FileView* TabbedDocumentView::addNewFileView(const QString& name)
+{
+    auto view = new FileView();
+    fileViews.push_back(view);
+    tabs->addTab(view, name);
+    return view;
+}
+
 void TabbedDocumentView::closeFileView(const QString& path)
 {
     long long index = getFileViewIndexByName(path);
@@ -101,14 +117,6 @@ void TabbedDocumentView::closeFileView(const QString& path)
         tabs->removeTab(static_cast<int>(index));
         fileViews.erase(fileViews.begin()+index);
     }
-}
-
-FileView* TabbedDocumentView::addNewFileView(const QString& name)
-{
-    auto view = new FileView();
-    fileViews.push_back(view);
-    tabs->addTab(view, name);
-    return view;
 }
 
 bool TabbedDocumentView::hasFileView(const QString& path)
@@ -205,6 +213,19 @@ FileView* SplitDocumentView::openFileView(const QString& path)
 
     // TODO: check if file is already open? allow to open it twice?
     // TODO: set app focus to this file view here.
+    return v;
+}
+
+FileView* SplitDocumentView::openStringFileView(const QString& path,
+                                                const QString& content)
+{
+    const MainWindow* mainW = MainWindow::instance();
+    mainW->getTerminalView()->showMessage("Opening: " + path);
+
+    if(tabbedViews.size() < 2)
+        addTabbedDocumentView();
+
+    FileView* v = tabbedViews[1]->openStringFileView(path, content);
     return v;
 }
 

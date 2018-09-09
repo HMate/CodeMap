@@ -25,7 +25,6 @@ class FileView : public QWidget
     QGridLayout* layout;
     FileEdit* editor;
     QLabel* nameLabel;
-protected:
     QString filePath;
 
 public:

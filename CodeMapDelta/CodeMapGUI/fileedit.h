@@ -5,8 +5,10 @@
 
 class FileEdit : public QTextEdit
 {
+    QString filePath;
 public:
     FileEdit(QWidget* parent);
+    void setFilePath(const QString& path);
 
     void contextMenuEvent(QContextMenuEvent *event);
 

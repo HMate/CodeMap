@@ -5,7 +5,6 @@
 #include <QDir>
 #include <QKeyEvent>
 #include <QTextDocumentWriter>
-#include <QGridLayout>
 
 #include "mainwindow.h"
 
@@ -77,6 +76,8 @@ void FileView::closeView()
 
 void FileView::keyPressEvent(QKeyEvent* ke)
 {
+    //Handle Ctrl+S as save file
+    // TODO: make keybinding configurable from settings
     if(ke->key() == Qt::Key_S && ke->modifiers().testFlag(Qt::ControlModifier))
     {
         auto terminal = MainWindow::instance()->getTerminalView();
@@ -125,6 +126,7 @@ void FileView::saveFile()
 void FileView::setFilePath(const QString &path)
 {
     filePath = path;
+    editor->setFilePath(path);
     nameLabel->setText(path);
 }
 
