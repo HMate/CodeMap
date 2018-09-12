@@ -4,7 +4,7 @@
 #include <QContextMenuEvent>
 
 #include "mainwindow.h"
-#include "../CodeParser/codeparser.h"
+#include "codeparser.h"
 
 FileEdit::FileEdit(QWidget* parent) : QTextEdit(parent)
 {

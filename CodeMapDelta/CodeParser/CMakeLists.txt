@@ -20,6 +20,9 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE ${LLVM_INCLUDE_DIR}
     PRIVATE ${CLANG_INCLUDE_DIRS})
 
+# Make headers includeable by users of this library
+target_include_directories(${PROJECT_NAME} INTERFACE ./)
+
 target_link_libraries(${PROJECT_NAME}
     Qt5::Core
 
