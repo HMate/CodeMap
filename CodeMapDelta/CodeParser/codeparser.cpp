@@ -2,6 +2,7 @@
 
 #include "clang/Tooling/Tooling.h"
 #include "clang/Frontend/CompilerInstance.h"
+#include "clang/Frontend/TextDiagnosticBuffer.h"
 
 /*
  * Preprocesses the input files and stores them in a string.
@@ -37,6 +38,11 @@ public:
     clang::FrontendAction *create() override { return new PreprocessorEliminatorFrontendAction(preprocessedOutput); }
 };
 
+class MyDiagnosticConsumer : public clang::DiagnosticConsumer
+{
+
+};
+
 
 QString CodeParser::getPreprocessedCode(const QString& source)
 {
@@ -54,8 +60,28 @@ QString CodeParser::getPreprocessedCodeFromPath(const QString& srcPath)
     std::vector<std::string> src{ srcPath.toStdString() };
     clang::tooling::ClangTool tool(cdb, src);
 
+    // TODO: write MyDiagnosticConsumer to capture errors in format better suited to us
+    clang::TextDiagnosticBuffer diagnostics;
+    tool.setDiagnosticConsumer(&diagnostics);
+
     std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<PreprocessorFrontendActionFactory>(result);
     tool.run(actionFactory.get());
+    for (auto it = diagnostics.err_begin(), ie = diagnostics.err_end(); it != ie; ++it)
+    {
+        auto& loc = it->first;
+    }
+    for (auto it = diagnostics.note_begin(), ie = diagnostics.note_end(); it != ie; ++it)
+    {
+        auto& loc = it->first;
+    }
+    for (auto it = diagnostics.warn_end(), ie = diagnostics.warn_end(); it != ie; ++it)
+    {
+        auto& loc = it->first;
+    }
+    for (auto it = diagnostics.remark_begin(), ie = diagnostics.remark_end(); it != ie; ++it)
+    {
+        auto& loc = it->first;
+    }
     return QString::fromStdString(result);
 }
 

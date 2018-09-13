@@ -8,6 +8,8 @@
 
 #include "mainwindow.h"
 
+#define NEW_FILE "{new file}"
+
 FileView::FileView(QWidget *parent) : QWidget(parent)
 {
     nameLabel = new QLabel(this);
@@ -30,7 +32,7 @@ FileView::FileView(QWidget *parent) : QWidget(parent)
 QToolBar* FileView::createToolbar()
 {
     QToolBar* toolbar = new QToolBar("FileView", this);
-    nameLabel->setText("{new file}");
+    nameLabel->setText(NEW_FILE);
     toolbar->addWidget(nameLabel);
     QWidget *spacerWidget = new QWidget(this);
     spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -49,7 +51,7 @@ void FileView::openFile(const QString& path)
     // If path is empty, we want to open a new file
     if(path.isEmpty())
     {
-        nameLabel->setText("{new file}");
+        nameLabel->setText(NEW_FILE);
         return;
     }
 
