@@ -10,6 +10,8 @@ message("Cmake system prefix: " ${CMAKE_SYSTEM_PREFIX_PATH} )
 set(QT_LIB_ROOT_PATH "C:/Qt/5.10.1/msvc2017_64" CACHE PATH "Path to qt5 libs and cmake root")
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${QT_LIB_ROOT_PATH})
 
+# windeployqt.exe is for copying dlls to build directory
+set(QT_WINDEPLOY ${QT_LIB_ROOT_PATH}\\bin\\windeployqt.exe)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)

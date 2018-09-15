@@ -25,5 +25,8 @@ target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
 
 target_link_libraries(${PROJECT_NAME} CodeParser)
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD        # Adds a post-build event to MyTest
-    COMMAND "C:\\Qt\\5.10.1\\msvc2017_64\\bin\\windeployqt.exe" $<TARGET_FILE_DIR:${PROJECT_NAME}>) 
+if ( WIN32 )
+	# Copy dlls to exe
+	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+		COMMAND ${QT_WINDEPLOY} $<TARGET_FILE_DIR:${PROJECT_NAME}>) 
+endif()
