@@ -4,6 +4,9 @@
 #include <vector>
 #include <QString>
 
+namespace cm
+{
+
 class CodeParser
 {
 public:
@@ -18,4 +21,5 @@ public:
     QString getPreprocessedCodeFromPath(const QString& srcPath, const std::vector<QString>& includeDirs);
 };
 
+}
 #endif // PARSER_H

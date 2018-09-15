@@ -27,7 +27,7 @@ void FileEdit::foldDefines()
     if(filePath == "")
         return;
     MainWindow::instance()->getTerminalView()->showMessage("foldDefines");
-    QString processed = CodeParser().getPreprocessedCodeFromPath(filePath);
+    QString processed = cm::CodeParser().getPreprocessedCodeFromPath(filePath);
     // TODO Handle errors? How exactly?
 
     QString name = tr("Folded defines for: %1").arg(filePath);

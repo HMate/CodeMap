@@ -15,8 +15,8 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 if ( MSVC )
-    # turn on all warnings, and fail on them
-    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W3 /WX")
+    # turn on all warnings
+    set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W3")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /wd4100 /wd4141 /wd4146 /wd4267 /wd4291")
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -D_SCL_SECURE_NO_WARNINGS")
 endif()
