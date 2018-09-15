@@ -7,6 +7,16 @@
 namespace cm
 {
 
+struct ParserResult
+{
+    typedef std::vector<QString> ErrorList;
+
+    QString content;
+    ErrorList errors;
+
+    bool hasErrors();
+};
+
 class CodeParser
 {
 public:
@@ -14,7 +24,7 @@ public:
     QString getPreprocessedCode(const QString& source);
 
     /* Returns the preprocessed content of the file */
-    QString getPreprocessedCodeFromPath(const QString& srcPath);
+    ParserResult getPreprocessedCodeFromPath(const QString& srcPath);
 
     /* Returns the preprocessed content of the file.
      * includeDirs is a list of directory paths. They are searched for resolving includes.*/

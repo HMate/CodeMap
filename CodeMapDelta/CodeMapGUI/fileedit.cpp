@@ -26,12 +26,21 @@ void FileEdit::foldDefines()
     // in case action is not available
     if(filePath == "")
         return;
-    MainWindow::instance()->getTerminalView()->showMessage("foldDefines");
-    QString processed = cm::CodeParser().getPreprocessedCodeFromPath(filePath);
+    const auto& terminal = MainWindow::instance()->getTerminalView();
+    terminal->showMessage(tr("Folding defines for %1").arg(filePath));
+    auto processed = cm::CodeParser().getPreprocessedCodeFromPath(filePath);
     // TODO Handle errors? How exactly?
 
     QString name = tr("Folded defines for: %1").arg(filePath);
-    MainWindow::instance()->getDocumentManager()->openStringFileView(name, processed);
+    if(processed.hasErrors())
+    {
+        terminal->showMessage(tr("Had %1 errors:").arg(processed.errors.size()));
+        for(auto& e : processed.errors)
+        {
+            terminal->showMessage(e);
+        }
+    }
+    MainWindow::instance()->getDocumentManager()->openStringFileView(name, processed.content);
 
 }
 

@@ -8,15 +8,15 @@ namespace cm{
 class ParserErrorCollector : public clang::DiagnosticConsumer
 {    
 public:
-    typedef std::vector<std::pair<clang::SourceLocation, std::string> > DiagList;
+    typedef std::vector<std::string> ErrorList;
 
     /// HandleDiagnostic - Store the errors, warnings, and notes that are
     /// reported.
     void HandleDiagnostic(clang::DiagnosticsEngine::Level Level, const clang::Diagnostic &Info);
-    DiagList GetErrorsList();
+    ErrorList GetErrorsList();
 
 protected:
-    DiagList Errors;
+    ErrorList Errors;
 };
 
 }

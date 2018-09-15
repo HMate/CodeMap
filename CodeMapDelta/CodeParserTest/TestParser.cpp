@@ -27,8 +27,8 @@ private slots:
         QString codePath = getTestPatternPath("testPreprocessorWithFile", "test.cpp");
         QString expected = readFileContent(getTestPatternPath("testPreprocessorWithFile", "result.cpp"));
 
-        QString result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
-        QCOMPARE(result, expected);
+        auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
+        QCOMPARE(result.content, expected);
     }
 
     /* Test if preprocessor include substitution is working,
@@ -38,8 +38,8 @@ private slots:
         QString codePath = getTestPatternPath("testPreprocessorInclude", "test.cpp");
         QString expected = readFileContent(getTestPatternPath("testPreprocessorInclude", "result.cpp"));
 
-        QString result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
-        QCOMPARE(result, expected);
+        auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
+        QCOMPARE(result.content, expected);
     }
 
     /* Test if preprocessor include substitution is working,
@@ -59,11 +59,11 @@ private slots:
         QString codePath = getTestPatternPath("testPreprocessorIncludeStdio", "test.cpp");
         QString expected = readFileContent(getTestPatternPath("testPreprocessorIncludeStdio", "result.cpp"));
 
-        QString result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
+        auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
         // Its complicated to actually compare the whole file content, because every define is expanded in stdio.h
         // just see if the method result contains the needed code + some stdio functions
-        QVERIFY(result.contains(expected));
-        QVERIFY(result.contains("__cdecl fopen")); // see if result contains something from <stdio.h>
+        QVERIFY(result.content.contains(expected));
+        QVERIFY(result.content.contains("__cdecl fopen")); // see if result contains something from <stdio.h>
     }
 
     // Test if the file is not a source code
@@ -72,8 +72,8 @@ private slots:
         QString codePath = getTestPatternPath("testPreprocessorNonSourceCode", "test.cpp");
         QString expected = readFileContent(getTestPatternPath("testPreprocessorNonSourceCode", "test.cpp"));
 
-        QString result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
-        QVERIFY(result.contains(expected));
+        auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
+        QVERIFY(result.content.contains(expected));
     }
 
     // Helper methods

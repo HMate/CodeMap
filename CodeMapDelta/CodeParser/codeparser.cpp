@@ -8,6 +8,11 @@
 namespace cm
 {
 
+bool ParserResult::hasErrors()
+{
+    return !errors.empty();
+}
+
 /*
  * Preprocesses the input files and stores them in a string.
  * */
@@ -51,9 +56,8 @@ QString CodeParser::getPreprocessedCode(const QString& source)
     return QString::fromStdString(result);
 }
 
-QString CodeParser::getPreprocessedCodeFromPath(const QString& srcPath)
+ParserResult CodeParser::getPreprocessedCodeFromPath(const QString& srcPath)
 {
-    std::string result;
 
     clang::tooling::FixedCompilationDatabase cdb("/", std::vector<std::string>());
     std::vector<std::string> src{ srcPath.toStdString() };
@@ -62,17 +66,19 @@ QString CodeParser::getPreprocessedCodeFromPath(const QString& srcPath)
     // TODO: write MyDiagnosticConsumer to capture errors in format better suited to us
     ParserErrorCollector errorCollector;
     tool.setDiagnosticConsumer(&errorCollector);
-
-    std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<PreprocessorFrontendActionFactory>(result);
+    
+    std::string processedFile;
+    std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<PreprocessorFrontendActionFactory>(processedFile);
     tool.run(actionFactory.get());
 
+    ParserResult result;
+    result.content = QString::fromStdString(processedFile);
     auto errors = errorCollector.GetErrorsList();
-    for (auto& it : errors)
+    for (const auto& it : errors)
     {
-        auto& loc = it.first;
-        auto& msg = it.second;
+        result.errors.emplace_back(QString::fromStdString(it));
     }
-    return QString::fromStdString(result);
+    return result;
 }
 
 QString CodeParser::getPreprocessedCodeFromPath(const QString& srcPath, const std::vector<QString>& includeDirs)
