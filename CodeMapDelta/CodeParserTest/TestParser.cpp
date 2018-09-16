@@ -49,8 +49,8 @@ private slots:
         QString codePath = getTestPatternPath("testPreprocessorIncludeOuterDir", "test.cpp");
         QString expected = readFileContent(getTestPatternPath("testPreprocessorIncludeOuterDir", "result.cpp"));
 
-        QString result = cm::CodeParser().getPreprocessedCodeFromPath(codePath, {getTestPatternPath("testPreprocessorIncludeOuterDir", "externalDependencies")});
-        QCOMPARE(result, expected);
+        auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath, {getTestPatternPath("testPreprocessorIncludeOuterDir", "externalDependencies")});
+        QCOMPARE(result.content, expected);
     }
 
     // Test if we can include stdlib code

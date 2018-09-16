@@ -56,37 +56,9 @@ QString CodeParser::getPreprocessedCode(const QString& source)
     return QString::fromStdString(result);
 }
 
-ParserResult CodeParser::getPreprocessedCodeFromPath(const QString& srcPath)
+ParserResult CodeParser::getPreprocessedCodeFromPath(const QString& srcPath, const std::vector<QString>& includeDirs)
 {
-
-    clang::tooling::FixedCompilationDatabase cdb("/", std::vector<std::string>());
-    std::vector<std::string> src{ srcPath.toStdString() };
-    clang::tooling::ClangTool tool(cdb, src);
-
-    // TODO: write MyDiagnosticConsumer to capture errors in format better suited to us
-    ParserErrorCollector errorCollector;
-    tool.setDiagnosticConsumer(&errorCollector);
-    
-    std::string processedFile;
-    std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<PreprocessorFrontendActionFactory>(processedFile);
-    tool.run(actionFactory.get());
-
-    ParserResult result;
-    result.content = QString::fromStdString(processedFile);
-    auto errors = errorCollector.GetErrorsList();
-    for (const auto& it : errors)
-    {
-        result.errors.emplace_back(QString::fromStdString(it));
-    }
-    return result;
-}
-
-QString CodeParser::getPreprocessedCodeFromPath(const QString& srcPath, const std::vector<QString>& includeDirs)
-{
-    std::string result;
-    std::vector<std::string> includes;
-    includes.reserve(includeDirs.size());
-
+    std::vector<std::string> includes(includeDirs.size());
     for(auto& dir : includeDirs)
     {
         includes.emplace_back(QString("-I%1").arg(dir).toStdString());
@@ -96,9 +68,21 @@ QString CodeParser::getPreprocessedCodeFromPath(const QString& srcPath, const st
     std::vector<std::string> src{ srcPath.toStdString() };
     clang::tooling::ClangTool tool(cdb, src);
 
-    std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<PreprocessorFrontendActionFactory>(result);
+    ParserErrorCollector errorCollector;
+    tool.setDiagnosticConsumer(&errorCollector);
+    
+    std::string processedFile;
+    std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<PreprocessorFrontendActionFactory>(processedFile);
     tool.run(actionFactory.get());
-    return QString::fromStdString(result);
+    
+    ParserResult result;
+    result.content = QString::fromStdString(processedFile);
+    auto errors = errorCollector.GetErrorsList();
+    for (const auto& it : errors)
+    {
+        result.errors.emplace_back(QString::fromStdString(it));
+    }
+    return result;
 }
 
 }
