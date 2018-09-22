@@ -4,8 +4,6 @@
 #include <QContextMenuEvent>
 
 #include "mainwindow.h"
-
-#include "cmakeparser.h"
 #include "codeparser.h"
 
 FileEdit::FileEdit(QWidget* parent) : QTextEdit(parent)
@@ -31,7 +29,6 @@ void FileEdit::foldDefines()
     const auto& terminal = MainWindow::instance()->getTerminalView();
     terminal->showMessage(tr("Folding defines for %1").arg(filePath));
     
-	auto includes = cm::CMakeParser().parseCmakeIncludes();
 	auto processed = cm::CodeParser().getPreprocessedCodeFromPath(filePath);
     
     QString name = tr("Folded defines for: %1").arg(filePath);

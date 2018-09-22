@@ -26,7 +26,6 @@ target_link_libraries(${PROJECT_NAME} Qt5::Core)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
 
 target_link_libraries(${PROJECT_NAME} CodeParser)
-target_link_libraries(${PROJECT_NAME} CMakeParser)
 
 if ( WIN32 )
 	# Copy dlls to exe
