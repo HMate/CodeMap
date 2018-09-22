@@ -4,6 +4,8 @@
 #include <QContextMenuEvent>
 
 #include "mainwindow.h"
+
+#include "cmakeparser.h"
 #include "codeparser.h"
 
 FileEdit::FileEdit(QWidget* parent) : QTextEdit(parent)
@@ -28,9 +30,10 @@ void FileEdit::foldDefines()
         return;
     const auto& terminal = MainWindow::instance()->getTerminalView();
     terminal->showMessage(tr("Folding defines for %1").arg(filePath));
-    auto processed = cm::CodeParser().getPreprocessedCodeFromPath(filePath);
-    // TODO Handle errors? How exactly?
-
+    
+	auto includes = cm::CMakeParser().parseCmakeIncludes();
+	auto processed = cm::CodeParser().getPreprocessedCodeFromPath(filePath);
+    
     QString name = tr("Folded defines for: %1").arg(filePath);
     if(processed.hasErrors())
     {
