@@ -29,10 +29,13 @@ void SettingsView::accept()
 {
 	// TODO: Settings view should apply settings instantly, not only when accepting
 	// and reset it back to previous settings on cancel.
+	auto& appState = MainWindow::instance()->getAppState();
+
 	// TODO: Editor / filepicker for paths, validate paths
 	auto includes = m_includeEdit->text();
 	auto& list = includes.split(';', QString::SplitBehavior::SkipEmptyParts);
-	MainWindow::instance()->getAppState().settings().globalIncludes = list;
+	appState.settings().globalIncludes = list;
+	appState.saveStateToDisk();
 
 	QDialog::accept();
 }

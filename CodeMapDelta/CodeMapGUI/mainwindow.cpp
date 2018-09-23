@@ -107,7 +107,7 @@ void MainWindow::loadAppState()
 {
     // TODO: look into QMainWindow::saveState for saving dockwidget state
 	// TODO: look into QSettings for storing, loading window position and size.
-    auto state = getAppState();
+    auto& state = getAppState();
 
     state.loadStateFromDisk();
 
