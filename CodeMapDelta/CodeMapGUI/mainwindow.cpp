@@ -6,6 +6,7 @@
 #include <QResizeEvent>
 
 #include "filesystem.h"
+#include "settingsview.h"
 
 /* DONE
 	- Need to save/load appstate:
@@ -105,6 +106,7 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
 void MainWindow::loadAppState()
 {
     // TODO: look into QMainWindow::saveState for saving dockwidget state
+	// TODO: look into QSettings for storing, loading window position and size.
     auto state = getAppState();
 
     state.loadStateFromDisk();
@@ -145,6 +147,10 @@ void MainWindow::createActions()
     connect(action.openFile, &QAction::triggered,
             this, &MainWindow::openFileWithDialog);
 
+	action.openSettingsView = new QAction(tr("Settings"), this);
+	connect(action.openSettingsView, &QAction::triggered,
+		this, &MainWindow::openSettingsView);
+
     action.quit = new QAction(tr("Quit"), this);
     connect(action.quit, &QAction::triggered,
             this, &MainWindow::quitApp);
@@ -154,6 +160,8 @@ void MainWindow::createFileMenu()
 {
     QMenu* fileMenu = menuBar()->addMenu(tr("File"));
     fileMenu->addAction(action.openFile);
+	fileMenu->addSeparator();
+	fileMenu->addAction(action.openSettingsView);
     fileMenu->addAction(action.quit);
 }
 
@@ -192,6 +200,12 @@ void MainWindow::openFileWithDialog()
             getAppState().saveStateToDisk();
         }
     }
+}
+
+void MainWindow::openSettingsView()
+{
+	auto settings = new SettingsView(this);
+	settings->exec();
 }
 
 void MainWindow::quitApp()

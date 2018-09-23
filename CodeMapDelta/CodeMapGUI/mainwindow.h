@@ -15,6 +15,7 @@ class MainWindow : public QMainWindow
 protected:
     struct Actions {
         QAction* openFile;
+		QAction* openSettingsView;
         QAction* quit;
 
         QAction* toggleTerminalHistory;
@@ -54,6 +55,7 @@ signals:
 public slots:
     void toggleViewTerminalHistory(bool onoff);
     void openFileWithDialog();
+	void openSettingsView();
     void quitApp();
 
 };

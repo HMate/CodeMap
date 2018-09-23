@@ -11,6 +11,7 @@ find_package(Qt5Widgets)
 add_executable(${PROJECT_NAME}
     main.cpp
     mainwindow.cpp
+    settingsview.cpp
     terminalgui.cpp
     viewmanager.cpp
     fileview.cpp
