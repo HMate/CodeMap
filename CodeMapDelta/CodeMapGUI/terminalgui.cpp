@@ -69,6 +69,7 @@ void TerminalView::handleTerminalCommand()
 void TerminalView::showMessage(const QString& command)
 {
     tHistory->addItem(command);
+	tHistory->scrollToBottom();
 }
 
 void TerminalView::focusInEvent(QFocusEvent *event)
@@ -78,8 +79,9 @@ void TerminalView::focusInEvent(QFocusEvent *event)
 
 TerminalHistory::TerminalHistory(QWidget* parent) : QListWidget(parent)
 {
-    setLayoutMode(LayoutMode::Batched);
-    setBatchSize(20);
+	// makes scrolToBottom buggy :(
+    /*setLayoutMode(LayoutMode::Batched);
+    setBatchSize(20);*/
 }
 
 TerminalInput::TerminalInput(QWidget* parent) : QLineEdit(parent)

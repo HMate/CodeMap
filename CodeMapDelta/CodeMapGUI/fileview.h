@@ -36,9 +36,14 @@ public:
 
     void saveFile();
     void openFile(const QString &path);
+
+	bool eventFilter(QObject *object, QEvent *event);
 protected:
     QToolBar* createToolbar();
     void keyPressEvent(QKeyEvent* ke);
+
+signals:
+	void gotFocus();
 
 public slots:
     void fileContentModified(bool changed);

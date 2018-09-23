@@ -7,6 +7,14 @@
 
 #include "settings.h"
 
+struct FileViewStateItem
+{
+	QString path;
+	long long tabIndex;
+
+	FileViewStateItem(const QString& path, long long tabIndex) : path(path), tabIndex(tabIndex) {}
+};
+
 /* Others can access the state of the application through this class.
  * State consists of things like
  * - last opened file, project
@@ -19,17 +27,15 @@ class AppStateHandler
 {
     QString dataDirPath;
     QString lastOpenedDirPath;
-    QStringList fileViews;
+    std::vector<FileViewStateItem> m_fileViews;
 
 	Settings appSettings;
 public:
     AppStateHandler();
 
-    void addFileView(const QString& filePath);
-    void addFileView(const QString& filePath, long long tabViewIndex);
-    void removeFileView(const QString& filePath);
-    void removeFileView(const QString& filePath, long long tabViewIndex);
-    const QStringList& getFileViews();
+    void addFileView(const QString& filePath, long long tabIndex);
+    void removeFileView(const QString& filePath, long long tabIndex);
+    const std::vector<FileViewStateItem>& getFileViews();
 
 	Settings& settings();
 

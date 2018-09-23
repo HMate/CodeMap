@@ -16,44 +16,28 @@ AppStateHandler::AppStateHandler()
     dataDirPath = FS::concat(FS::getCWD(), "data");
 }
 
-void AppStateHandler::addFileView(const QString& filePath)
+void AppStateHandler::addFileView(const QString& filePath, long long tabIndex)
 {
-    fileViews.append(filePath);
+	m_fileViews.emplace_back(filePath, tabIndex);
 }
 
-void AppStateHandler::addFileView(const QString& filePath, long long tabViewIndex)
+void AppStateHandler::removeFileView(const QString& filePath, long long tabIndex)
 {
-    // TODO save the tabViewIndex to the state
-    fileViews.append(filePath);
-}
-
-void AppStateHandler::removeFileView(const QString& filePath)
-{
-    for(int i = 0; i < fileViews.length(); i++)
+    for(int i = 0; i < m_fileViews.size(); i++)
     {
-        if(fileViews[i] == filePath)
+		auto& item = m_fileViews[i];
+        if(item.path == filePath &&
+			item.tabIndex == tabIndex)
         {
-            fileViews.erase(fileViews.begin()+i);
+			m_fileViews.erase(m_fileViews.begin()+i);
             break;
         }
     }
 }
 
-void AppStateHandler::removeFileView(const QString& filePath, long long tabViewIndex)
+const std::vector<FileViewStateItem>& AppStateHandler::getFileViews()
 {
-    for(int i = 0; i < fileViews.length(); i++)
-    {
-        if(fileViews[i] == filePath)
-        {
-            fileViews.erase(fileViews.begin()+i);
-            break;
-        }
-    }
-}
-
-const QStringList& AppStateHandler::getFileViews()
-{
-    return fileViews;
+    return m_fileViews;
 }
 
 Settings& AppStateHandler::settings()
@@ -71,12 +55,23 @@ void AppStateHandler::setLastOpenedDirectory(const QString& path)
     lastOpenedDirPath = path;
 }
 
-QJsonArray json(QStringList list)
+QJsonArray json(const QStringList& list)
 {
 	QJsonArray result;
 	for (auto& s : list)
 	{
 		result.push_back(s);
+	}
+	return result;
+}
+
+QJsonArray json(const std::vector<FileViewStateItem>& list)
+{
+	QJsonArray result;
+	for (auto& s : list)
+	{
+		QJsonObject o{ {"path", s.path}, {"index", s.tabIndex} };
+		result.push_back(o);
 	}
 	return result;
 }
@@ -93,7 +88,7 @@ void AppStateHandler::saveStateToDisk()
     QString stateFilePath = FS::concat(dataDirPath, STATE_FILE_NAME);
 
     QJsonObject stateJson{{"version", 2}};
-    QJsonArray fileViewsJson = json(fileViews);
+    QJsonArray fileViewsJson = json(m_fileViews);
     stateJson.insert("fileViews", fileViewsJson);
 	QJsonObject settingsJson = json(appSettings);
 	stateJson.insert("settings", settingsJson);
@@ -101,6 +96,33 @@ void AppStateHandler::saveStateToDisk()
     const QString serialized = QJsonDocument(stateJson).toJson();
     bool succeed = FS::saveFile(stateFilePath, serialized);
     qDebug() << "Writing state result: " << succeed << "\n" << serialized;
+}
+
+std::vector<FileViewStateItem> loadFileViewJson(const QJsonValue& fileViewsValueRef)
+{
+	std::vector<FileViewStateItem> result;
+	if (fileViewsValueRef.isArray())
+	{
+		QJsonArray fileViewsJson = fileViewsValueRef.toArray();
+		for (const auto f : fileViewsJson)
+		{
+			if (f.isObject())
+			{
+				auto& itemJson = f.toObject();
+				QJsonValue pathVal = itemJson["path"];
+				if (pathVal.isString())
+				{
+					long long index = 0;
+					QJsonValue indexVal = itemJson["index"];
+					if (indexVal.isDouble())
+						index = indexVal.toInt();
+
+					result.emplace_back(pathVal.toString(), index);
+				}
+			}
+		}
+	}
+	return result;
 }
 
 void AppStateHandler::loadStateFromDisk()
@@ -120,17 +142,7 @@ void AppStateHandler::loadStateFromDisk()
             int version = versionJson.toInt();
             if(version != 2)
                 qDebug() << "State version is unknown: "<< state << "!";
-            const QJsonValue& fileViewsValueRef = stateJson["fileViews"];
-            if(fileViewsValueRef.isArray())
-            {
-                QJsonArray fileViewsJson = fileViewsValueRef.toArray();
-				fileViews.clear();
-                for(const auto f : fileViewsJson)
-                {
-                    if(f.isString())
-                        fileViews.append(f.toString());
-                }
-            }
+			m_fileViews = loadFileViewJson(stateJson["fileViews"]);
 
 			const QJsonValue& settingsValueRef = stateJson["settings"];
 			if (settingsValueRef.isObject())

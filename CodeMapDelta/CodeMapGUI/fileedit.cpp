@@ -26,10 +26,18 @@ void FileEdit::foldDefines()
     // in case action is not available
     if(filePath == "")
         return;
-    const auto& terminal = MainWindow::instance()->getTerminalView();
+	auto mw = MainWindow::instance();
+    const auto& terminal = mw->getTerminalView();
     terminal->showMessage(tr("Folding defines for %1").arg(filePath));
-    
-	auto processed = cm::CodeParser().getPreprocessedCodeFromPath(filePath);
+
+	auto& appState = mw->getAppState();
+
+	std::vector<QString> includes;
+	for (auto& i : appState.settings().globalIncludes)
+	{
+		includes.emplace_back(i);
+	}
+	auto processed = cm::CodeParser().getPreprocessedCodeFromPath(filePath, includes);
     
     QString name = tr("Folded defines for: %1").arg(filePath);
     if(processed.hasErrors())

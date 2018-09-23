@@ -23,6 +23,7 @@ FileView::FileView(QWidget *parent) : QWidget(parent)
 
     editor = new FileEdit(this);
     setFocusProxy(editor);
+	editor->installEventFilter(this);
     layout->addWidget(editor, 1, 0);
 
     connect(editor->document(), &QTextDocument::modificationChanged,
@@ -44,6 +45,18 @@ QToolBar* FileView::createToolbar()
     toolbar->setFixedHeight(20);
 
     return toolbar;
+}
+
+bool FileView::eventFilter(QObject *object, QEvent *event)
+{
+	auto type = event->type();
+	if(type == QEvent::FocusIn ||
+		type == QEvent::MouseButtonPress)
+	{
+		// TODO log MainWindow::instance()->getTerminalView()->showMessage(tr("last filview is %1").arg((long long)this));
+		gotFocus();
+	}
+	return false;
 }
 
 void FileView::openFile(const QString& path)
