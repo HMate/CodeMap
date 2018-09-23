@@ -7,37 +7,49 @@
 
 #include "filesystem.h"
 
+/* DONE
+	- Need to save/load appstate:
+		- Save opened files
+	- Views:
+		- Opened fies view
+	- Fold out defines
+*/
+
 /* TODO
- * - Need to save/load appstate:
- *      - opened project
- *      - toggled views
- *      - app user options
- * - Views:
- *      - project / opened files view
- * - Project recognizer:
- *      - First allow users to add files by hand to a project (call it workspace?)
- *      - Walk includes and try to find them?
- *      - Parse cmake/sln descriptor and build project from that
- * - Fold out defines, includes, preprocessor directives
- *      - create collapsible regions for #includes
- * - Control flow diagram
- * - Dependency graph, parameter/variable dependencies
- *      - function interpreter: put function to separate file, collect its dependencies, and call it in separate program.
- *      - this may need to mock input/ouput operations: maybe separate window for them to define them, trap them?
- *      - Custom includes window for these?
- *      - Ability to trace a variable's path through the code.
- *        ie. x was set: x = 7; and sued in function: foo(x)
- *        then it can show in foo(int p): p will be 7 on that invocation.
- *      - Also need mechanism to switch between invocations for a function.
- *        Means right click on function call-> use this invocation.
- *        Or choose from a visual function invocation graph?
- *      - This is interpreter like: define variable values in editor for tracing with this functionality?
- *        And show other variables values in live.
- *        Also show code paths in the source. Grey out code that wont be run with given variable values
- *        (unused branches of an if).
- * - Draw own module graph, compare to generated
- * - Fold out templates
- * - Debugger(lldb?)
+	- Need to save/load appstate:
+		- opened project
+		- toggled views
+		- app user options
+	- Views:
+		- project view
+	- Project recognizer:
+		- First allow users to add files by hand to a project (call it workspace?)
+		- Walk includes and try to find them?
+  			- For now just give includes in settings.
+  			- Generate and parse compile_commands.json somehow.
+		- Parse cmake/sln descriptor and build project from that
+  			- (Failed) Cmake cannot be used as a library, too much hassle.
+	- Fold out defines, includes, preprocessor directives
+		- create collapsible regions for #includes
+	- Syntax highlight
+	- Control flow diagram
+	- Dependency graph, parameter/variable dependencies
+		- function interpreter: put function to separate file, collect its dependencies, and call it in separate program.
+		- this may need to mock input/ouput operations: maybe separate window for them to define them, trap them?
+		- Custom includes window for these?
+		- Ability to trace a variable's path through the code.
+			ie. x was set: x = 7; and used in function: foo(x)
+			then it can show in foo(int p): p will be 7 on that invocation.
+		- Also need mechanism to switch between invocations for a function.
+			Means right click on function call-> use this invocation.
+			Or choose from a visual function invocation graph?
+		- This is interpreter like: define variable values in editor for tracing with this functionality?
+			And show other variables values in live.
+			Also show code paths in the source. Grey out code that wont be run with given variable values
+			(unused branches of an if).
+	- Draw own module graph, compare to generated
+	- Fold out templates
+	- Debugger(lldb?)
  */
 
 MainWindow* MainWindow::instanceP = nullptr;
