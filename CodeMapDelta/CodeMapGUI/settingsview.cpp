@@ -1,7 +1,6 @@
 #include "settingsview.h"
 
 #include <QLabel>
-#include <QLineEdit>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 
@@ -28,8 +27,11 @@ SettingsView::SettingsView(QWidget* parent) : QDialog(parent)
 
 void SettingsView::accept()
 {
+	// TODO: Settings view should apply settings instantly, not only when accepting
+	// and reset it back to previous settings on cancel.
+	// TODO: Editor / filepicker for paths, validate paths
 	auto includes = m_includeEdit->text();
-	auto list = includes.split(';', QString::SplitBehavior::SkipEmptyParts);
+	auto& list = includes.split(';', QString::SplitBehavior::SkipEmptyParts);
 	MainWindow::instance()->getAppState().settings().globalIncludes = list;
 
 	QDialog::accept();
