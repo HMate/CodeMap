@@ -56,6 +56,11 @@ const QStringList& AppStateHandler::getFileViews()
     return fileViews;
 }
 
+Settings& AppStateHandler::settings()
+{
+	return appSettings;
+}
+
 const QString& AppStateHandler::getLastOpenedDirectory()
 {
     return lastOpenedDirPath;

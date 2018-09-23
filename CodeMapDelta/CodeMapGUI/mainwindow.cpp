@@ -206,6 +206,7 @@ void MainWindow::openSettingsView()
 {
 	auto settings = new SettingsView(this);
 	settings->exec();
+	delete settings;
 }
 
 void MainWindow::quitApp()

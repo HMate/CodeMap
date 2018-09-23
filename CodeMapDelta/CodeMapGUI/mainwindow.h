@@ -50,7 +50,6 @@ public:
     TerminalView* getTerminalView() const {return terminalView;}
     SplitDocumentView* getDocumentManager() const {return docManager->getView();}
     const Actions& getActions() const {return action;}
-signals:
 
 public slots:
     void toggleViewTerminalHistory(bool onoff);

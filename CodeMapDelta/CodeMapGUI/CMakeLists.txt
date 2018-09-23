@@ -12,6 +12,7 @@ add_executable(${PROJECT_NAME}
     main.cpp
     mainwindow.cpp
     settingsview.cpp
+    settings.cpp
     terminalgui.cpp
     viewmanager.cpp
     fileview.cpp
