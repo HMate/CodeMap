@@ -11,6 +11,9 @@ StringListEditorDialog::StringListEditorDialog(QWidget* parent, const QStringLis
 {
 	// TODO: Should we restrict how many characters/rows can be in the editor?
 
+	setMinimumWidth(300);
+	setMinimumHeight(500);
+
 	m_listView = new QListWidget(this);
 
 	m_listView->addItems(initialList);
@@ -31,10 +34,15 @@ StringListEditorDialog::StringListEditorDialog(QWidget* parent, const QStringLis
 	connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
 	auto layout = new QGridLayout(this);
+	layout->setRowStretch(0, 1);
+	layout->setRowStretch(1, 1);
+	layout->setRowStretch(2, 99);
+	layout->setRowStretch(3, 0);
+
 	layout->addWidget(m_listView, 0, 0, 3, 1);
-	layout->addWidget(addButton, 0, 1, 1, 1);
-	layout->addWidget(editButton, 1, 1, 1, 1);
-	layout->addWidget(deleteButton, 2, 1, 1, 1);
+	layout->addWidget(addButton, 0, 1, 1, 1, Qt::AlignBottom);
+	layout->addWidget(editButton, 1, 1, 1, 1, Qt::AlignCenter);
+	layout->addWidget(deleteButton, 2, 1, 1, 1, Qt::AlignTop);
 	layout->addWidget(buttonBox, 3, 0, 1, 2);
 }
 
