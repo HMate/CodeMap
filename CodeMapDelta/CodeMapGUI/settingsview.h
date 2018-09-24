@@ -12,10 +12,10 @@ private:
 
 public:
 	SettingsView(QWidget* parent);
-	~SettingsView();
 
 public slots:
 	void accept() override;
+	void includePathEditPushed();
 
 };
 

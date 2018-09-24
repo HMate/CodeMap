@@ -18,7 +18,8 @@ add_executable(${PROJECT_NAME}
     fileview.cpp
     fileedit.cpp
     filesystem.cpp
-    appstate.cpp)
+    appstate.cpp
+	stringlisteditordialog.cpp)
 
 target_include_directories(${PROJECT_NAME} 
 	PRIVATE CMakeParser

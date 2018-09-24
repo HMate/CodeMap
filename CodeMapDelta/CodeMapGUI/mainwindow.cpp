@@ -188,7 +188,7 @@ void MainWindow::openFileWithDialog()
     const QString& lastDir = state.getLastOpenedDirectory();
     if(QDir(lastDir).exists())
         dialog.setDirectory(lastDir);
-    if(dialog.exec())
+    if(dialog.exec() == QDialog::Accepted)
     {
         const QStringList& files = dialog.selectedFiles();
         const QString& f = files[0];
