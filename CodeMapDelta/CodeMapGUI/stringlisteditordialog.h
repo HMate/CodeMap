@@ -9,7 +9,6 @@ class StringListEditorDialog : public QDialog
 {
 	Q_OBJECT 
 
-	QStringList m_list;
 	QListWidget* m_listView = nullptr;
 
 public:
@@ -21,6 +20,9 @@ public slots:
 	void addPath();
 	void editPath();
 	void deletePath();
+
+	void itemClicked(QListWidgetItem *item);
+	void itemDoubleClicked(QListWidgetItem *item);
 };
 
 #endif // STRINGLISTEDITORDIALOG_H

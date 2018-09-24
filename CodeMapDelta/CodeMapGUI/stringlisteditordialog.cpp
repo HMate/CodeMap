@@ -14,6 +14,9 @@ StringListEditorDialog::StringListEditorDialog(QWidget* parent, const QStringLis
 	m_listView = new QListWidget(this);
 
 	m_listView->addItems(initialList);
+	
+	connect(m_listView, &QListWidget::itemClicked, this, &StringListEditorDialog::itemClicked);
+	connect(m_listView, &QListWidget::itemDoubleClicked, this, &StringListEditorDialog::itemDoubleClicked);
 
 	QPushButton* addButton = new QPushButton(tr("Add"), this);
 	QPushButton* editButton = new QPushButton(tr("Edit"), this);
@@ -23,7 +26,7 @@ StringListEditorDialog::StringListEditorDialog(QWidget* parent, const QStringLis
 	connect(editButton, &QPushButton::clicked, this, &StringListEditorDialog::editPath);
 	connect(deleteButton, &QPushButton::clicked, this, &StringListEditorDialog::deletePath);
 
-	auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+	auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
 	connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
 	connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
@@ -35,12 +38,24 @@ StringListEditorDialog::StringListEditorDialog(QWidget* parent, const QStringLis
 	layout->addWidget(buttonBox, 3, 0, 1, 2);
 }
 
+void StringListEditorDialog::itemClicked(QListWidgetItem *item)
+{
+	item->setFlags(item->flags() | Qt::ItemIsEditable);
+	m_listView->editItem(item);
+}
+
+void StringListEditorDialog::itemDoubleClicked(QListWidgetItem *item)
+{
+	m_listView->setCurrentItem(item);
+	editPath();
+}
+
 void StringListEditorDialog::addPath()
 {
 	// TODO: For this class to be general, this should be an argument if its file/directory/both picker
 	// Currently this is more of a DirectoryListEditorDialog
 	QFileDialog dialog(this);
-	dialog.setFileMode(QFileDialog::DirectoryOnly);
+	dialog.setFileMode(QFileDialog::FileMode::DirectoryOnly);
 	dialog.setOption(QFileDialog::ShowDirsOnly, true);
 
 	// TODO: cache last path opened here and open dialog there?
@@ -76,7 +91,8 @@ void StringListEditorDialog::editPath()
 void StringListEditorDialog::deletePath()
 {
 	auto it = m_listView->currentItem();
-	// TODO implement deleting the selected item from the list
+	auto detached = m_listView->takeItem(m_listView->row(it));
+	delete detached;
 }
 
 QStringList StringListEditorDialog::getStringList()

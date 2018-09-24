@@ -46,7 +46,8 @@ void DocumentListView::removeFile(const QString& path)
         auto items = listView->findItems(path, Qt::MatchFixedString);
         for(const auto& i : items)
         {
-            listView->takeItem(listView->row(i));
+            auto it = listView->takeItem(listView->row(i));
+			delete it;
         }
 
         auto it = std::find(files.begin(), files.end(), path);
