@@ -13,9 +13,15 @@
  * - save file -> put to menu + tool bar
  * - save new file
  * - Set from options:
- *      - font size, family, color, background
+ *      - font size, family, color, background, word wrap
+ * - Key rebinding
  * - syntax highlighting
  * - intellisense
+ * - Line numbering
+ * - Code navigation
+	 - Find in file/project/all open files/file in cwd
+	 - Go to declaration/implementation
+	 - switch header/cpp
  * */
 
 class FileView : public QWidget

@@ -72,7 +72,7 @@ void DocumentListView::selectionChanged(QListWidgetItem *current)
 TabbedDocumentView::TabbedDocumentView(QWidget* parent) : QWidget(parent)
 {
     //setBackground(QBrush(QColor(50, 120, 50)));
-    setStyleSheet("QTextEdit { background-color: rgb(120, 180, 120) }");
+    setStyleSheet("QPlainTextEdit { background-color: rgb(120, 180, 120) }");
 
     setSizePolicy(QSizePolicy(QSizePolicy::Policy::Expanding,
                               QSizePolicy::Policy::Expanding));

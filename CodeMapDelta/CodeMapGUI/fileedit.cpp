@@ -6,9 +6,9 @@
 #include "mainwindow.h"
 #include "codeparser.h"
 
-FileEdit::FileEdit(QWidget* parent) : QTextEdit(parent)
+FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 {
-    this->setLineWrapMode(QTextEdit::LineWrapMode::NoWrap);
+    this->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     this->setFont(QFont("Consolas"));
 }
 

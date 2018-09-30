@@ -1,9 +1,10 @@
 #ifndef FILEEDIT_H
 #define FILEEDIT_H
 
-#include <QTextEdit>
+//#include <QTextEdit>
+#include <QPlainTextEdit>
 
-class FileEdit : public QTextEdit
+class FileEdit : public QPlainTextEdit
 {
     QString filePath;
 public:

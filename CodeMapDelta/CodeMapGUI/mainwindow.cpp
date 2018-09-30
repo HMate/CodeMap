@@ -34,10 +34,16 @@
   			- (Failed) Cmake cannot be used as a library, too much hassle.
 	- Fold out defines, includes, preprocessor directives
 		- create collapsible regions for #includes
+	- All kind of work with colors and stylesheets
+		- changeable from settings
+		- Change window/editor style
 	- Editor features
 		- Syntax highlight
 		- Line numbering
+		- Set word wrap in settings
+		- Set editor font
 		- Code navigation
+			- Find in file/project/all open files/file in cwd
 			- Go to declaration/implementation
 			- switch header/cpp
 		- Key rebinding in settings

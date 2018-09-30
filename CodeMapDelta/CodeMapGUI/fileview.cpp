@@ -160,6 +160,6 @@ void FileView::fileContentModified(bool changed)
 
 void FileView::setText(const QString& t)
 {
-    editor->setText(t);
+    editor->setPlainText(t);
     editor->document()->setModified(false);
 }
