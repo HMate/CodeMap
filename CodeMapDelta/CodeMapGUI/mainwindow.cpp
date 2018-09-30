@@ -13,7 +13,10 @@
 		- Save opened files
 	- Views:
 		- Opened fies view
+	- Project recognizer:
 	- Fold out defines
+		- Walk includes and try to find them?
+  			- For now just give includes in settings.
 */
 
 /* TODO
@@ -26,13 +29,18 @@
 	- Project recognizer:
 		- First allow users to add files by hand to a project (call it workspace?)
 		- Walk includes and try to find them?
-  			- For now just give includes in settings.
   			- Generate and parse compile_commands.json somehow.
 		- Parse cmake/sln descriptor and build project from that
   			- (Failed) Cmake cannot be used as a library, too much hassle.
 	- Fold out defines, includes, preprocessor directives
 		- create collapsible regions for #includes
-	- Syntax highlight
+	- Editor features
+		- Syntax highlight
+		- Line numbering
+		- Code navigation
+			- Go to declaration/implementation
+			- switch header/cpp
+		- Key rebinding in settings
 	- Control flow diagram
 	- Dependency graph, parameter/variable dependencies
 		- function interpreter: put function to separate file, collect its dependencies, and call it in separate program.

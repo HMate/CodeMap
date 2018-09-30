@@ -47,4 +47,4 @@ public:
     void loadStateFromDisk();
 };
 
-#endif APPSTATE_H
+#endif // APPSTATE_H

@@ -14,6 +14,9 @@ FileEdit::FileEdit(QWidget* parent) : QTextEdit(parent)
 
 void FileEdit::contextMenuEvent(QContextMenuEvent* event)
 {
+	// TODO: put check to centext menu disable action if not availabe
+	// TODO: write help in context menu, show what is missing
+	// in case action is not available
     std::unique_ptr<QMenu> menu(createStandardContextMenu());
     menu->addAction(tr("Fold defines"), this, &FileEdit::foldDefines);
     menu->exec(event->globalPos());
@@ -21,9 +24,8 @@ void FileEdit::contextMenuEvent(QContextMenuEvent* event)
 
 void FileEdit::foldDefines()
 {
-    // TODO: put check to centext menu disable action if not availabe
-    // TODO: write help in context menu, show what is missing
-    // in case action is not available
+	// TODO: Fold defines on another thread, because it can be slow. 
+	// Show loading screen in the meanwhile.
     if(filePath == "")
         return;
 	auto mw = MainWindow::instance();

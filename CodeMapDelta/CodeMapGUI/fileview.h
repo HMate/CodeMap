@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QToolBar>
 
-#include <fileedit.h>
+#include "fileedit.h"
 
 /* TODO
  * - Ask to load file again if it was changed outside of editor
