@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QToolBar>
 
-#include "fileedit.h"
+class FileEdit;
 
 /* TODO
  * - Ask to load file again if it was changed outside of editor
@@ -17,7 +17,6 @@
  * - Key rebinding
  * - syntax highlighting
  * - intellisense
- * - Line numbering
  * - Code navigation
 	 - Find in file/project/all open files/file in cwd
 	 - Go to declaration/implementation

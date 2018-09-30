@@ -8,7 +8,7 @@
 #include <QSplitter>
 #include <QDockWidget>
 
-#include "fileview.h"
+class FileView;
 
 class DocumentListView : public QWidget
 {

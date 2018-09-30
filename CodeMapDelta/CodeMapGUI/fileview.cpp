@@ -7,6 +7,7 @@
 #include <QTextDocumentWriter>
 
 #include "mainwindow.h"
+#include "fileedit.h"
 
 #define NEW_FILE "{new file}"
 

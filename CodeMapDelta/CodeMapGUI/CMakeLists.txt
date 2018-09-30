@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
     viewmanager.cpp
     fileview.cpp
     fileedit.cpp
+	linenumberarea.cpp
     filesystem.cpp
     appstate.cpp
 	stringlisteditordialog.cpp)

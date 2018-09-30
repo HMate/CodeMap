@@ -6,6 +6,7 @@
 
 #include "common_types.h"
 #include "mainwindow.h"
+#include "fileview.h"
 
 DocumentListView::DocumentListView(QWidget* parent) : QWidget(parent)
 {

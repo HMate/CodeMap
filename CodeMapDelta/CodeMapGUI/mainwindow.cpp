@@ -14,9 +14,12 @@
 	- Views:
 		- Opened fies view
 	- Project recognizer:
-	- Fold out defines
 		- Walk includes and try to find them?
   			- For now just give includes in settings.
+	- Editor features:
+		- Line numbering
+		
+	- Fold out defines
 */
 
 /* TODO
@@ -39,7 +42,6 @@
 		- Change window/editor style
 	- Editor features
 		- Syntax highlight
-		- Line numbering
 		- Set word wrap in settings
 		- Set editor font
 		- Code navigation
