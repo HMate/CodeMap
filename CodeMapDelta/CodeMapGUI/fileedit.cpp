@@ -5,10 +5,12 @@
 
 #include <QPainter>
 #include <QTextBlock>
+#include <QtConcurrent>
 
 #include "mainwindow.h"
 #include "codeparser.h"
 #include "linenumberarea.h"
+#include "fileview.h"
 
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 {
@@ -20,6 +22,8 @@ FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 	connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(updateLineNumberAreaWidth(int)));
 	connect(this, SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumberArea(QRect, int)));
 	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
+
+	connect(&foldWatcher, SIGNAL(finished()), this, SLOT(foldDefinesFinished()));
 
 	updateLineNumberAreaWidth(0);
 	highlightCurrentLine();
@@ -39,37 +43,52 @@ void FileEdit::foldDefines()
 {
 	// TODO: Fold defines on another thread, because it can be slow. 
 	// Show loading screen in the meanwhile.
-    if(filePath == "")
+    if(m_FilePath == "")
         return;
 	auto mw = MainWindow::instance();
     const auto& terminal = mw->getTerminalView();
-    terminal->showMessage(tr("Folding defines for %1").arg(filePath));
+    terminal->showMessage(tr("Folding defines for %1").arg(m_FilePath));
 
+	auto foldFuture = QtConcurrent::run(this, &FileEdit::foldDefinesForFile, m_FilePath);
+	foldWatcher.setFuture(foldFuture);
+
+	QString name = tr("Folded defines for: %1").arg(m_FilePath);
+	m_FoldedFile = MainWindow::instance()->getDocumentManager()->openStringFileView(name, "");
+}
+
+void FileEdit::foldDefinesFinished()
+{
+	QString result = foldWatcher.future().result();
+	m_FoldedFile->setText(result);
+}
+
+QString FileEdit::foldDefinesForFile(const QString& filePath) const
+{
+	auto mw = MainWindow::instance();
+	const auto& terminal = mw->getTerminalView();
 	auto& appState = mw->getAppState();
 
 	std::vector<QString> includes;
-	for (auto& i : appState.settings().globalIncludes)
+	for(auto& i : appState.settings().globalIncludes)
 	{
 		includes.emplace_back(i);
 	}
 	auto processed = cm::CodeParser().getPreprocessedCodeFromPath(filePath, includes);
-    
-    QString name = tr("Folded defines for: %1").arg(filePath);
-    if(processed.hasErrors())
-    {
-        terminal->showMessage(tr("Had %1 errors:").arg(processed.errors.size()));
-        for(auto& e : processed.errors)
-        {
-            terminal->showMessage(e);
-        }
-    }
-    MainWindow::instance()->getDocumentManager()->openStringFileView(name, processed.content);
 
+	if(processed.hasErrors())
+	{
+		terminal->showMessage(tr("Had %1 errors:").arg(processed.errors.size()));
+		for(auto& e : processed.errors)
+		{
+			terminal->showMessage(e);
+		}
+	}
+	return processed.content;
 }
 
 void FileEdit::setFilePath(const QString& path)
 {
-	filePath = path;
+	m_FilePath = path;
 }
 
 // Line numbering things
