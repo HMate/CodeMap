@@ -12,7 +12,7 @@ class FileEdit : public QPlainTextEdit
 	Q_OBJECT
 
     QString m_FilePath;
-	FileView* m_FoldedFile;
+	FileView* m_FoldedFileView;
 	LineNumberArea* lineNumberArea;
 	QFutureWatcher<QString> foldWatcher;
 public:

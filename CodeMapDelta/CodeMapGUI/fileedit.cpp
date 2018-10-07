@@ -41,25 +41,23 @@ void FileEdit::contextMenuEvent(QContextMenuEvent* event)
 
 void FileEdit::foldDefines()
 {
-	// TODO: Fold defines on another thread, because it can be slow. 
-	// Show loading screen in the meanwhile.
     if(m_FilePath == "")
         return;
 	auto mw = MainWindow::instance();
     const auto& terminal = mw->getTerminalView();
     terminal->showMessage(tr("Folding defines for %1").arg(m_FilePath));
 
+	QString name = tr("Folded defines for: %1").arg(m_FilePath);
+	m_FoldedFileView = MainWindow::instance()->getDocumentManager()->openStringFileView(name, "Loading...");
+
 	auto foldFuture = QtConcurrent::run(this, &FileEdit::foldDefinesForFile, m_FilePath);
 	foldWatcher.setFuture(foldFuture);
-
-	QString name = tr("Folded defines for: %1").arg(m_FilePath);
-	m_FoldedFile = MainWindow::instance()->getDocumentManager()->openStringFileView(name, "");
 }
 
 void FileEdit::foldDefinesFinished()
 {
 	QString result = foldWatcher.future().result();
-	m_FoldedFile->setText(result);
+	m_FoldedFileView->setText(result);
 }
 
 QString FileEdit::foldDefinesForFile(const QString& filePath) const
