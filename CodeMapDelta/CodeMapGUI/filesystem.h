@@ -16,6 +16,7 @@ public:
     static QDir getDirectory(const QString& path);
     static QString concat(const QString& A, const QString& B);
 
+	static bool doesFileExist(const QString& filePath);
     static bool saveFile(const QString& path, const QString& content);
     static QString readFile(const QString& filePath);
 };

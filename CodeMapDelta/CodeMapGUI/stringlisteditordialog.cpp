@@ -63,7 +63,7 @@ void StringListEditorDialog::addPath()
 	// TODO: For this class to be general, this should be an argument if its file/directory/both picker
 	// Currently this is more of a DirectoryListEditorDialog
 	QFileDialog dialog(this);
-	dialog.setFileMode(QFileDialog::FileMode::DirectoryOnly);
+	dialog.setFileMode(QFileDialog::FileMode::Directory);
 	dialog.setOption(QFileDialog::ShowDirsOnly, true);
 
 	// TODO: cache last path opened here and open dialog there?
@@ -83,7 +83,7 @@ void StringListEditorDialog::editPath()
 	auto it = m_listView->currentItem();
 	
 	QFileDialog dialog(this);
-	dialog.setFileMode(QFileDialog::FileMode::DirectoryOnly);
+	dialog.setFileMode(QFileDialog::FileMode::Directory);
 	dialog.setOption(QFileDialog::ShowDirsOnly, true);
 
 	const QString& lastDir = it->text();

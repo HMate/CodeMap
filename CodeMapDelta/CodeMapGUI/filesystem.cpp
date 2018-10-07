@@ -42,6 +42,11 @@ bool FileSystemManager::saveFile(const QString& filePath, const QString& content
     return true;
 }
 
+bool FileSystemManager::doesFileExist(const QString& filePath)
+{
+	return QFile::exists(filePath);
+}
+
 QString FileSystemManager::readFile(const QString& filePath)
 {
     QFile fileHandler(filePath);

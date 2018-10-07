@@ -8,6 +8,7 @@
 
 #include "mainwindow.h"
 #include "fileedit.h"
+#include "filesystem.h"
 
 #define NEW_FILE "{new file}"
 
@@ -97,7 +98,7 @@ void FileView::keyPressEvent(QKeyEvent* ke)
     if(ke->key() == Qt::Key_S && ke->modifiers().testFlag(Qt::ControlModifier))
     {
         auto terminal = MainWindow::instance()->getTerminalView();
-        terminal->showMessage(tr("Saving \"%1\"").arg(filePath));
+        terminal->showMessage(tr("Saving \"%1\"").arg(m_FilePath));
         ke->setAccepted(true);
         saveFile();
     }
@@ -107,56 +108,61 @@ void FileView::keyPressEvent(QKeyEvent* ke)
     }
 }
 
+#include <QFileDialog>
+
 void FileView::saveFile()
 {
     auto terminal = MainWindow::instance()->getTerminalView();
-    if(filePath == "")
+    if(m_FilePath == "" || !FS::doesFileExist(m_FilePath))
     {
-        // TODO: Open save as dialog
-        /*
+        // Open save as dialog
         QFileDialog fileDialog(this, tr("Save as..."));
         fileDialog.setAcceptMode(QFileDialog::AcceptSave);
-        QStringList mimeTypes;
-        mimeTypes << "application/vnd.oasis.opendocument.text" << "text/html" << "text/plain";
-        fileDialog.setMimeTypeFilters(mimeTypes);
-        fileDialog.setDefaultSuffix("odt");
+
+		auto& state = MainWindow::instance()->getAppState();
+		const QString& lastDir = state.getLastOpenedDirectory();
+		fileDialog.setDirectory(lastDir);
+
+        fileDialog.setDefaultSuffix("cpp");
         if (fileDialog.exec() != QDialog::Accepted)
-            return false;
-        const QString fn = fileDialog.selectedFiles().first();
-        setCurrentFileName(fn);
-        */
+            return;
+        const QString path = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
+		setFilePath(path);
+
+		state.setLastOpenedDirectory(FS::getDirectory(path).absolutePath());
+		state.saveStateToDisk();
     }
 
-    QTextDocumentWriter writer(filePath);
+    QTextDocumentWriter writer(m_FilePath);
     writer.setFormat("plaintext");
     bool success = writer.write(editor->document());
     if (success) {
         editor->document()->setModified(false);
-        terminal->showMessage(tr("Saved \"%1\"").arg(filePath));
+        terminal->showMessage(tr("Saved \"%1\"").arg(m_FilePath));
     } else {
         terminal->showMessage(tr("Saving failed. Could not write to file \"%1\"")
-                                 .arg(filePath));
+                                 .arg(m_FilePath));
     }
 }
 
 void FileView::setFilePath(const QString &path)
 {
-    filePath = path;
+    m_FilePath = path;
     editor->setFilePath(path);
     nameLabel->setText(path);
 }
 
 const QString& FileView::getFilePath()
 {
-    return filePath;
+    return m_FilePath;
 }
 
 void FileView::fileContentModified(bool changed)
 {
     if(changed)
-        nameLabel->setText(filePath+"*");
+        nameLabel->setText(m_FilePath+"*");
     else
-        nameLabel->setText(filePath);
+        nameLabel->setText(m_FilePath);
 }
 
 void FileView::setText(const QString& t)

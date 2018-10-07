@@ -30,7 +30,7 @@ class FileView : public QWidget
     QGridLayout* layout;
     FileEdit* editor;
     QLabel* nameLabel;
-    QString filePath;
+    QString m_FilePath;
 
 public:
     explicit FileView(QWidget *parent = nullptr);
