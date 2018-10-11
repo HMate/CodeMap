@@ -7,6 +7,7 @@
 #include "common_types.h"
 #include "mainwindow.h"
 #include "fileview.h"
+#include "filesystem.h"
 
 DocumentListView::DocumentListView(QWidget* parent) : QWidget(parent)
 {
@@ -111,9 +112,17 @@ FileView* TabbedDocumentView::addNewFileView(const QString& name)
 {
     auto view = new FileView(this);
     fileViews.push_back(view);
-    tabs->addTab(view, name);
 	connect(view, &FileView::gotFocus,
 		this, &TabbedDocumentView::childGotFocus);
+
+	QString tabName = name;
+	if(FS::doesFileExist(tabName))
+	{
+		tabName = QFileInfo(tabName).fileName();
+	}
+	MainWindow::instance()->getTerminalView()->showMessage(tr("adding tab with name %1").arg(tabName));
+	tabs->addTab(view, tabName);
+
     return view;
 }
 

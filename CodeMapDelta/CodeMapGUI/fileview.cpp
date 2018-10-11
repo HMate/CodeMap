@@ -6,6 +6,8 @@
 #include <QKeyEvent>
 #include <QTextDocumentWriter>
 
+#include <QFileDialog>
+
 #include "mainwindow.h"
 #include "fileedit.h"
 #include "filesystem.h"
@@ -107,8 +109,6 @@ void FileView::keyPressEvent(QKeyEvent* ke)
         QWidget::keyPressEvent(ke);
     }
 }
-
-#include <QFileDialog>
 
 void FileView::saveFile()
 {
