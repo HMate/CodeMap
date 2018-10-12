@@ -1,6 +1,8 @@
 #ifndef FOLDABLETEXTAREA_H
 #define FOLDABLETEXTAREA_H
 
+// Source: https://github.com/CapelliC/foldingQTextEdit
+
 #include <QObject>
 #include <QPainter>
 #include <QTextDocument>
