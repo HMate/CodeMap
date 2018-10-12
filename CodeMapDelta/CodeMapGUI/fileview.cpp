@@ -103,7 +103,15 @@ void FileView::keyPressEvent(QKeyEvent* ke)
         terminal->showMessage(tr("Saving \"%1\"").arg(m_FilePath));
         ke->setAccepted(true);
         saveFile();
-    }
+    } 
+	else if(ke->key() == Qt::Key_D && ke->modifiers().testFlag(Qt::ControlModifier))
+	{
+		editor->fold();
+	}
+	else if(ke->key() == Qt::Key_F && ke->modifiers().testFlag(Qt::ControlModifier))
+	{
+		editor->unfold();
+	}
     else
     {
         QWidget::keyPressEvent(ke);

@@ -15,6 +15,9 @@
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 {
 	lineNumberArea = new LineNumberArea(this);
+	m_regionFolder = new FoldableTextArea(this);
+
+	document()->documentLayout()->registerHandler(m_regionFolder->type(), m_regionFolder);
 
     this->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     this->setFont(QFont("Consolas"));
@@ -29,9 +32,22 @@ FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 	highlightCurrentLine();
 }
 
+void FileEdit::fold() {
+	auto c = textCursor();
+	c.setPosition(10);
+	c.setPosition(20, QTextCursor::KeepAnchor);
+	m_regionFolder->fold(c);
+}
+
+void FileEdit::unfold() {
+	auto c = textCursor();
+	c.setPosition(11);
+	m_regionFolder->unfold(c);
+}
+
 void FileEdit::contextMenuEvent(QContextMenuEvent* event)
 {
-	// TODO: put check to centext menu disable action if not availabe
+	// TODO: put check to centext menu disable action if not available
 	// TODO: write help in context menu, show what is missing
 	// in case action is not available
     std::unique_ptr<QMenu> menu(createStandardContextMenu());

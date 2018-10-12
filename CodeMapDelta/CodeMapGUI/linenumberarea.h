@@ -3,6 +3,7 @@
 
 #include <QWidget>
 
+// Has to include class because it inherits QWidget, and that makes it qobject_cast-able
 #include "fileedit.h"
 
 class LineNumberArea : public QWidget
