@@ -81,7 +81,7 @@ QString FileEdit::foldDefinesForFile(const QString& filePath) const
 			terminal->showMessage(e);
 		}
 	}
-	return processed.content;
+	return processed.code.content;
 }
 
 void FileEdit::setFilePath(const QString& path)

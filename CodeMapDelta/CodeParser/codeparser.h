@@ -7,16 +7,22 @@
 namespace cm
 {
 
+struct ParsedCodeFile
+{
+	QString content;
+};
+
 struct ParserResult
 {
     typedef std::vector<QString> ErrorList;
 
-    QString content;
+	ParsedCodeFile code;
     ErrorList errors;
 
     bool hasErrors();
 };
 
+/// Contains methods to parse in cpp code files
 class CodeParser
 {
 public:

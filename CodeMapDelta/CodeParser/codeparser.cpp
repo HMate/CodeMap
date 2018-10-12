@@ -51,9 +51,12 @@ class PreprocessorFrontendActionFactory : public clang::tooling::FrontendActionF
 {
     std::string& preprocessedOutput;
 public:
-    PreprocessorFrontendActionFactory(std::string& preprocessedOutDest) :
-        preprocessedOutput(preprocessedOutDest){}
-    clang::FrontendAction *create() override { return new PreprocessorEliminatorFrontendAction(preprocessedOutput); }
+    PreprocessorFrontendActionFactory(std::string& preprocessedOutDest) : preprocessedOutput(preprocessedOutDest){}
+
+    clang::FrontendAction *create() override 
+	{ 
+		return new PreprocessorEliminatorFrontendAction(preprocessedOutput); 
+	}
 };
 
 
@@ -85,7 +88,7 @@ ParserResult CodeParser::getPreprocessedCodeFromPath(const QString& srcPath, con
     tool.run(actionFactory.get());
     
     ParserResult result;
-    result.content = QString::fromStdString(processedFile);
+    result.code.content = QString::fromStdString(processedFile);
     auto errors = errorCollector.GetErrorsList();
     for (const auto& it : errors)
     {
