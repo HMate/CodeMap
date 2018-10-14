@@ -1,5 +1,5 @@
-#ifndef FOLDABLETEXTAREA_H
-#define FOLDABLETEXTAREA_H
+#ifndef TEXTFOLDER_H
+#define TEXTFOLDER_H
 
 // Source: https://github.com/CapelliC/foldingQTextEdit
 
@@ -8,7 +8,7 @@
 #include <QTextDocument>
 #include <QTextObjectInterface>
 
-class FoldableTextArea : public QObject, public QTextObjectInterface
+class TextFolder : public QObject, public QTextObjectInterface
 {
     Q_OBJECT
     Q_INTERFACES(QTextObjectInterface)
@@ -16,8 +16,8 @@ class FoldableTextArea : public QObject, public QTextObjectInterface
     QString m_PlaceholderText;
 
 public:
-    explicit FoldableTextArea(QObject *parent = 0);
-    explicit FoldableTextArea(QObject *parent, const QString& placeholderText);
+    explicit TextFolder(QObject *parent = 0);
+    explicit TextFolder(QObject *parent, const QString& placeholderText);
 
     static int type() { return QTextFormat::UserObject + 1; }
     static int prop() { return 1; }
@@ -29,4 +29,4 @@ public:
     bool unfold(QTextCursor c);
 };
 
-#endif // FOLDABLETEXTAREA_H
+#endif // TEXTFOLDER_H

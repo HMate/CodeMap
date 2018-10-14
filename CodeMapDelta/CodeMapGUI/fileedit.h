@@ -4,7 +4,7 @@
 #include <QPlainTextEdit>
 #include <QFutureWatcher>
 
-#include "foldabletextarea.h"
+#include "textfolder.h"
 
 class LineNumberArea;
 class FileView;
@@ -16,7 +16,7 @@ class FileEdit : public QPlainTextEdit
     QString m_FilePath;
     FileView* m_FoldedFileView;
     LineNumberArea* lineNumberArea;
-    FoldableTextArea* m_regionFolder;
+    TextFolder* m_regionFolder;
     QFutureWatcher<QString> foldWatcher;
 public:
     FileEdit(QWidget* parent);

@@ -1,18 +1,18 @@
-#include "foldabletextarea.h"
+#include "textfolder.h"
 
 #include <QTextDocumentFragment>
 
 Q_DECLARE_METATYPE(QTextDocumentFragment)
 
-FoldableTextArea::FoldableTextArea(QObject *parent) : FoldableTextArea(parent, "")
+TextFolder::TextFolder(QObject *parent) : TextFolder(parent, "")
 {}
 
-FoldableTextArea::FoldableTextArea(QObject *parent, const QString& placeholderText) : QObject(parent)
+TextFolder::TextFolder(QObject *parent, const QString& placeholderText) : QObject(parent)
 {
     m_PlaceholderText = placeholderText;
 }
 
-QSizeF FoldableTextArea::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format) {
+QSizeF TextFolder::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format) {
     Q_UNUSED(doc)
     Q_UNUSED(posInDocument)
     Q_ASSERT(format.type() == format.CharFormat);
@@ -25,7 +25,7 @@ QSizeF FoldableTextArea::intrinsicSize(QTextDocument *doc, int posInDocument, co
     return sz;
 }
 
-void FoldableTextArea::drawObject(QPainter *painter, const QRectF &rect, 
+void TextFolder::drawObject(QPainter *painter, const QRectF &rect, 
     QTextDocument *doc, int posInDocument, const QTextFormat &format) {
 
     Q_UNUSED(doc)
@@ -35,7 +35,7 @@ void FoldableTextArea::drawObject(QPainter *painter, const QRectF &rect,
     painter->drawRect(rect);
 }
 
-void FoldableTextArea::fold(QTextCursor c) {
+void TextFolder::fold(QTextCursor c) {
     QTextCharFormat f;
     f.setObjectType(type());
     QVariant v;
@@ -45,7 +45,7 @@ void FoldableTextArea::fold(QTextCursor c) {
     c.insertText(QString(QChar::ObjectReplacementCharacter), f);
 }
 
-bool FoldableTextArea::unfold(QTextCursor c) {
+bool TextFolder::unfold(QTextCursor c) {
     if(!c.hasSelection()) {
         QTextCharFormat f = c.charFormat();
         if(f.objectType() == type()) {

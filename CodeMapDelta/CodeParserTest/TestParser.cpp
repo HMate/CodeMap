@@ -28,7 +28,7 @@ private slots:
         QString expected = readFileContent(getTestPatternPath("testPreprocessorWithFile", "result.cpp"));
 
         auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
-        QCOMPARE(result.content, expected);
+        QCOMPARE(result.code.content, expected);
     }
 
     /* Test if preprocessor include substitution is working,
@@ -39,7 +39,7 @@ private slots:
         QString expected = readFileContent(getTestPatternPath("testPreprocessorInclude", "result.cpp"));
 
         auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
-        QCOMPARE(result.content, expected);
+        QCOMPARE(result.code.content, expected);
     }
 
     /* Test if preprocessor include substitution is working,
@@ -50,7 +50,7 @@ private slots:
         QString expected = readFileContent(getTestPatternPath("testPreprocessorIncludeOuterDir", "result.cpp"));
 
         auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath, {getTestPatternPath("testPreprocessorIncludeOuterDir", "externalDependencies")});
-        QCOMPARE(result.content, expected);
+        QCOMPARE(result.code.content, expected);
     }
 
     // Test if we can include stdlib code
@@ -62,8 +62,8 @@ private slots:
         auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
         // Its complicated to actually compare the whole file content, because every define is expanded in stdio.h
         // just see if the method result contains the needed code + some stdio functions
-        QVERIFY(result.content.contains(expected));
-        QVERIFY(result.content.contains("__cdecl fopen")); // see if result contains something from <stdio.h>
+        QVERIFY(result.code.content.contains(expected));
+        QVERIFY(result.code.content.contains("__cdecl fopen")); // see if result contains something from <stdio.h>
     }
 
     // Test if the file is not a source code
@@ -73,7 +73,7 @@ private slots:
         QString expected = readFileContent(getTestPatternPath("testPreprocessorNonSourceCode", "test.cpp"));
 
         auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
-        QVERIFY(result.content.contains(expected));
+        QVERIFY(result.code.content.contains(expected));
     }
 
     // Helper methods

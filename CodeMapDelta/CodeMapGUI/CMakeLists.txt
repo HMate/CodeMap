@@ -18,7 +18,7 @@ add_executable(${PROJECT_NAME}
     viewmanager.cpp
     fileview.cpp
     fileedit.cpp
-    foldabletextarea.cpp
+    textfolder.cpp
     linenumberarea.cpp
     filesystem.cpp
     appstate.cpp

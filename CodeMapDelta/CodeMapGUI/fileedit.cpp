@@ -15,7 +15,7 @@
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 {
     lineNumberArea = new LineNumberArea(this);
-    m_regionFolder = new FoldableTextArea(this, "ASD");
+    m_regionFolder = new TextFolder(this, "ASD");
 
     document()->documentLayout()->registerHandler(m_regionFolder->type(), m_regionFolder);
 
@@ -105,6 +105,10 @@ void FileEdit::setFilePath(const QString& path)
     m_FilePath = path;
 }
 
+// regions
+
+
+
 // Line numbering things
 
 void FileEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
@@ -125,6 +129,8 @@ void FileEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
             painter.setPen(Qt::black);
             painter.drawText(0, top, lineNumberArea->width() - rightMargin, fontMetrics().height(),
                 Qt::AlignRight, number);
+
+
         }
 
         block = block.next();
