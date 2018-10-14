@@ -8,20 +8,20 @@
 
 class LineNumberArea : public QWidget
 {
-	Q_OBJECT
+    Q_OBJECT
 
 public:
-	LineNumberArea(FileEdit *editor) : QWidget(qobject_cast<QWidget*>(editor)) {
-		codeEditor = editor;
-	}
+    LineNumberArea(FileEdit *editor) : QWidget(qobject_cast<QWidget*>(editor)) {
+        codeEditor = editor;
+    }
 
-	QSize sizeHint() const override;
+    QSize sizeHint() const override;
 
 protected:
-	void paintEvent(QPaintEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
 
 private:
-	FileEdit *codeEditor;
+    FileEdit *codeEditor;
 
 };
 

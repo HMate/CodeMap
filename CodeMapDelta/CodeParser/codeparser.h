@@ -9,14 +9,14 @@ namespace cm
 
 struct ParsedCodeFile
 {
-	QString content;
+    QString content;
 };
 
 struct ParserResult
 {
     typedef std::vector<QString> ErrorList;
 
-	ParsedCodeFile code;
+    ParsedCodeFile code;
     ErrorList errors;
 
     bool hasErrors();

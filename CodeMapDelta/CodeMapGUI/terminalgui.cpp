@@ -69,7 +69,7 @@ void TerminalView::handleTerminalCommand()
 void TerminalView::showMessage(const QString& command)
 {
     tHistory->addItem(command);
-	tHistory->scrollToBottom();
+    tHistory->scrollToBottom();
 }
 
 void TerminalView::focusInEvent(QFocusEvent *event)
@@ -79,7 +79,7 @@ void TerminalView::focusInEvent(QFocusEvent *event)
 
 TerminalHistory::TerminalHistory(QWidget* parent) : QListWidget(parent)
 {
-	// makes scrolToBottom buggy :(
+    // makes scrolToBottom buggy :(
     /*setLayoutMode(LayoutMode::Batched);
     setBatchSize(20);*/
 }

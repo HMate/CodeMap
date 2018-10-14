@@ -7,22 +7,22 @@
 
 class StringListEditorDialog : public QDialog
 {
-	Q_OBJECT 
+    Q_OBJECT 
 
-	QListWidget* m_listView = nullptr;
+    QListWidget* m_listView = nullptr;
 
 public:
-	StringListEditorDialog(QWidget* parent, const QStringList& initialList);
+    StringListEditorDialog(QWidget* parent, const QStringList& initialList);
 
-	QStringList getStringList();
+    QStringList getStringList();
 
 public slots:
-	void addPath();
-	void editPath();
-	void deletePath();
+    void addPath();
+    void editPath();
+    void deletePath();
 
-	void itemClicked(QListWidgetItem *item);
-	void itemDoubleClicked(QListWidgetItem *item);
+    void itemClicked(QListWidgetItem *item);
+    void itemDoubleClicked(QListWidgetItem *item);
 };
 
 #endif // STRINGLISTEDITORDIALOG_H

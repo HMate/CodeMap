@@ -49,7 +49,7 @@ public:
     void closeFileView(FileView* const view);
     bool hasFileView(FileView* const view);
 
-	bool event(QEvent *event);
+    bool event(QEvent *event);
 protected:
     FileView* addNewFileView(const QString& name);
     long long getFileViewIndexByAddress(FileView* const view);
@@ -57,10 +57,10 @@ protected:
     virtual QSize sizeHint() const;
 
 signals:
-	void gotFocus(QObject*);
+    void gotFocus(QObject*);
 
 public slots:
-	void childGotFocus();
+    void childGotFocus();
 };
 
 // Contains views of files through TabbedDocumentViews
@@ -70,7 +70,7 @@ class SplitDocumentView : public QWidget
 
     QLayout* layout = nullptr;
     QSplitter* splitter = nullptr;
-	long long lastFocusedTab = 0;
+    long long lastFocusedTab = 0;
     std::vector<TabbedDocumentView*> tabbedViews;
 
 public:
@@ -82,14 +82,14 @@ public:
     void closeFileView(FileView* const view);
     FileView* openStringFileView(const QString& path, const QString& content);
 
-	long long getLastFocusedTabIndex();
+    long long getLastFocusedTabIndex();
 protected:
     long long getDocumentViewIndexFromAddress(FileView* const view);
 
     virtual QSize sizeHint() const;
 
 public slots:
-	void childGotFocus(QObject*);
+    void childGotFocus(QObject*);
 };
 
 // Wrapper class around SplitDocumentView and SplitDocumentViewTitleBar 

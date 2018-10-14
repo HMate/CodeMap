@@ -7,7 +7,7 @@
 
 struct Settings
 {
-	QStringList globalIncludes;
+    QStringList globalIncludes;
 };
 
 #endif // !SETTINGS_H

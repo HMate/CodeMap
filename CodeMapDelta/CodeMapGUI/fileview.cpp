@@ -27,7 +27,7 @@ FileView::FileView(QWidget *parent) : QWidget(parent)
 
     editor = new FileEdit(this);
     setFocusProxy(editor);
-	editor->installEventFilter(this);
+    editor->installEventFilter(this);
     layout->addWidget(editor, 1, 0);
 
     connect(editor->document(), &QTextDocument::modificationChanged,
@@ -53,14 +53,14 @@ QToolBar* FileView::createToolbar()
 
 bool FileView::eventFilter(QObject *object, QEvent *event)
 {
-	auto type = event->type();
-	if(type == QEvent::FocusIn ||
-		type == QEvent::MouseButtonPress)
-	{
-		// TODO log MainWindow::instance()->getTerminalView()->showMessage(tr("last filview is %1").arg((long long)this));
-		gotFocus();
-	}
-	return false;
+    auto type = event->type();
+    if(type == QEvent::FocusIn ||
+        type == QEvent::MouseButtonPress)
+    {
+        // TODO log MainWindow::instance()->getTerminalView()->showMessage(tr("last filview is %1").arg((long long)this));
+        gotFocus();
+    }
+    return false;
 }
 
 void FileView::openFile(const QString& path)
@@ -104,14 +104,14 @@ void FileView::keyPressEvent(QKeyEvent* ke)
         ke->setAccepted(true);
         saveFile();
     } 
-	else if(ke->key() == Qt::Key_D && ke->modifiers().testFlag(Qt::ControlModifier))
-	{
-		editor->fold();
-	}
-	else if(ke->key() == Qt::Key_F && ke->modifiers().testFlag(Qt::ControlModifier))
-	{
-		editor->unfold();
-	}
+    else if(ke->key() == Qt::Key_D && ke->modifiers().testFlag(Qt::ControlModifier))
+    {
+        editor->fold();
+    }
+    else if(ke->key() == Qt::Key_F && ke->modifiers().testFlag(Qt::ControlModifier))
+    {
+        editor->unfold();
+    }
     else
     {
         QWidget::keyPressEvent(ke);
@@ -127,18 +127,18 @@ void FileView::saveFile()
         QFileDialog fileDialog(this, tr("Save as..."));
         fileDialog.setAcceptMode(QFileDialog::AcceptSave);
 
-		auto& state = MainWindow::instance()->getAppState();
-		const QString& lastDir = state.getLastOpenedDirectory();
-		fileDialog.setDirectory(lastDir);
+        auto& state = MainWindow::instance()->getAppState();
+        const QString& lastDir = state.getLastOpenedDirectory();
+        fileDialog.setDirectory(lastDir);
 
         fileDialog.setDefaultSuffix("cpp");
         if (fileDialog.exec() != QDialog::Accepted)
             return;
         const QString path = QDir::toNativeSeparators(fileDialog.selectedFiles().first());
-		setFilePath(path);
+        setFilePath(path);
 
-		state.setLastOpenedDirectory(FS::getDirectory(path).absolutePath());
-		state.saveStateToDisk();
+        state.setLastOpenedDirectory(FS::getDirectory(path).absolutePath());
+        state.saveStateToDisk();
     }
 
     QTextDocumentWriter writer(m_FilePath);

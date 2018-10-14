@@ -18,15 +18,15 @@ add_executable(${PROJECT_NAME}
     viewmanager.cpp
     fileview.cpp
     fileedit.cpp
-	foldabletextarea.cpp
-	linenumberarea.cpp
+    foldabletextarea.cpp
+    linenumberarea.cpp
     filesystem.cpp
     appstate.cpp
-	stringlisteditordialog.cpp)
+    stringlisteditordialog.cpp)
 
 target_include_directories(${PROJECT_NAME} 
-	PRIVATE CMakeParser
-	PRIVATE CodeParser)
+    PRIVATE CMakeParser
+    PRIVATE CodeParser)
 
 target_link_libraries(${PROJECT_NAME} Qt5::Core)
 target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
@@ -35,7 +35,7 @@ target_link_libraries(${PROJECT_NAME} Qt5::Concurrent)
 target_link_libraries(${PROJECT_NAME} CodeParser)
 
 if ( WIN32 )
-	# Copy dlls to exe
-	add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-		COMMAND ${QT_WINDEPLOY} $<TARGET_FILE_DIR:${PROJECT_NAME}>) 
+    # Copy dlls to exe
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${QT_WINDEPLOY} $<TARGET_FILE_DIR:${PROJECT_NAME}>) 
 endif()

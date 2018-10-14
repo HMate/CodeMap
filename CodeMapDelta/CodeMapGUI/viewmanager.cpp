@@ -49,7 +49,7 @@ void DocumentListView::removeFile(const QString& path)
         for(const auto& i : items)
         {
             auto it = listView->takeItem(listView->row(i));
-			delete it;
+            delete it;
         }
 
         auto it = std::find(files.begin(), files.end(), path);
@@ -60,13 +60,13 @@ void DocumentListView::removeFile(const QString& path)
 void DocumentListView::selectionChanged(QListWidgetItem *current)
 {
     auto dm = MainWindow::instance()->getDocumentManager();
-	const auto& path = current->text();
-	long long tabIndex = dm->getLastFocusedTabIndex();
+    const auto& path = current->text();
+    long long tabIndex = dm->getLastFocusedTabIndex();
     dm->openFileView(path, tabIndex)->setFocus();
 
-	auto& state = MainWindow::instance()->getAppState();
-	state.addFileView(path, tabIndex);
-	state.saveStateToDisk();
+    auto& state = MainWindow::instance()->getAppState();
+    state.addFileView(path, tabIndex);
+    state.saveStateToDisk();
 }
 
 // ------------------------------------------
@@ -112,34 +112,34 @@ FileView* TabbedDocumentView::addNewFileView(const QString& name)
 {
     auto view = new FileView(this);
     fileViews.push_back(view);
-	connect(view, &FileView::gotFocus,
-		this, &TabbedDocumentView::childGotFocus);
+    connect(view, &FileView::gotFocus,
+        this, &TabbedDocumentView::childGotFocus);
 
-	QString tabName = name;
-	if(FS::doesFileExist(tabName))
-	{
-		tabName = QFileInfo(tabName).fileName();
-	}
-	MainWindow::instance()->getTerminalView()->showMessage(tr("adding tab with name %1").arg(tabName));
-	tabs->addTab(view, tabName);
+    QString tabName = name;
+    if(FS::doesFileExist(tabName))
+    {
+        tabName = QFileInfo(tabName).fileName();
+    }
+    MainWindow::instance()->getTerminalView()->showMessage(tr("adding tab with name %1").arg(tabName));
+    tabs->addTab(view, tabName);
 
     return view;
 }
 
 bool TabbedDocumentView::event(QEvent *event)
 {
-	if(event->type() == QEvent::MouseButtonPress)
-	{
-		setFocus(Qt::FocusReason::MouseFocusReason);
-		// TODO log MainWindow::instance()->getTerminalView()->showMessage(tr("last tab is %1").arg((long long)this));
-		gotFocus(this);
-	}
-	return false;
+    if(event->type() == QEvent::MouseButtonPress)
+    {
+        setFocus(Qt::FocusReason::MouseFocusReason);
+        // TODO log MainWindow::instance()->getTerminalView()->showMessage(tr("last tab is %1").arg((long long)this));
+        gotFocus(this);
+    }
+    return false;
 }
 
 void TabbedDocumentView::childGotFocus()
 {
-	gotFocus(this);
+    gotFocus(this);
 }
 
 void TabbedDocumentView::closeFileView(FileView* const view)
@@ -195,7 +195,7 @@ SplitDocumentViewTitleBar::SplitDocumentViewTitleBar(SplitDocumentViewHolder* pa
 
     auto addDocumentViewButton = new QPushButton("++", this);
     layout->addWidget(addDocumentViewButton);
-	
+    
     connect(addDocumentViewButton, &QPushButton::clicked,
             this, &SplitDocumentViewTitleBar::addDocumentViewPushed);
 }
@@ -235,27 +235,27 @@ void SplitDocumentView::addTabbedDocumentView()
     tabbedViews.emplace_back(v);
     splitter->addWidget(v);
 
-	v->installEventFilter(this);
-	connect(v, &TabbedDocumentView::gotFocus,
-		this, &SplitDocumentView::childGotFocus);
+    v->installEventFilter(this);
+    connect(v, &TabbedDocumentView::gotFocus,
+        this, &SplitDocumentView::childGotFocus);
 }
 
 void SplitDocumentView::childGotFocus(QObject* focused)
 {
-	for(auto i = 0; i < tabbedViews.size(); i++)
-	{
-		auto tab = tabbedViews[i];
-		if(tab == focused)
-		{
-			// TODO log MainWindow::instance()->getTerminalView()->showMessage(tr("last tab is %1").arg(i));
-			lastFocusedTab = i;
-		}
-	}
+    for(auto i = 0; i < tabbedViews.size(); i++)
+    {
+        auto tab = tabbedViews[i];
+        if(tab == focused)
+        {
+            // TODO log MainWindow::instance()->getTerminalView()->showMessage(tr("last tab is %1").arg(i));
+            lastFocusedTab = i;
+        }
+    }
 }
 
 long long SplitDocumentView::getLastFocusedTabIndex()
 {
-	return lastFocusedTab;
+    return lastFocusedTab;
 }
 
 FileView* SplitDocumentView::openFileView(const QString& path, size_t tabIndex)
@@ -263,13 +263,13 @@ FileView* SplitDocumentView::openFileView(const QString& path, size_t tabIndex)
     const MainWindow* mainW = MainWindow::instance();
     mainW->getTerminalView()->showMessage( tr("Opening in tab %1: %2").arg(tabIndex).arg(path));
 
-	while(tabIndex >= tabbedViews.size())
-	{
-		addTabbedDocumentView();
-	}
+    while(tabIndex >= tabbedViews.size())
+    {
+        addTabbedDocumentView();
+    }
 
     FileView* v = tabbedViews[tabIndex]->openFileView(path);
-	
+    
     // TODO: check if file is already open? allow to open it twice?
     // TODO: set app focus to this file view here.
     return v;

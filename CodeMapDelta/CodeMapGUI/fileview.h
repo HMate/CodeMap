@@ -18,9 +18,9 @@ class FileEdit;
  * - syntax highlighting
  * - intellisense
  * - Code navigation
-	 - Find in file/project/all open files/file in cwd
-	 - Go to declaration/implementation
-	 - switch header/cpp
+     - Find in file/project/all open files/file in cwd
+     - Go to declaration/implementation
+     - switch header/cpp
  * */
 
 class FileView : public QWidget
@@ -42,13 +42,13 @@ public:
     void saveFile();
     void openFile(const QString &path);
 
-	bool eventFilter(QObject *object, QEvent *event);
+    bool eventFilter(QObject *object, QEvent *event);
 protected:
     QToolBar* createToolbar();
     void keyPressEvent(QKeyEvent* ke);
 
 signals:
-	void gotFocus();
+    void gotFocus();
 
 public slots:
     void fileContentModified(bool changed);

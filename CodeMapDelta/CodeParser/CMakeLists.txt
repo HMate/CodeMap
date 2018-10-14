@@ -14,7 +14,7 @@ find_package(llvm REQUIRED)
 find_package(clang REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC
-	parsererror.cpp
+    parsererror.cpp
     codeparser.cpp)
 
 target_include_directories(${PROJECT_NAME}

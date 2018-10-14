@@ -9,10 +9,10 @@
 
 struct FileViewStateItem
 {
-	QString path;
-	long long tabIndex;
+    QString path;
+    long long tabIndex;
 
-	FileViewStateItem(const QString& path, long long tabIndex) : path(path), tabIndex(tabIndex) {}
+    FileViewStateItem(const QString& path, long long tabIndex) : path(path), tabIndex(tabIndex) {}
 };
 
 /* Others can access the state of the application through this class.
@@ -29,7 +29,7 @@ class AppStateHandler
     QString lastOpenedDirPath;
     std::vector<FileViewStateItem> m_fileViews;
 
-	Settings appSettings;
+    Settings appSettings;
 public:
     AppStateHandler();
 
@@ -37,7 +37,7 @@ public:
     void removeFileView(const QString& filePath, long long tabIndex);
     const std::vector<FileViewStateItem>& getFileViews();
 
-	Settings& settings();
+    Settings& settings();
 
     const QString& getLastOpenedDirectory();
     void setLastOpenedDirectory(const QString& path);

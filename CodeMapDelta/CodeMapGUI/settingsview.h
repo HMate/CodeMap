@@ -6,16 +6,16 @@
 
 class SettingsView : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
 private:
-	QLineEdit* m_includeEdit;
+    QLineEdit* m_includeEdit;
 
 public:
-	SettingsView(QWidget* parent);
+    SettingsView(QWidget* parent);
 
 public slots:
-	void accept() override;
-	void includePathEditPushed();
+    void accept() override;
+    void includePathEditPushed();
 
 };
 

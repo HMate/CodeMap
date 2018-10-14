@@ -23,7 +23,7 @@ public:
 
     PreprocessorEliminatorFrontendAction(std::string& preprocessedOutputDest) :
         preprocessedOutput(preprocessedOutputDest){}
-	
+    
     void ExecuteAction() override
     {
         clang::CompilerInstance &CI = getCompilerInstance();
@@ -33,15 +33,15 @@ public:
         ppoo.ShowCPP = 1;
         ppoo.ShowComments = 1;
 
-		/* Figured out how line markers work:
-		first is line number where we enter the file, then file name.
-		The flgas part is 1, if we entered the file thorught na import directive
-		Flags is 2, if we entered back to a file by leaving an include.
-		3 is when we enter a systems file. 
-		4 is extern C? Not sure what that means right now and if i need to handle it.
-		*/
+        /* Figured out how line markers work:
+        first is line number where we enter the file, then file name.
+        The flgas part is 1, if we entered the file thorught na import directive
+        Flags is 2, if we entered back to a file by leaving an include.
+        3 is when we enter a systems file. 
+        4 is extern C? Not sure what that means right now and if i need to handle it.
+        */
         ppoo.ShowLineMarkers = 1;
-		ppoo.UseLineDirectives = 0;
+        ppoo.UseLineDirectives = 0;
         clang::DoPrintPreprocessedInput(CI.getPreprocessor(), &OS, ppoo);
         OS.flush();
     }
@@ -54,9 +54,9 @@ public:
     PreprocessorFrontendActionFactory(std::string& preprocessedOutDest) : preprocessedOutput(preprocessedOutDest){}
 
     clang::FrontendAction *create() override 
-	{ 
-		return new PreprocessorEliminatorFrontendAction(preprocessedOutput); 
-	}
+    { 
+        return new PreprocessorEliminatorFrontendAction(preprocessedOutput); 
+    }
 };
 
 
