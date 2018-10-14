@@ -22,6 +22,7 @@ add_executable(${PROJECT_NAME}
     linenumberarea.cpp
     filesystem.cpp
     appstate.cpp
+    imagehandler.cpp
     stringlisteditordialog.cpp)
 
 target_include_directories(${PROJECT_NAME} 

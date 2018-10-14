@@ -11,7 +11,8 @@
 #include "codeparser.h"
 #include "linenumberarea.h"
 #include "fileview.h"
-#include "filesystem.h"
+
+#include "imagehandler.h"
 
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 {
@@ -140,7 +141,7 @@ void FileEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
                 auto topMargin = (lineHeight - s + 1) / 2;
                 if(lineNumber == 2)
                 {
-                    auto image = QImage(QString("%1/plus.png").arg(FS::getGuiIconsFolder()));
+                    auto image = ImageHandler::loadIcon(icons::Plus);
                     painter.drawImage(QRect(numAreaWidth, top + topMargin, s, s), image);
 
                     painter.drawRect(QRect(numAreaWidth, top, fw - 1, lineHeight));
@@ -154,7 +155,7 @@ void FileEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
 
                 if(lineNumber == 5)
                 {
-                    auto image = QImage(QString("%1/minus.png").arg(FS::getGuiIconsFolder()));
+                    auto image = ImageHandler::loadIcon(icons::Minus);
                     painter.drawImage(QRect(numAreaWidth, top + topMargin, s, s), image);
 
                     painter.drawRect(QRect(numAreaWidth, top, fw - 1, lineHeight));
