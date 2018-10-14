@@ -4,7 +4,12 @@
 
 Q_DECLARE_METATYPE(QTextDocumentFragment)
 
-FoldableTextArea::FoldableTextArea(QObject *parent) : QObject(parent) {
+FoldableTextArea::FoldableTextArea(QObject *parent) : FoldableTextArea(parent, "")
+{}
+
+FoldableTextArea::FoldableTextArea(QObject *parent, const QString& placeholderText) : QObject(parent)
+{
+	m_PlaceholderText = placeholderText;
 }
 
 QSizeF FoldableTextArea::intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format) {
@@ -16,18 +21,17 @@ QSizeF FoldableTextArea::intrinsicSize(QTextDocument *doc, int posInDocument, co
 	QFont fn = tf.font();
 	QFontMetrics fm(fn);
 
-	QString s("...");
-	QSizeF sz = fm.boundingRect(s).size();
+	QSizeF sz = fm.boundingRect(m_PlaceholderText).size();
 	return sz;
 }
 
-void FoldableTextArea::drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format) {
+void FoldableTextArea::drawObject(QPainter *painter, const QRectF &rect, 
+	QTextDocument *doc, int posInDocument, const QTextFormat &format) {
 
 	Q_UNUSED(doc)
 	Q_UNUSED(posInDocument)
 	Q_ASSERT(format.type() == format.CharFormat);
-	QString s("...");
-	painter->drawText(rect, s);
+	painter->drawText(rect, m_PlaceholderText);
 	painter->drawRect(rect);
 }
 
@@ -35,10 +39,12 @@ void FoldableTextArea::fold(QTextCursor c) {
 	QTextCharFormat f;
 	f.setObjectType(type());
 	QVariant v;
+	c.selection().toPlainText().size();
 	v.setValue(c.selection());
 	f.setProperty(prop(), v);
 	c.insertText(QString(QChar::ObjectReplacementCharacter), f);
 }
+
 bool FoldableTextArea::unfold(QTextCursor c) {
 	if(!c.hasSelection()) {
 		QTextCharFormat f = c.charFormat();

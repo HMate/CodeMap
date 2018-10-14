@@ -15,7 +15,7 @@
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 {
 	lineNumberArea = new LineNumberArea(this);
-	m_regionFolder = new FoldableTextArea(this);
+	m_regionFolder = new FoldableTextArea(this, "ASD");
 
 	document()->documentLayout()->registerHandler(m_regionFolder->type(), m_regionFolder);
 
