@@ -34,6 +34,9 @@ target_link_libraries(${PROJECT_NAME} Qt5::Concurrent)
 
 target_link_libraries(${PROJECT_NAME} CodeParser)
 
+file(COPY ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/gui_icons
+    DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
+
 if ( WIN32 )
     # Copy dlls to exe
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

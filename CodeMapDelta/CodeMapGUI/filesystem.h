@@ -19,6 +19,9 @@ public:
 	static bool doesFileExist(const QString& filePath);
     static bool saveFile(const QString& path, const QString& content);
     static QString readFile(const QString& filePath);
+
+    static QString getDataFolder();
+    static QString getGuiIconsFolder();
 };
 
 using FS = FileSystemManager;

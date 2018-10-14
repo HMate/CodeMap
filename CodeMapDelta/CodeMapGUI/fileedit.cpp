@@ -11,6 +11,7 @@
 #include "codeparser.h"
 #include "linenumberarea.h"
 #include "fileview.h"
+#include "filesystem.h"
 
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 {
@@ -117,26 +118,54 @@ void FileEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
     painter.fillRect(event->rect(), Qt::lightGray);
 
     QTextBlock block = firstVisibleBlock();
-    int blockNumber = block.blockNumber();
+    int lineNumber = block.blockNumber() + 1;
     int top = (int)blockBoundingGeometry(block).translated(contentOffset()).top();
     int bottom = top + (int)blockBoundingRect(block).height();
     
     const int rightMargin = 2;
+    int numAreaWidth = lineNumberArea->numberAreaWidth();
 
     while(block.isValid() && top <= event->rect().bottom()) {
         if(block.isVisible() && bottom >= event->rect().top()) {
-            QString number = QString::number(blockNumber + 1);
+            QString number = QString::number(lineNumber);
+            int lineHeight = fontMetrics().height();
             painter.setPen(Qt::black);
-            painter.drawText(0, top, lineNumberArea->width() - rightMargin, fontMetrics().height(),
+            painter.drawText(0, top, numAreaWidth - rightMargin, lineHeight,
                 Qt::AlignRight, number);
 
+            // draw region folders
+            {
+                auto fw = lineNumberArea->foldAreaWidth();
+                auto s = qMin(fw, lineHeight);
+                auto topMargin = (lineHeight - s + 1) / 2;
+                if(lineNumber == 2)
+                {
+                    auto image = QImage(QString("%1/plus.png").arg(FS::getGuiIconsFolder()));
+                    painter.drawImage(QRect(numAreaWidth, top + topMargin, s, s), image);
 
+                    painter.drawRect(QRect(numAreaWidth, top, fw - 1, lineHeight));
+                }
+                
+                if(lineNumber > 2 && lineNumber < 5)
+                {
+                    auto half = fw / 2;
+                    painter.drawLine(numAreaWidth + half, top, numAreaWidth + half, top + lineHeight);
+                }
+
+                if(lineNumber == 5)
+                {
+                    auto image = QImage(QString("%1/minus.png").arg(FS::getGuiIconsFolder()));
+                    painter.drawImage(QRect(numAreaWidth, top + topMargin, s, s), image);
+
+                    painter.drawRect(QRect(numAreaWidth, top, fw - 1, lineHeight));
+                }
+            }
         }
 
         block = block.next();
         top = bottom;
         bottom = top + (int)blockBoundingRect(block).height();
-        ++blockNumber;
+        ++lineNumber;
     }
 }
 
@@ -149,22 +178,22 @@ int FileEdit::lineNumberAreaWidth()
         ++digits;
     }
 
-    int space = 3 + fontMetrics().width(QLatin1Char('9'))*digits;
-
-    return space;
+    int width = 3 + fontMetrics().width(QLatin1Char('9'))*digits;
+    return width;
 }
 
 void FileEdit::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
-
+    
+    // Call this manually because linenumberarea is not contained in any layout.
     QRect cr = contentsRect();
-    lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+    lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberArea->totalWidth(), cr.height()));
 }
 
 void FileEdit::updateLineNumberAreaWidth(int newBlockCount)
 {
-    setViewportMargins(lineNumberAreaWidth(), 0, 0, 0);
+    setViewportMargins(lineNumberArea->width(), 0, 0, 0);
 }
 
 void FileEdit::highlightCurrentLine()

@@ -13,7 +13,7 @@ const QString STATE_FILE_NAME = "state.cms";
 
 AppStateHandler::AppStateHandler()
 {
-    dataDirPath = FS::concat(FS::getCWD(), "data");
+    dataDirPath = FS::getDataFolder();
 }
 
 void AppStateHandler::addFileView(const QString& filePath, long long tabIndex)

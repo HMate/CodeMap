@@ -2,6 +2,7 @@
 
 #include <QTextStream>
 #include <QDebug>
+#include <QApplication>
 
 QString FileSystemManager::getCWD()
 {
@@ -62,4 +63,14 @@ QString FileSystemManager::readFile(const QString& filePath)
     QString result = fileStream.readAll();
     return result;
 
+}
+
+QString FileSystemManager::getDataFolder()
+{
+    return FS::concat(FS::getCWD(), "data");
+}
+
+QString FileSystemManager::getGuiIconsFolder()
+{
+    return FS::concat(getDataFolder(), "gui_icons");
 }

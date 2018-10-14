@@ -16,6 +16,9 @@ public:
     }
 
     QSize sizeHint() const override;
+    int totalWidth() const;
+    int numberAreaWidth() const;
+    int foldAreaWidth() const;
 
 protected:
     void paintEvent(QPaintEvent *event) override;
