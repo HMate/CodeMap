@@ -4,15 +4,12 @@
 #include <QContextMenuEvent>
 
 #include <QPainter>
-#include <QTextBlock>
 #include <QtConcurrent>
 
 #include "mainwindow.h"
 #include "codeparser.h"
 #include "linenumberarea.h"
 #include "fileview.h"
-
-#include "imagehandler.h"
 
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 {
@@ -113,76 +110,6 @@ void FileEdit::setFilePath(const QString& path)
 
 // Line numbering things
 
-void FileEdit::lineNumberAreaPaintEvent(QPaintEvent *event)
-{
-    QPainter painter(lineNumberArea);
-    painter.fillRect(event->rect(), Qt::lightGray);
-
-    QTextBlock block = firstVisibleBlock();
-    int lineNumber = block.blockNumber() + 1;
-    int top = (int)blockBoundingGeometry(block).translated(contentOffset()).top();
-    int bottom = top + (int)blockBoundingRect(block).height();
-    
-    const int rightMargin = 2;
-    int numAreaWidth = lineNumberArea->numberAreaWidth();
-
-    while(block.isValid() && top <= event->rect().bottom()) {
-        if(block.isVisible() && bottom >= event->rect().top()) {
-            QString number = QString::number(lineNumber);
-            int lineHeight = fontMetrics().height();
-            painter.setPen(Qt::black);
-            painter.drawText(0, top, numAreaWidth - rightMargin, lineHeight,
-                Qt::AlignRight, number);
-
-            // draw region folders
-            {
-                auto fw = lineNumberArea->foldAreaWidth();
-                auto s = qMin(fw, lineHeight);
-                auto topMargin = (lineHeight - s + 1) / 2;
-                if(lineNumber == 2)
-                {
-                    auto image = ImageHandler::loadIcon(icons::Plus);
-                    painter.drawImage(QRect(numAreaWidth, top + topMargin, s, s), image);
-
-                    painter.drawRect(QRect(numAreaWidth, top, fw - 1, lineHeight));
-                }
-                
-                if(lineNumber > 2 && lineNumber < 5)
-                {
-                    auto half = fw / 2;
-                    painter.drawLine(numAreaWidth + half, top, numAreaWidth + half, top + lineHeight);
-                }
-
-                if(lineNumber == 5)
-                {
-                    auto image = ImageHandler::loadIcon(icons::Minus);
-                    painter.drawImage(QRect(numAreaWidth, top + topMargin, s, s), image);
-
-                    painter.drawRect(QRect(numAreaWidth, top, fw - 1, lineHeight));
-                }
-            }
-        }
-
-        block = block.next();
-        top = bottom;
-        bottom = top + (int)blockBoundingRect(block).height();
-        ++lineNumber;
-    }
-}
-
-int FileEdit::lineNumberAreaWidth()
-{
-    int digits = 1;
-    int max = qMax(1, blockCount());
-    while(max >= 10) {
-        max /= 10;
-        ++digits;
-    }
-
-    int width = 3 + fontMetrics().width(QLatin1Char('9'))*digits;
-    return width;
-}
-
 void FileEdit::resizeEvent(QResizeEvent *e)
 {
     QPlainTextEdit::resizeEvent(e);
@@ -195,6 +122,17 @@ void FileEdit::resizeEvent(QResizeEvent *e)
 void FileEdit::updateLineNumberAreaWidth(int newBlockCount)
 {
     setViewportMargins(lineNumberArea->width(), 0, 0, 0);
+}
+
+void FileEdit::updateLineNumberArea(const QRect &rect, int dy)
+{
+    if(dy)
+        lineNumberArea->scroll(0, dy);
+    else
+        lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
+
+    if(rect.contains(viewport()->rect()))
+        updateLineNumberAreaWidth(0);
 }
 
 void FileEdit::highlightCurrentLine()
@@ -214,15 +152,4 @@ void FileEdit::highlightCurrentLine()
     }
 
     setExtraSelections(extraSelections);
-}
-
-void FileEdit::updateLineNumberArea(const QRect &rect, int dy)
-{
-    if(dy)
-        lineNumberArea->scroll(0, dy);
-    else
-        lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
-
-    if(rect.contains(viewport()->rect()))
-        updateLineNumberAreaWidth(0);
 }

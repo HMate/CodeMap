@@ -41,6 +41,8 @@ private slots:
     void updateLineNumberAreaWidth(int newBlockCount);
     void highlightCurrentLine();
     void updateLineNumberArea(const QRect &, int);
+
+    friend class LineNumberArea;
 };
 
 #endif // FILEEDIT_H

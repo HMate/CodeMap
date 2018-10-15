@@ -11,7 +11,7 @@ class LineNumberArea : public QWidget
     Q_OBJECT
 
 public:
-    LineNumberArea(FileEdit *editor) : QWidget(qobject_cast<QWidget*>(editor)) {
+    explicit LineNumberArea(FileEdit *editor) : QWidget(qobject_cast<QWidget*>(editor)) {
         codeEditor = editor;
     }
 
