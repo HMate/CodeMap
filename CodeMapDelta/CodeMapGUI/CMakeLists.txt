@@ -5,9 +5,7 @@ project(CodeMapGUI)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt5Core)
-find_package(Qt5Widgets)
-find_package(Qt5Concurrent)
+find_package(Qt5 CONFIG REQUIRED Core Widgets Concurrent)
 
 add_executable(${PROJECT_NAME}
     main.cpp
@@ -29,11 +27,12 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE CMakeParser
     PRIVATE CodeParser)
 
-target_link_libraries(${PROJECT_NAME} Qt5::Core)
-target_link_libraries(${PROJECT_NAME} Qt5::Widgets)
-target_link_libraries(${PROJECT_NAME} Qt5::Concurrent)
-
-target_link_libraries(${PROJECT_NAME} CodeParser)
+target_link_libraries(${PROJECT_NAME} 
+    Qt5::Core
+    Qt5::Widgets
+    Qt5::Concurrent
+    
+    CodeParser)
 
 file(COPY ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/gui_icons
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
