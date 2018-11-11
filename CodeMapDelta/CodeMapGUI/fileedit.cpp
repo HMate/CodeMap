@@ -13,7 +13,7 @@
 
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 {
-    lineNumberArea = new LineNumberArea(this);
+    m_lineNumberArea = new LineNumberArea(this);
     m_regionFolder = new TextFolder(this, "ASD");
 
     document()->documentLayout()->registerHandler(m_regionFolder->type(), m_regionFolder);
@@ -63,16 +63,10 @@ void FileEdit::foldDefines()
     terminal->showMessage(tr("Folding defines for %1").arg(m_FilePath));
 
     QString name = tr("Folded defines for: %1").arg(m_FilePath);
-    m_FoldedFileView = MainWindow::instance()->getDocumentManager()->openStringFileView(name, "Loading...");
+    m_PreprocessedFileView = MainWindow::instance()->getDocumentManager()->openStringFileView(name, "Loading...");
 
     auto foldFuture = QtConcurrent::run(this, &FileEdit::foldDefinesForFile, m_FilePath);
     foldWatcher.setFuture(foldFuture);
-}
-
-void FileEdit::foldDefinesFinished()
-{
-    QString result = foldWatcher.future().result();
-    m_FoldedFileView->setText(result);
 }
 
 QString FileEdit::foldDefinesForFile(const QString& filePath) const
@@ -99,6 +93,12 @@ QString FileEdit::foldDefinesForFile(const QString& filePath) const
     return processed.code.content;
 }
 
+void FileEdit::foldDefinesFinished()
+{
+    QString result = foldWatcher.future().result();
+    m_PreprocessedFileView->setText(result);
+}
+
 void FileEdit::setFilePath(const QString& path)
 {
     m_FilePath = path;
@@ -116,20 +116,20 @@ void FileEdit::resizeEvent(QResizeEvent *e)
     
     // Call this manually because linenumberarea is not contained in any layout.
     QRect cr = contentsRect();
-    lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), lineNumberArea->totalWidth(), cr.height()));
+    m_lineNumberArea->setGeometry(QRect(cr.left(), cr.top(), m_lineNumberArea->totalWidth(), cr.height()));
 }
 
 void FileEdit::updateLineNumberAreaWidth(int newBlockCount)
 {
-    setViewportMargins(lineNumberArea->width(), 0, 0, 0);
+    setViewportMargins(m_lineNumberArea->width(), 0, 0, 0);
 }
 
 void FileEdit::updateLineNumberArea(const QRect &rect, int dy)
 {
     if(dy)
-        lineNumberArea->scroll(0, dy);
+        m_lineNumberArea->scroll(0, dy);
     else
-        lineNumberArea->update(0, rect.y(), lineNumberArea->width(), rect.height());
+        m_lineNumberArea->update(0, rect.y(), m_lineNumberArea->width(), rect.height());
 
     if(rect.contains(viewport()->rect()))
         updateLineNumberAreaWidth(0);

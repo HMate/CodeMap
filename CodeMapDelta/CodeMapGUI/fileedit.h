@@ -14,8 +14,8 @@ class FileEdit : public QPlainTextEdit
     Q_OBJECT
 
     QString m_FilePath;
-    FileView* m_FoldedFileView;
-    LineNumberArea* lineNumberArea;
+    FileView* m_PreprocessedFileView;
+    LineNumberArea* m_lineNumberArea;
     TextFolder* m_regionFolder;
     QFutureWatcher<QString> foldWatcher;
 public:
