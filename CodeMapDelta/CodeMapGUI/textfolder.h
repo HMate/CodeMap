@@ -8,6 +8,7 @@
 #include <QTextDocument>
 #include <QTextObjectInterface>
 
+/* Helps to collapse text in QTextDocument */
 class TextFolder : public QObject, public QTextObjectInterface
 {
     Q_OBJECT

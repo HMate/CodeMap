@@ -36,20 +36,21 @@ void TextFolder::drawObject(QPainter *painter, const QRectF &rect,
 }
 
 void TextFolder::fold(QTextCursor c) {
+    QVariant v;
+    v.setValue(c.selection());
+
     QTextCharFormat f;
     f.setObjectType(type());
-    QVariant v;
-    c.selection().toPlainText().size();
-    v.setValue(c.selection());
     f.setProperty(prop(), v);
+
     c.insertText(QString(QChar::ObjectReplacementCharacter), f);
 }
 
 bool TextFolder::unfold(QTextCursor c) {
     if(!c.hasSelection()) {
+        c.movePosition(c.Right, c.KeepAnchor);
         QTextCharFormat f = c.charFormat();
         if(f.objectType() == type()) {
-            c.movePosition(c.Left, c.KeepAnchor);
             QVariant v = f.property(prop());
             auto q = v.value<QTextDocumentFragment>();
             c.insertFragment(q);

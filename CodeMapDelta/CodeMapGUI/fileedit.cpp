@@ -40,7 +40,7 @@ void FileEdit::fold() {
 
 void FileEdit::unfold() {
     auto c = textCursor();
-    c.setPosition(11);
+    c.setPosition(10);
     m_regionFolder->unfold(c);
 }
 
