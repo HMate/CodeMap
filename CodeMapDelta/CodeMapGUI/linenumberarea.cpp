@@ -95,19 +95,48 @@ void FoldIndicator::drawIndicator(QPainter& painter, int lineNumber,
     }
 }
 
+bool LineNumberArea::event(QEvent *event)
+{
+    switch(event->type())
+    {
+    case QEvent::HoverEnter:
+        qDebug() << "HoverEnter";
+        handleMouseOverFoldIndicator(static_cast<QHoverEvent*>(event)->pos());
+        return true;
+        break;
+    case QEvent::HoverLeave:
+        qDebug() << "HoverLeave";
+        handleMouseOverFoldIndicator(static_cast<QHoverEvent*>(event)->pos());
+        return true;
+        break;
+    case QEvent::HoverMove:
+        qDebug() << "Move";
+        handleMouseOverFoldIndicator(static_cast<QHoverEvent*>(event)->pos());
+        return true;
+        break;
+    default:
+        break;
+    }
+    return QWidget::event(event);
+}
+
 void LineNumberArea::mouseMoveEvent(QMouseEvent *event)
+{
+    auto p = event->pos();
+    handleMouseOverFoldIndicator(p);
+}
+
+void LineNumberArea::handleMouseOverFoldIndicator(const QPoint& pos)
 {
     // TODO: we dont get the vent when leaving on right side to editor
     // TODO: this either needs to be handled by the layout system, or placed to the editor
     // because if i want to highlight a block here, the code will become messy.
-    auto p = event->pos();
-
     QTextBlock block = m_codeEditor->firstVisibleBlock();
     int top = (int)m_codeEditor->blockBoundingGeometry(block).translated(m_codeEditor->contentOffset()).top();
     auto s = m_f->sizeHint();
     QPoint fpos(numberAreaWidth(), top + fontMetrics().height()*(m_f->m_startLine-1));
     QRect frect = QRect(fpos, s);
-    m_f->setContainsMouse(frect.contains(p));
+    m_f->setContainsMouse(frect.contains(pos));
     repaint();
 }
 

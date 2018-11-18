@@ -14,6 +14,10 @@ bool ParserResult::hasErrors()
 }
 
 /*
+clang -H: flag to list include dependencies
+*/
+
+/*
  * Preprocesses the input files and stores them in a string.
  * */
 class PreprocessorEliminatorFrontendAction : public clang::PreprocessorFrontendAction

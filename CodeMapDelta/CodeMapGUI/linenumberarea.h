@@ -35,8 +35,10 @@ public:
     int foldAreaWidth() const;
 
 protected:
+    bool event(QEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void handleMouseOverFoldIndicator(const QPoint& pos);
 };
 
 #endif // LINENUMBERAREA_H
