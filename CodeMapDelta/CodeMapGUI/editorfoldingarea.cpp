@@ -26,31 +26,7 @@ void EditorFoldingArea::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
 
     auto& rc = event->rect();
-    painter.fillRect(event->rect(), Qt::yellow);
-
-    QTextBlock block = m_codeEditor->firstVisibleBlock();
-    int lineNumber = block.blockNumber() + 1;
-    int top = (int)m_codeEditor->blockBoundingGeometry(block).translated(m_codeEditor->contentOffset()).top();
-    int bottom = top + (int)m_codeEditor->blockBoundingRect(block).height();
-
-    const int w = width();
-    const int lineHeight = fontMetrics().height();
-
-    while(block.isValid() && top <= event->rect().bottom()) {
-        if(block.isVisible() && bottom >= event->rect().top()) {
-            painter.setPen(Qt::black);
-
-            // draw region folders
-            {
-                m_f->drawIndicator(painter, lineNumber, top, lineHeight, 0, w);
-            }
-        }
-
-        block = block.next();
-        top = bottom;
-        bottom = top + (int)m_codeEditor->blockBoundingRect(block).height();
-        ++lineNumber;
-    }
+    painter.fillRect(rc, Qt::lightGray);
 }
 
 void EditorFoldingArea::addFoldingButton(int firstLine, int lastLine)
@@ -137,35 +113,38 @@ void EditorFoldingButton::setContainsMouse(bool c)
     m_containsMouse = c;
 }
 
-void EditorFoldingButton::drawIndicator(QPainter& painter, int lineNumber,
-    int top, int lineHeight, int leftOffset, int width) const
+void EditorFoldingButton::paintEvent(QPaintEvent *event) 
 {
-    auto s = qMin(width - 4, lineHeight - 4);
+    QWidget::paintEvent(event);
+    QPainter painter(this);
+
+    const int lineHeight = fontMetrics().height();
+    auto s = qMin(width() - 4, lineHeight - 4);
     auto topMargin = (lineHeight - s + 1) / 2;
-    auto leftMargin = (width - s + 1) / 2;
+    auto leftMargin = (width() - s + 1) / 2;
     if(m_containsMouse)
     {
-        //painter.fillRect(QRect(leftOffset, top, width - 1, lineHeight), Qt::white);
         painter.setPen(Qt::darkGray);
     }
-
-    if(lineNumber == m_startLine)
+    else
     {
-        auto image = ImageHandler::loadIcon(icons::Plus);
-        painter.drawImage(QRect(leftOffset + leftMargin, top + topMargin, s, s), image);
-        painter.drawRect(QRect(leftOffset, top, width - 1, lineHeight));
+        painter.setPen(Qt::black);
     }
 
-    if(lineNumber > m_startLine && lineNumber < m_endLine)
-    {
-        auto half = width / 2;
-        painter.drawLine(leftOffset + half, top, leftOffset + half, top + lineHeight);
-    }
+    // draw start box
+    auto plusImage = ImageHandler::loadIcon(icons::Plus);
+    painter.drawImage(QRect(leftMargin, topMargin, s, s), plusImage);
+    painter.drawRect(QRect(0, 0, width() - 1, lineHeight-1));
 
-    if(lineNumber == m_endLine)
-    {
-        auto image = ImageHandler::loadIcon(icons::Minus);
-        painter.drawImage(QRect(leftOffset + leftMargin, top + topMargin, s, s), image);
-        painter.drawRect(QRect(leftOffset, top, width - 1, lineHeight));
-    }
+    // draw middle line
+    auto half = width() / 2;
+    int lineTop = lineHeight;
+    int lineLength = m_endLine - m_startLine - 1;
+    int lineBottom = lineTop + (lineHeight*lineLength);
+    painter.drawLine(half, lineTop, half, lineBottom);
+
+    // draw closing box
+    auto minusImage = ImageHandler::loadIcon(icons::Minus);
+    painter.drawImage(QRect(leftMargin, lineBottom + topMargin, s, s), minusImage);
+    painter.drawRect(QRect(0, lineBottom, width() - 1, lineHeight-1));
 }

@@ -38,10 +38,10 @@ public:
     EditorFoldingButton(QWidget* parent, int start, int end);
 
     void setContainsMouse(bool);
-    void drawIndicator(QPainter& painter, int lineNumber, int top, int lineHeight, int leftOffset, int width) const;
     QSize sizeHint() const override;
 
 protected:
+    void paintEvent(QPaintEvent *event) override;
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;
 };
