@@ -7,6 +7,7 @@
 #include <QToolBar>
 
 class LineNumberArea;
+class EditorFoldingArea;
 class FileEdit;
 
 /* TODO
@@ -34,6 +35,7 @@ class FileView : public QWidget
     QGridLayout* m_layout;
 
     LineNumberArea* m_lineNumberArea;
+    EditorFoldingArea* m_foldingArea;
     FileEdit* m_editor;
 
     QLabel* m_nameLabel;

@@ -12,6 +12,7 @@
 #include "fileedit.h"
 #include "filesystem.h"
 #include "linenumberarea.h"
+#include "editorfoldingarea.h"
 
 #define NEW_FILE "{new file}"
 
@@ -24,15 +25,18 @@ FileView::FileView(QWidget *parent) : QWidget(parent)
     m_layout->setSpacing(0);
 
     QToolBar* toolbar = createToolbar();
-    m_layout->addWidget(toolbar, 0, 0, 1, 2);
+    m_layout->addWidget(toolbar, 0, 0, 1, -1);
 
     m_editor = new FileEdit(this);
     setFocusProxy(m_editor);
     m_editor->installEventFilter(this);
-    m_layout->addWidget(m_editor, 1, 1);
+    m_layout->addWidget(m_editor, 1, 2);
 
     m_lineNumberArea = new LineNumberArea(this, m_editor);
     m_layout->addWidget(m_lineNumberArea, 1, 0);
+
+    m_foldingArea = new EditorFoldingArea(this, m_editor);
+    m_layout->addWidget(m_foldingArea, 1, 1);
 
     connect(m_editor->document(), &QTextDocument::modificationChanged,
             this, &FileView::fileContentModified);
@@ -103,8 +107,7 @@ void FileView::keyPressEvent(QKeyEvent* ke)
     // TODO: make keybinding configurable from settings
     if(ke->key() == Qt::Key_S && ke->modifiers().testFlag(Qt::ControlModifier))
     {
-        auto terminal = MainWindow::instance()->getTerminalView();
-        terminal->showMessage(tr("Saving \"%1\"").arg(m_FilePath));
+        logTerminal(tr("Saving \"%1\"").arg(m_FilePath));
         ke->setAccepted(true);
         saveFile();
     } 
@@ -124,7 +127,6 @@ void FileView::keyPressEvent(QKeyEvent* ke)
 
 void FileView::saveFile()
 {
-    auto terminal = MainWindow::instance()->getTerminalView();
     if(m_FilePath == "" || !FS::doesFileExist(m_FilePath))
     {
         // Open save as dialog
@@ -150,10 +152,9 @@ void FileView::saveFile()
     bool success = writer.write(m_editor->document());
     if (success) {
         m_editor->document()->setModified(false);
-        terminal->showMessage(tr("Saved \"%1\"").arg(m_FilePath));
+        logTerminal(tr("Saved \"%1\"").arg(m_FilePath));
     } else {
-        terminal->showMessage(tr("Saving failed. Could not write to file \"%1\"")
-                                 .arg(m_FilePath));
+        logTerminal(tr("Saving failed. Could not write to file \"%1\"").arg(m_FilePath));
     }
 }
 

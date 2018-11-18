@@ -35,6 +35,7 @@ private slots:
     void highlightCurrentLine();
 
     friend class LineNumberArea;
+    friend class EditorFoldingArea;
 };
 
 #endif // FILEEDIT_H

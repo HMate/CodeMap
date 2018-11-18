@@ -18,6 +18,7 @@ add_executable(${PROJECT_NAME}
     fileedit.cpp
     textfolder.cpp
     linenumberarea.cpp
+	editorfoldingarea.cpp
     filesystem.cpp
     appstate.cpp
     imagehandler.cpp
