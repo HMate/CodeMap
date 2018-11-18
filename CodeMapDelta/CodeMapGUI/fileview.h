@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QToolBar>
 
+class LineNumberArea;
 class FileEdit;
 
 /* TODO
@@ -23,13 +24,19 @@ class FileEdit;
      - switch header/cpp
  * */
 
+/*
+Wrapper class around the file editor, that provides an interface for others to use the editor
+*/
 class FileView : public QWidget
 {
     Q_OBJECT
 
-    QGridLayout* layout;
-    FileEdit* editor;
-    QLabel* nameLabel;
+    QGridLayout* m_layout;
+
+    LineNumberArea* m_lineNumberArea;
+    FileEdit* m_editor;
+
+    QLabel* m_nameLabel;
     QString m_FilePath;
 
 public:

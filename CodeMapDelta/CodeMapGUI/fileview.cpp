@@ -11,36 +11,40 @@
 #include "mainwindow.h"
 #include "fileedit.h"
 #include "filesystem.h"
+#include "linenumberarea.h"
 
 #define NEW_FILE "{new file}"
 
 FileView::FileView(QWidget *parent) : QWidget(parent)
 {
-    nameLabel = new QLabel(this);
+    m_nameLabel = new QLabel(this);
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
-    layout = new QGridLayout(this);
-    layout->setMargin(0);
-    layout->setSpacing(0);
+    m_layout = new QGridLayout(this);
+    m_layout->setMargin(0);
+    m_layout->setSpacing(0);
 
     QToolBar* toolbar = createToolbar();
-    layout->addWidget(toolbar, 0, 0);
+    m_layout->addWidget(toolbar, 0, 0, 1, 2);
 
-    editor = new FileEdit(this);
-    setFocusProxy(editor);
-    editor->installEventFilter(this);
-    layout->addWidget(editor, 1, 0);
+    m_editor = new FileEdit(this);
+    setFocusProxy(m_editor);
+    m_editor->installEventFilter(this);
+    m_layout->addWidget(m_editor, 1, 1);
 
-    connect(editor->document(), &QTextDocument::modificationChanged,
+    m_lineNumberArea = new LineNumberArea(this, m_editor);
+    m_layout->addWidget(m_lineNumberArea, 1, 0);
+
+    connect(m_editor->document(), &QTextDocument::modificationChanged,
             this, &FileView::fileContentModified);
 }
 
 QToolBar* FileView::createToolbar()
 {
     QToolBar* toolbar = new QToolBar("FileView", this);
-    nameLabel->setText(NEW_FILE);
-    toolbar->addWidget(nameLabel);
+    m_nameLabel->setText(NEW_FILE);
+    toolbar->addWidget(m_nameLabel);
     QWidget *spacerWidget = new QWidget(this);
-    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     toolbar->addWidget(spacerWidget);
     toolbar->addAction("X", [this](){
         MainWindow::instance()->getDocumentManager()->closeFileView(this);
@@ -68,7 +72,7 @@ void FileView::openFile(const QString& path)
     // If path is empty, we want to open a new file
     if(path.isEmpty())
     {
-        nameLabel->setText(NEW_FILE);
+        m_nameLabel->setText(NEW_FILE);
         return;
     }
 
@@ -106,11 +110,11 @@ void FileView::keyPressEvent(QKeyEvent* ke)
     } 
     else if(ke->key() == Qt::Key_D && ke->modifiers().testFlag(Qt::ControlModifier))
     {
-        editor->fold();
+        m_editor->fold();
     }
     else if(ke->key() == Qt::Key_F && ke->modifiers().testFlag(Qt::ControlModifier))
     {
-        editor->unfold();
+        m_editor->unfold();
     }
     else
     {
@@ -143,9 +147,9 @@ void FileView::saveFile()
 
     QTextDocumentWriter writer(m_FilePath);
     writer.setFormat("plaintext");
-    bool success = writer.write(editor->document());
+    bool success = writer.write(m_editor->document());
     if (success) {
-        editor->document()->setModified(false);
+        m_editor->document()->setModified(false);
         terminal->showMessage(tr("Saved \"%1\"").arg(m_FilePath));
     } else {
         terminal->showMessage(tr("Saving failed. Could not write to file \"%1\"")
@@ -156,8 +160,8 @@ void FileView::saveFile()
 void FileView::setFilePath(const QString &path)
 {
     m_FilePath = path;
-    editor->setFilePath(path);
-    nameLabel->setText(path);
+    m_editor->setFilePath(path);
+    m_nameLabel->setText(path);
 }
 
 const QString& FileView::getFilePath()
@@ -168,13 +172,13 @@ const QString& FileView::getFilePath()
 void FileView::fileContentModified(bool changed)
 {
     if(changed)
-        nameLabel->setText(m_FilePath+"*");
+        m_nameLabel->setText(m_FilePath+"*");
     else
-        nameLabel->setText(m_FilePath);
+        m_nameLabel->setText(m_FilePath);
 }
 
 void FileView::setText(const QString& t)
 {
-    editor->setPlainText(t);
-    editor->document()->setModified(false);
+    m_editor->setPlainText(t);
+    m_editor->document()->setModified(false);
 }

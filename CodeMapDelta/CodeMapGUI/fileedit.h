@@ -6,7 +6,6 @@
 
 #include "textfolder.h"
 
-class LineNumberArea;
 class FileView;
 
 class FileEdit : public QPlainTextEdit
@@ -14,33 +13,26 @@ class FileEdit : public QPlainTextEdit
     Q_OBJECT
 
     QString m_FilePath;
+    
     FileView* m_PreprocessedFileView;
-    LineNumberArea* m_lineNumberArea;
     TextFolder* m_regionFolder;
-    QFutureWatcher<QString> foldWatcher;
+    QFutureWatcher<QString> m_foldWatcher;
 public:
     FileEdit(QWidget* parent);
     void setFilePath(const QString& path);
+    const QString& getFilePath() { return m_FilePath; }
 
     void contextMenuEvent(QContextMenuEvent *event);
 
     void foldDefines(); 
     QString foldDefinesForFile(const QString& filePath) const;
-
-    void lineNumberAreaPaintEvent(QPaintEvent *event);
-    int lineNumberAreaWidth();
-
+    
     void fold();
     void unfold();
-protected:
-    void resizeEvent(QResizeEvent *event) override;
 
 private slots:
     void foldDefinesFinished();
-
-    void updateLineNumberAreaWidth(int newBlockCount);
     void highlightCurrentLine();
-    void updateLineNumberArea(const QRect &, int);
 
     friend class LineNumberArea;
 };

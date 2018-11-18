@@ -27,12 +27,16 @@ class LineNumberArea : public QWidget
     FileEdit *m_codeEditor;
     FoldIndicator *m_f;
 public:
-    explicit LineNumberArea(FileEdit *editor);
+    explicit LineNumberArea(QWidget *parent, FileEdit *editor);
 
     QSize sizeHint() const override;
     int totalWidth() const;
     int numberAreaWidth() const;
     int foldAreaWidth() const;
+
+public slots:
+    void updateLineNumberArea(const QRect &rect, int dy);
+    void updateSize();
 
 protected:
     bool event(QEvent *event) override;

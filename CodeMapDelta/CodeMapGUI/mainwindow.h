@@ -59,4 +59,6 @@ public slots:
 
 };
 
+#define logTerminal(msg) MainWindow::instance()->getTerminalView()->showMessage(msg);
+
 #endif // MAINWINDOW_H

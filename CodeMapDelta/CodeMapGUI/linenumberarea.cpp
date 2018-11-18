@@ -3,14 +3,20 @@
 #include <QTextBlock>
 
 #include "imagehandler.h"
+#include "mainwindow.h"
 
-const int FoldAreaWidth = 13;
+const int FOLD_AREA_WIDTH = 13;
 
-LineNumberArea::LineNumberArea(FileEdit *editor) : QWidget(qobject_cast<QWidget*>(editor))
+LineNumberArea::LineNumberArea(QWidget *parent, FileEdit *editor) : QWidget(parent)
 {
     m_codeEditor = editor;
     m_f = new FoldIndicator(this, 3, 5);
-    setMouseTracking(true);
+
+    setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
+    setMaximumWidth(totalWidth());
+
+    // Need this callback to handle scrolling and size update after editor content changed
+    connect(m_codeEditor, SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumberArea(QRect, int)));
 }
 
 void LineNumberArea::paintEvent(QPaintEvent *event) {
@@ -43,55 +49,6 @@ void LineNumberArea::paintEvent(QPaintEvent *event) {
         top = bottom;
         bottom = top + (int)m_codeEditor->blockBoundingRect(block).height();
         ++lineNumber;
-    }
-}
-
-FoldIndicator::FoldIndicator(QWidget* parent, int start, int end) : QWidget(parent), m_startLine(start), m_endLine(end)
-{
-    Q_ASSERT(start < end);
-}
-
-QSize FoldIndicator::sizeHint() const
-{
-    const int lineHeight = fontMetrics().height();
-    return QSize(FoldAreaWidth, lineHeight*(m_endLine-m_startLine+1));
-}
-
-void FoldIndicator::setContainsMouse(bool c)
-{
-    m_containsMouse = c;
-}
-
-void FoldIndicator::drawIndicator(QPainter& painter, int lineNumber, 
-    int top, int lineHeight, int leftOffset, int width) const
-{
-    auto s = qMin(width-4, lineHeight-4);
-    auto topMargin = (lineHeight - s + 1) / 2;
-    auto leftMargin = (width - s + 1) / 2;
-    if(m_containsMouse)
-    {
-        //painter.fillRect(QRect(leftOffset, top, width - 1, lineHeight), Qt::white);
-        painter.setPen(Qt::darkGray);
-    }
-
-    if(lineNumber == m_startLine)
-    {
-        auto image = ImageHandler::loadIcon(icons::Plus);
-        painter.drawImage(QRect(leftOffset + leftMargin, top + topMargin, s, s), image);
-        painter.drawRect(QRect(leftOffset, top, width - 1, lineHeight));
-    }
-
-    if(lineNumber > m_startLine && lineNumber < m_endLine)
-    {
-        auto half = width / 2;
-        painter.drawLine(leftOffset + half, top, leftOffset + half, top + lineHeight);
-    }
-
-    if(lineNumber == m_endLine)
-    {
-        auto image = ImageHandler::loadIcon(icons::Minus);
-        painter.drawImage(QRect(leftOffset + leftMargin, top + topMargin, s, s), image);
-        painter.drawRect(QRect(leftOffset, top, width - 1, lineHeight));
     }
 }
 
@@ -140,9 +97,27 @@ void LineNumberArea::handleMouseOverFoldIndicator(const QPoint& pos)
     repaint();
 }
 
+void LineNumberArea::updateLineNumberArea(const QRect &rect, int dy)
+{
+    if(dy)
+        this->scroll(0, dy);
+    else
+        this->update(0, rect.y(), this->width(), rect.height());
+
+    if(rect.contains(m_codeEditor->viewport()->rect()))
+        updateSize();
+}
+
+void LineNumberArea::updateSize()
+{
+    auto s = sizeHint();
+    resize(s);
+    setMaximumWidth(s.width());
+}
+
 QSize LineNumberArea::sizeHint() const 
 {
-    return QSize(totalWidth(), 0);
+    return QSize(totalWidth(), m_codeEditor->size().height());
 }
 
 int LineNumberArea::totalWidth() const
@@ -165,7 +140,57 @@ int LineNumberArea::numberAreaWidth() const
 
 int LineNumberArea::foldAreaWidth() const
 {
-    return FoldAreaWidth;
+    return FOLD_AREA_WIDTH;
 }
 
 
+// ---------------Fold Indicator -------------------------
+
+FoldIndicator::FoldIndicator(QWidget* parent, int start, int end) : QWidget(parent), m_startLine(start), m_endLine(end)
+{
+    Q_ASSERT(start < end);
+}
+
+QSize FoldIndicator::sizeHint() const
+{
+    const int lineHeight = fontMetrics().height();
+    return QSize(FOLD_AREA_WIDTH, lineHeight*(m_endLine - m_startLine + 1));
+}
+
+void FoldIndicator::setContainsMouse(bool c)
+{
+    m_containsMouse = c;
+}
+
+void FoldIndicator::drawIndicator(QPainter& painter, int lineNumber,
+    int top, int lineHeight, int leftOffset, int width) const
+{
+    auto s = qMin(width - 4, lineHeight - 4);
+    auto topMargin = (lineHeight - s + 1) / 2;
+    auto leftMargin = (width - s + 1) / 2;
+    if(m_containsMouse)
+    {
+        //painter.fillRect(QRect(leftOffset, top, width - 1, lineHeight), Qt::white);
+        painter.setPen(Qt::darkGray);
+    }
+
+    if(lineNumber == m_startLine)
+    {
+        auto image = ImageHandler::loadIcon(icons::Plus);
+        painter.drawImage(QRect(leftOffset + leftMargin, top + topMargin, s, s), image);
+        painter.drawRect(QRect(leftOffset, top, width - 1, lineHeight));
+    }
+
+    if(lineNumber > m_startLine && lineNumber < m_endLine)
+    {
+        auto half = width / 2;
+        painter.drawLine(leftOffset + half, top, leftOffset + half, top + lineHeight);
+    }
+
+    if(lineNumber == m_endLine)
+    {
+        auto image = ImageHandler::loadIcon(icons::Minus);
+        painter.drawImage(QRect(leftOffset + leftMargin, top + topMargin, s, s), image);
+        painter.drawRect(QRect(leftOffset, top, width - 1, lineHeight));
+    }
+}
