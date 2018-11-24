@@ -35,7 +35,7 @@ void TextFolder::drawObject(QPainter *painter, const QRectF &rect,
     painter->drawRect(rect);
 }
 
-void TextFolder::fold(QTextCursor c) {
+void TextFolder::fold(QTextCursor& c) {
     QVariant v;
     v.setValue(c.selection());
 
@@ -46,7 +46,7 @@ void TextFolder::fold(QTextCursor c) {
     c.insertText(QString(QChar::ObjectReplacementCharacter), f);
 }
 
-bool TextFolder::unfold(QTextCursor c) {
+bool TextFolder::unfold(QTextCursor& c) {
     if(!c.hasSelection()) {
         c.movePosition(c.Right, c.KeepAnchor);
         QTextCharFormat f = c.charFormat();

@@ -4,7 +4,6 @@
 #include <QPlainTextEdit>
 #include <QFutureWatcher>
 
-#include "textfolder.h"
 
 class FileView;
 
@@ -15,7 +14,6 @@ class FileEdit : public QPlainTextEdit
     QString m_FilePath;
     
     FileView* m_PreprocessedFileView;
-    TextFolder* m_regionFolder;
     QFutureWatcher<QString> m_foldWatcher;
 public:
     FileEdit(QWidget* parent);
@@ -27,9 +25,6 @@ public:
     void foldDefines(); 
     QString foldDefinesForFile(const QString& filePath) const;
     
-    void fold();
-    void unfold();
-
 private slots:
     void foldDefinesFinished();
     void highlightCurrentLine();

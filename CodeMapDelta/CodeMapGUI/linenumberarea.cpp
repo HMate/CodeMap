@@ -1,6 +1,7 @@
 #include "linenumberarea.h"
 
 #include <QTextBlock>
+#include <QPainter>
 
 #include "fileedit.h"
 
@@ -24,7 +25,7 @@ void LineNumberArea::paintEvent(QPaintEvent *event) {
     int lineNumber = block.blockNumber() + 1;
     int top = (int)m_codeEditor->blockBoundingGeometry(block).translated(m_codeEditor->contentOffset()).top();
     int bottom = top + (int)m_codeEditor->blockBoundingRect(block).height();
-
+    
     const int rightMargin = 2;
     const int numAreaWidth = width();
     const int lineHeight = fontMetrics().height();

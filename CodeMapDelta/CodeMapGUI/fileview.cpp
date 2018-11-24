@@ -105,19 +105,13 @@ void FileView::keyPressEvent(QKeyEvent* ke)
 {
     //Handle Ctrl+S as save file
     // TODO: make keybinding configurable from settings
+
+
     if(ke->key() == Qt::Key_S && ke->modifiers().testFlag(Qt::ControlModifier))
     {
-        logTerminal(tr("Saving \"%1\"").arg(m_FilePath));
+        logTerminal(tr("Saving \"%1\"").arg(m_filePath));
         ke->setAccepted(true);
         saveFile();
-    } 
-    else if(ke->key() == Qt::Key_D && ke->modifiers().testFlag(Qt::ControlModifier))
-    {
-        m_editor->fold();
-    }
-    else if(ke->key() == Qt::Key_F && ke->modifiers().testFlag(Qt::ControlModifier))
-    {
-        m_editor->unfold();
     }
     else
     {
@@ -127,7 +121,7 @@ void FileView::keyPressEvent(QKeyEvent* ke)
 
 void FileView::saveFile()
 {
-    if(m_FilePath == "" || !FS::doesFileExist(m_FilePath))
+    if(m_filePath == "" || !FS::doesFileExist(m_filePath))
     {
         // Open save as dialog
         QFileDialog fileDialog(this, tr("Save as..."));
@@ -147,39 +141,57 @@ void FileView::saveFile()
         state.saveStateToDisk();
     }
 
-    QTextDocumentWriter writer(m_FilePath);
+    QTextDocumentWriter writer(m_filePath);
     writer.setFormat("plaintext");
     bool success = writer.write(m_editor->document());
     if (success) {
         m_editor->document()->setModified(false);
-        logTerminal(tr("Saved \"%1\"").arg(m_FilePath));
+        logTerminal(tr("Saved \"%1\"").arg(m_filePath));
     } else {
-        logTerminal(tr("Saving failed. Could not write to file \"%1\"").arg(m_FilePath));
+        logTerminal(tr("Saving failed. Could not write to file \"%1\"").arg(m_filePath));
     }
 }
 
 void FileView::setFilePath(const QString &path)
 {
-    m_FilePath = path;
+    m_filePath = path;
     m_editor->setFilePath(path);
     m_nameLabel->setText(path);
 }
 
 const QString& FileView::getFilePath()
 {
-    return m_FilePath;
+    return m_filePath;
 }
 
 void FileView::fileContentModified(bool changed)
 {
     if(changed)
-        m_nameLabel->setText(m_FilePath+"*");
+        m_nameLabel->setText(m_filePath+"*");
     else
-        m_nameLabel->setText(m_FilePath);
+        m_nameLabel->setText(m_filePath);
 }
 
 void FileView::setText(const QString& t)
 {
     m_editor->setPlainText(t);
     m_editor->document()->setModified(false);
+
+    logTerminal(tr("adding buttons to: %1").arg(m_filePath));
+    m_foldingArea->addFoldingButton(5, 7);
+    m_foldingArea->addFoldingButton(8, 9);
+}
+
+struct IncludeRegion
+{
+    int firstLine, lastLine;
+
+    IncludeRegion(int firstLine, int lastLine) : firstLine(firstLine), lastLine(lastLine) {}
+};
+
+void FileView::setIncludeCollapsers()
+{
+    IncludeRegion region(2, 4);
+
+    m_foldingArea->addFoldingButton(region.firstLine, region.lastLine);
 }

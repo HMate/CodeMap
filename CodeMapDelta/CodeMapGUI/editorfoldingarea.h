@@ -2,6 +2,11 @@
 #define EDITORFOLDINGAREA_H
 
 #include <QWidget>
+#include <QTextBlock>
+
+#include <vector>
+
+#include "textfolder.h"
 
 class FileEdit;
 class EditorFoldingButton;
@@ -10,7 +15,7 @@ class EditorFoldingArea : public QWidget
 {
     Q_OBJECT
     FileEdit *m_codeEditor;
-    EditorFoldingButton *m_f;
+    std::vector<EditorFoldingButton*> m_foldingButtons;
 public:
     explicit EditorFoldingArea(QWidget *parent, FileEdit *editor);
 
@@ -26,24 +31,45 @@ public slots:
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *e);
+    void setFoldingButtonGeometry(EditorFoldingButton& fb);
 };
 
 class EditorFoldingButton : public QWidget
 {
-    bool m_containsMouse = false;
-public:
+    Q_OBJECT
+    TextFolder *m_regionFolder;
+    FileEdit *m_editor;
+    QTextCursor m_foldingCursor;
+    QTextCursor m_unfoldingCursor;
+    QTextBlock m_firstBlock;
+    QTextBlock m_lastBlock;
+
     const int m_startLine;
     const int m_endLine;
 
-    EditorFoldingButton(QWidget* parent, int start, int end);
+    bool m_collapsed = false;
+    bool m_containsMouse = false;
+public:
+
+    EditorFoldingButton(QWidget* parent, FileEdit *editor, int firstLine, int lastLine);
+
+    int getFirstLine() { return m_startLine; }
+    QTextBlock getFirstLineBlock();
 
     void setContainsMouse(bool);
     QSize sizeHint() const override;
+
+signals:
+    void changedSize();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+
+    void fold();
+    void unfold();
 };
 
 #endif // EDITORFOLDINGAREA_H

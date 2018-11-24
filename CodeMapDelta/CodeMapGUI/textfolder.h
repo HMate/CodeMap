@@ -26,8 +26,8 @@ public:
     QSizeF intrinsicSize(QTextDocument *doc, int posInDocument, const QTextFormat &format);
     void drawObject(QPainter *painter, const QRectF &rect, QTextDocument *doc, int posInDocument, const QTextFormat &format);
 
-    void fold(QTextCursor c);
-    bool unfold(QTextCursor c);
+    void fold(QTextCursor& c);
+    bool unfold(QTextCursor& c);
 };
 
 #endif // TEXTFOLDER_H

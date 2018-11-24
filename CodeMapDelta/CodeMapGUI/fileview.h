@@ -6,6 +6,8 @@
 #include <QLabel>
 #include <QToolBar>
 
+#include <QTextCursor>
+
 class LineNumberArea;
 class EditorFoldingArea;
 class FileEdit;
@@ -13,7 +15,8 @@ class FileEdit;
 /* TODO
  * - Ask to load file again if it was changed outside of editor
  * - save file -> put to menu + tool bar
- * - save new file
+ * - create/save as new file 
+        - saveFile can handle it, just need to bind it to a command
  * - Set from options:
  *      - font size, family, color, background, word wrap
  * - Key rebinding
@@ -39,7 +42,7 @@ class FileView : public QWidget
     FileEdit* m_editor;
 
     QLabel* m_nameLabel;
-    QString m_FilePath;
+    QString m_filePath;
 
 public:
     explicit FileView(QWidget *parent = nullptr);
@@ -47,6 +50,8 @@ public:
     void setFilePath(const QString& path);
     const QString& getFilePath();
     void setText(const QString& t);
+
+    void setIncludeCollapsers();
 
     void saveFile();
     void openFile(const QString &path);

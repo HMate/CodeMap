@@ -3,7 +3,6 @@
 #include <QMenu>
 #include <QContextMenuEvent>
 
-#include <QPainter>
 #include <QtConcurrent>
 
 #include "mainwindow.h"
@@ -12,9 +11,9 @@
 
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
 {
-    m_regionFolder = new TextFolder(this, "ASD");
+    //m_regionFolder = new TextFolder(this, "ASD");
     
-    this->document()->documentLayout()->registerHandler(m_regionFolder->type(), m_regionFolder);
+    //this->document()->documentLayout()->registerHandler(m_regionFolder->type(), m_regionFolder);
 
     this->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     this->setFont(QFont("Consolas"));
@@ -24,19 +23,6 @@ FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
     connect(&m_foldWatcher, SIGNAL(finished()), this, SLOT(foldDefinesFinished()));
 
     highlightCurrentLine();
-}
-
-void FileEdit::fold() {
-    auto c = this->textCursor();
-    c.setPosition(10);
-    c.setPosition(20, QTextCursor::KeepAnchor);
-    m_regionFolder->fold(c);
-}
-
-void FileEdit::unfold() {
-    auto c = this->textCursor();
-    c.setPosition(10);
-    m_regionFolder->unfold(c);
 }
 
 void FileEdit::contextMenuEvent(QContextMenuEvent* event)
@@ -60,6 +46,9 @@ void FileEdit::foldDefines()
     QString name = tr("Folded defines for: %1").arg(m_FilePath);
     m_PreprocessedFileView = MainWindow::instance()->getDocumentManager()->openStringFileView(name, "Loading...");
 
+    // TODO: Put folding defines command to a separate command handler class
+    // There could be a static class that acts like a "separate thread" for running long commands liek this
+    // This class should handle set/clean up after commands etc.
     auto foldFuture = QtConcurrent::run(this, &FileEdit::foldDefinesForFile, m_FilePath);
     m_foldWatcher.setFuture(foldFuture);
 }
@@ -92,6 +81,7 @@ void FileEdit::foldDefinesFinished()
 {
     QString result = m_foldWatcher.future().result();
     m_PreprocessedFileView->setText(result);
+    m_PreprocessedFileView->setIncludeCollapsers();
 }
 
 void FileEdit::setFilePath(const QString& path)
