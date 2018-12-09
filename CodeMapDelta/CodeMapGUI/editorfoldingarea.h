@@ -30,7 +30,7 @@ public slots:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
-    void resizeEvent(QResizeEvent *e);
+    void resizeEvent(QResizeEvent *e) override;
     void setFoldingButtonGeometry(EditorFoldingButton& fb);
 };
 

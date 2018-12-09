@@ -34,22 +34,21 @@ void EditorFoldingArea::addFoldingButton(int firstLine, int lastLine)
     logTerminal(tr("add button to %1 on lines %2, %3").arg(m_codeEditor->m_FilePath).arg(firstLine).arg(lastLine));
     EditorFoldingButton *fb = new EditorFoldingButton(this, m_codeEditor, firstLine, lastLine);
     connect(fb, &EditorFoldingButton::changedSize, this, &EditorFoldingArea::updateSize);
+    fb->setVisible(true);
     m_foldingButtons.emplace_back(fb);
 
     setFoldingButtonGeometry(*fb);
 }
 
+// *layout like behaviour -> should call setGeometry on every child to update them*
 void EditorFoldingArea::resizeEvent(QResizeEvent *e)
 {
     QWidget::resizeEvent(e);
-    //logTerminal(tr("resizeEvent %1").arg(m_codeEditor->m_FilePath));
-
     updateSize();
 }
 
 void EditorFoldingArea::updateArea(const QRect &rect, int dy)
 {
-    //logTerminal(tr("updateArea %1").arg(m_codeEditor->m_FilePath));
     if(dy)
         this->scroll(0, dy);
     else
@@ -81,11 +80,6 @@ void EditorFoldingArea::setFoldingButtonGeometry(EditorFoldingButton& fb)
     auto s = fb.sizeHint();
     QRect cr = contentsRect();
     auto qr = QRect(cr.left(), blockBB.top(), cr.right(), s.height());
-    /*logTerminal(tr("-- set geometry --"));
-    logTerminal(tr("block BB: %1, %2, %3, %4").arg(blockBB.left()).arg(blockBB.top()).arg(blockBB.right()).arg(blockBB.bottom()));
-    logTerminal(tr("contents rect %1, %2, %3, %4").arg(cr.left()).arg(cr.top()).arg(cr.right()).arg(cr.bottom()));
-    logTerminal(tr("size: %1, %2").arg(s.width()).arg(s.height()));
-    logTerminal(tr("set geometry to: %1, %2, %3, %4").arg(qr.left()).arg(qr.top()).arg(qr.right()).arg(qr.bottom()));*/
     fb.setGeometry(qr);
 }
 
@@ -155,9 +149,13 @@ void EditorFoldingButton::setContainsMouse(bool c)
     m_containsMouse = c;
 }
 
+
 void EditorFoldingButton::fold() 
 {
-
+    /*TODO: Use block isVisible to fold lines 
+      -> Needs to handle hierarchy of folding buttons.
+      -> Needs to paint overlay text on the editor.
+    */
 }
 
 void EditorFoldingButton::unfold() 
@@ -178,7 +176,7 @@ void EditorFoldingButton::paintEvent(QPaintEvent *event)
     auto s = qMin(width() - 4, lineHeight - 4);
     auto topMargin = (lineHeight - s + 1) / 2;
     auto leftMargin = (width() - s + 1) / 2;
-    if(true/*m_containsMouse*/)
+    if(m_containsMouse)
     {
         painter.setPen(Qt::darkGray);
         painter.fillRect(event->rect(), Qt::white);
