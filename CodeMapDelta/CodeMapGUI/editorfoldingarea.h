@@ -37,10 +37,7 @@ protected:
 class EditorFoldingButton : public QWidget
 {
     Q_OBJECT
-    TextFolder *m_regionFolder;
     FileEdit *m_editor;
-    QTextCursor m_foldingCursor;
-    QTextCursor m_unfoldingCursor;
     QTextBlock m_firstBlock;
     QTextBlock m_lastBlock;
 

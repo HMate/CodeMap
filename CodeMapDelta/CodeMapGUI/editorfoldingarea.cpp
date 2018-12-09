@@ -16,7 +16,7 @@ EditorFoldingArea::EditorFoldingArea(QWidget *parent, FileEdit *editor) : QWidge
     setMaximumWidth(calculateWidth());
 
     // Need this callback to handle scrolling and size update after editor content changed
-    connect(m_codeEditor, SIGNAL(updateRequest(QRect, int)), this, SLOT(updateArea(QRect, int)));
+    connect(m_codeEditor, &FileEdit::updateRequest, this, &EditorFoldingArea::updateArea);
 }
 
 void EditorFoldingArea::paintEvent(QPaintEvent *event) {
@@ -31,8 +31,9 @@ void EditorFoldingArea::paintEvent(QPaintEvent *event) {
 void EditorFoldingArea::addFoldingButton(int firstLine, int lastLine)
 {
     // TODO: build tree of foldingButtons?
+    logTerminal(tr("add button to %1 on lines %2, %3").arg(m_codeEditor->m_FilePath).arg(firstLine).arg(lastLine));
     EditorFoldingButton *fb = new EditorFoldingButton(this, m_codeEditor, firstLine, lastLine);
-    connect(fb, SIGNAL(changedSize()), this, SLOT(updateSize()));
+    connect(fb, &EditorFoldingButton::changedSize, this, &EditorFoldingArea::updateSize);
     m_foldingButtons.emplace_back(fb);
 
     setFoldingButtonGeometry(*fb);
@@ -41,16 +42,14 @@ void EditorFoldingArea::addFoldingButton(int firstLine, int lastLine)
 void EditorFoldingArea::resizeEvent(QResizeEvent *e)
 {
     QWidget::resizeEvent(e);
+    //logTerminal(tr("resizeEvent %1").arg(m_codeEditor->m_FilePath));
 
-    // Call this manually because folding buttons are not contained in any layout.
-    for(auto b : m_foldingButtons)
-    {
-        setFoldingButtonGeometry(*b);
-    }
+    updateSize();
 }
 
 void EditorFoldingArea::updateArea(const QRect &rect, int dy)
 {
+    //logTerminal(tr("updateArea %1").arg(m_codeEditor->m_FilePath));
     if(dy)
         this->scroll(0, dy);
     else
@@ -82,7 +81,11 @@ void EditorFoldingArea::setFoldingButtonGeometry(EditorFoldingButton& fb)
     auto s = fb.sizeHint();
     QRect cr = contentsRect();
     auto qr = QRect(cr.left(), blockBB.top(), cr.right(), s.height());
-    logTerminal(tr("set geometry to: %1, %2, %3, %4").arg(qr.left()).arg(qr.top()).arg(qr.right()).arg(qr.bottom()));
+    /*logTerminal(tr("-- set geometry --"));
+    logTerminal(tr("block BB: %1, %2, %3, %4").arg(blockBB.left()).arg(blockBB.top()).arg(blockBB.right()).arg(blockBB.bottom()));
+    logTerminal(tr("contents rect %1, %2, %3, %4").arg(cr.left()).arg(cr.top()).arg(cr.right()).arg(cr.bottom()));
+    logTerminal(tr("size: %1, %2").arg(s.width()).arg(s.height()));
+    logTerminal(tr("set geometry to: %1, %2, %3, %4").arg(qr.left()).arg(qr.top()).arg(qr.right()).arg(qr.bottom()));*/
     fb.setGeometry(qr);
 }
 
@@ -104,21 +107,8 @@ EditorFoldingButton::EditorFoldingButton(QWidget* parent, FileEdit *editor, int 
 {
     Q_ASSERT(firstLine < lastLine);
     
-    m_foldingCursor = m_editor->textCursor();
     m_firstBlock = m_editor->document()->findBlockByLineNumber(firstLine-1);
     m_lastBlock = m_editor->document()->findBlockByLineNumber(lastLine-1);
-    int p = m_firstBlock.position();
-    m_foldingCursor.setPosition(p);
-    int lastP = m_lastBlock.position();
-    int lastBlockLength = m_lastBlock.length() - 1;
-    m_foldingCursor.setPosition(lastP+lastBlockLength, QTextCursor::KeepAnchor);
-
-    m_unfoldingCursor  = m_editor->textCursor();
-    m_unfoldingCursor.setPosition(m_firstBlock.position());
-
-    // IMMEDIATETODO: type() should change here I guess ....
-    m_regionFolder = new TextFolder(this, "ASD");
-    m_foldingCursor.document()->documentLayout()->registerHandler(m_regionFolder->type(), m_regionFolder);
 }
 
 QTextBlock EditorFoldingButton::getFirstLineBlock()
@@ -165,12 +155,14 @@ void EditorFoldingButton::setContainsMouse(bool c)
     m_containsMouse = c;
 }
 
-void EditorFoldingButton::fold() {
-    m_regionFolder->fold(m_foldingCursor);
+void EditorFoldingButton::fold() 
+{
+
 }
 
-void EditorFoldingButton::unfold() {
-    m_regionFolder->unfold(m_unfoldingCursor);
+void EditorFoldingButton::unfold() 
+{
+
 }
 
 void EditorFoldingButton::paintEvent(QPaintEvent *event) 
@@ -186,7 +178,7 @@ void EditorFoldingButton::paintEvent(QPaintEvent *event)
     auto s = qMin(width() - 4, lineHeight - 4);
     auto topMargin = (lineHeight - s + 1) / 2;
     auto leftMargin = (width() - s + 1) / 2;
-    if(m_containsMouse)
+    if(true/*m_containsMouse*/)
     {
         painter.setPen(Qt::darkGray);
         painter.fillRect(event->rect(), Qt::white);

@@ -18,7 +18,7 @@
 
 FileView::FileView(QWidget *parent) : QWidget(parent)
 {
-    m_nameLabel = new QLabel(this);
+    m_nameLabel = new QLabel(NEW_FILE, this);
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     m_layout = new QGridLayout(this);
     m_layout->setMargin(0);
@@ -45,7 +45,6 @@ FileView::FileView(QWidget *parent) : QWidget(parent)
 QToolBar* FileView::createToolbar()
 {
     QToolBar* toolbar = new QToolBar("FileView", this);
-    m_nameLabel->setText(NEW_FILE);
     toolbar->addWidget(m_nameLabel);
     QWidget *spacerWidget = new QWidget(this);
     spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -113,6 +112,10 @@ void FileView::keyPressEvent(QKeyEvent* ke)
         ke->setAccepted(true);
         saveFile();
     }
+    else if(ke->key() == Qt::Key_F && ke->modifiers().testFlag(Qt::ControlModifier))
+    {
+        m_foldingArea->addFoldingButton(8, 10);
+    }
     else
     {
         QWidget::keyPressEvent(ke);
@@ -177,9 +180,7 @@ void FileView::setText(const QString& t)
     m_editor->setPlainText(t);
     m_editor->document()->setModified(false);
 
-    logTerminal(tr("adding buttons to: %1").arg(m_filePath));
     m_foldingArea->addFoldingButton(5, 7);
-    m_foldingArea->addFoldingButton(8, 9);
 }
 
 struct IncludeRegion
