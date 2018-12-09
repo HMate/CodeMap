@@ -3,20 +3,22 @@
 
 #include "imagehandler.h"
 #include "fileedit.h"
+#include "fileview.h"
 
 #include "mainwindow.h"
 
 const int FOLD_AREA_WIDTH = 13;
 
-EditorFoldingArea::EditorFoldingArea(QWidget *parent, FileEdit *editor) : QWidget(parent)
+EditorFoldingArea::EditorFoldingArea(FileView *parent) : QWidget((QWidget*)parent)
 {
-    m_codeEditor = editor;
+    m_view = parent;
+    Q_ASSERT(m_view->getEditor() != nullptr);
 
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     setMaximumWidth(calculateWidth());
 
     // Need this callback to handle scrolling and size update after editor content changed
-    connect(m_codeEditor, &FileEdit::updateRequest, this, &EditorFoldingArea::updateArea);
+    connect(parent->getEditor(), &FileEdit::updateRequest, this, &EditorFoldingArea::updateArea);
 }
 
 void EditorFoldingArea::paintEvent(QPaintEvent *event) {
@@ -31,8 +33,7 @@ void EditorFoldingArea::paintEvent(QPaintEvent *event) {
 void EditorFoldingArea::addFoldingButton(int firstLine, int lastLine)
 {
     // TODO: build tree of foldingButtons?
-    logTerminal(tr("add button to %1 on lines %2, %3").arg(m_codeEditor->m_FilePath).arg(firstLine).arg(lastLine));
-    EditorFoldingButton *fb = new EditorFoldingButton(this, m_codeEditor, firstLine, lastLine);
+    EditorFoldingButton *fb = new EditorFoldingButton(this, m_view, firstLine, lastLine);
     connect(fb, &EditorFoldingButton::changedSize, this, &EditorFoldingArea::updateSize);
     fb->setVisible(true);
     m_foldingButtons.emplace_back(fb);
@@ -76,7 +77,8 @@ void EditorFoldingArea::setFoldingButtonGeometry(EditorFoldingButton& fb)
 {
     // TODO: What if block is not visible? What does this give? Check it!
     QTextBlock block = fb.getFirstLineBlock();
-    QRectF blockBB = m_codeEditor->blockBoundingGeometry(block).translated(m_codeEditor->contentOffset());
+    auto editor = m_view->getEditor();
+    QRectF blockBB = editor->blockBoundingGeometry(block).translated(editor->contentOffset());
     auto s = fb.sizeHint();
     QRect cr = contentsRect();
     auto qr = QRect(cr.left(), blockBB.top(), cr.right(), s.height());
@@ -85,7 +87,7 @@ void EditorFoldingArea::setFoldingButtonGeometry(EditorFoldingButton& fb)
 
 QSize EditorFoldingArea::sizeHint() const
 {
-    auto rc = QSize(calculateWidth(), m_codeEditor->size().height());
+    auto rc = QSize(calculateWidth(), m_view->size().height());
     return rc;
 }
 
@@ -96,13 +98,14 @@ int EditorFoldingArea::calculateWidth() const
 
 // --------------- Folding Button --------------------
 
-EditorFoldingButton::EditorFoldingButton(QWidget* parent, FileEdit *editor, int firstLine, int lastLine)
-    : QWidget(parent), m_editor(editor), m_startLine(firstLine), m_endLine(lastLine)
+EditorFoldingButton::EditorFoldingButton(QWidget* parent, FileView *view, int firstLine, int lastLine)
+    : QWidget(parent), m_view(view), m_startLine(firstLine), m_endLine(lastLine)
 {
     Q_ASSERT(firstLine < lastLine);
     
-    m_firstBlock = m_editor->document()->findBlockByLineNumber(firstLine-1);
-    m_lastBlock = m_editor->document()->findBlockByLineNumber(lastLine-1);
+    auto editor = m_view->getEditor();
+    m_firstBlock = editor->document()->findBlockByLineNumber(firstLine-1);
+    m_lastBlock = editor->document()->findBlockByLineNumber(lastLine-1);
 }
 
 QTextBlock EditorFoldingButton::getFirstLineBlock()
@@ -127,8 +130,14 @@ void EditorFoldingButton::leaveEvent(QEvent *event)
 void EditorFoldingButton::mousePressEvent(QMouseEvent *event)
 {
     m_collapsed = !m_collapsed;
+
+    if(m_collapsed)
+        fold();
+    else
+        unfold();
+
     changedSize();
-    parentWidget()->repaint();
+    m_view->update();
 }
 
 QSize EditorFoldingButton::sizeHint() const
@@ -156,11 +165,21 @@ void EditorFoldingButton::fold()
       -> Needs to handle hierarchy of folding buttons.
       -> Needs to paint overlay text on the editor.
     */
+
+    auto& oneAfterLast = m_lastBlock.next();
+    for(auto block = m_firstBlock.next(); block != oneAfterLast; block = block.next())
+    {
+        block.setVisible(false);
+    }
 }
 
 void EditorFoldingButton::unfold() 
 {
-
+    auto& oneAfterLast = m_lastBlock.next();
+    for(auto block = m_firstBlock.next(); block != oneAfterLast; block = block.next())
+    {
+        block.setVisible(true);
+    }
 }
 
 void EditorFoldingButton::paintEvent(QPaintEvent *event) 

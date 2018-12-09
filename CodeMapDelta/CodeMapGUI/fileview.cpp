@@ -32,10 +32,10 @@ FileView::FileView(QWidget *parent) : QWidget(parent)
     m_editor->installEventFilter(this);
     m_layout->addWidget(m_editor, 1, 2);
 
-    m_lineNumberArea = new LineNumberArea(this, m_editor);
+    m_lineNumberArea = new LineNumberArea(this);
     m_layout->addWidget(m_lineNumberArea, 1, 0);
 
-    m_foldingArea = new EditorFoldingArea(this, m_editor);
+    m_foldingArea = new EditorFoldingArea(this);
     m_layout->addWidget(m_foldingArea, 1, 1);
 
     connect(m_editor->document(), &QTextDocument::modificationChanged,
@@ -194,5 +194,5 @@ void FileView::setIncludeCollapsers()
 {
     IncludeRegion region(2, 4);
 
-    m_foldingArea->addFoldingButton(region.firstLine, region.lastLine);
+    //m_foldingArea->addFoldingButton(region.firstLine, region.lastLine);
 }

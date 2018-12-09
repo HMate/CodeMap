@@ -35,17 +35,19 @@ class FileView : public QWidget
 {
     Q_OBJECT
 
-    QGridLayout* m_layout;
+    QGridLayout* m_layout = nullptr;
 
-    LineNumberArea* m_lineNumberArea;
-    EditorFoldingArea* m_foldingArea;
-    FileEdit* m_editor;
+    LineNumberArea* m_lineNumberArea = nullptr;
+    EditorFoldingArea* m_foldingArea = nullptr;
+    FileEdit* m_editor = nullptr;
 
-    QLabel* m_nameLabel;
+    QLabel* m_nameLabel = nullptr;
     QString m_filePath;
 
 public:
     explicit FileView(QWidget *parent = nullptr);
+
+    FileEdit* getEditor() { return m_editor; }
 
     void setFilePath(const QString& path);
     const QString& getFilePath();

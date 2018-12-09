@@ -4,16 +4,18 @@
 #include <QPainter>
 
 #include "fileedit.h"
+#include "fileview.h"
 
-LineNumberArea::LineNumberArea(QWidget *parent, FileEdit *editor) : QWidget(parent)
+LineNumberArea::LineNumberArea(FileView *parent) : QWidget((QWidget*)parent)
 {
-    m_codeEditor = editor;
+    m_view = parent;
+    Q_ASSERT(m_view->getEditor() != nullptr);
 
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     setMaximumWidth(calculateWidth());
 
     // Need this callback to handle scrolling and size update after editor content changed
-    connect(m_codeEditor, SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumberArea(QRect, int)));
+    connect(m_view->getEditor(), SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumberArea(QRect, int)));
 }
 
 void LineNumberArea::paintEvent(QPaintEvent *event) {
@@ -21,10 +23,11 @@ void LineNumberArea::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.fillRect(event->rect(), Qt::lightGray);
 
-    QTextBlock block = m_codeEditor->firstVisibleBlock();
+    auto editor = m_view->getEditor();
+    QTextBlock block = m_view->getEditor()->firstVisibleBlock();
     int lineNumber = block.blockNumber() + 1;
-    int top = (int)m_codeEditor->blockBoundingGeometry(block).translated(m_codeEditor->contentOffset()).top();
-    int bottom = top + (int)m_codeEditor->blockBoundingRect(block).height();
+    int top = (int)editor->blockBoundingGeometry(block).translated(editor->contentOffset()).top();
+    int bottom = top + (int)editor->blockBoundingRect(block).height();
     
     const int rightMargin = 2;
     const int numAreaWidth = width();
@@ -40,7 +43,7 @@ void LineNumberArea::paintEvent(QPaintEvent *event) {
 
         block = block.next();
         top = bottom;
-        bottom = top + (int)m_codeEditor->blockBoundingRect(block).height();
+        bottom = top + (int)editor->blockBoundingRect(block).height();
         ++lineNumber;
     }
 }
@@ -52,8 +55,7 @@ void LineNumberArea::updateLineNumberArea(const QRect &rect, int dy)
     else
         this->update(0, rect.y(), this->width(), rect.height());
 
-    if(rect.contains(m_codeEditor->viewport()->rect()))
-        updateSize();
+    updateSize();
 }
 
 void LineNumberArea::updateSize()
@@ -65,13 +67,13 @@ void LineNumberArea::updateSize()
 
 QSize LineNumberArea::sizeHint() const 
 {
-    return QSize(calculateWidth(), m_codeEditor->size().height());
+    return QSize(calculateWidth(), m_view->size().height());
 }
 
 int LineNumberArea::calculateWidth() const
 {
     int digits = 1;
-    int max = qMax(1, m_codeEditor->blockCount());
+    int max = qMax(1, m_view->getEditor()->blockCount());
     while(max >= 10) {
         max /= 10;
         ++digits;

@@ -8,16 +8,16 @@
 
 #include "textfolder.h"
 
-class FileEdit;
+class FileView;
 class EditorFoldingButton;
 
 class EditorFoldingArea : public QWidget
 {
     Q_OBJECT
-    FileEdit *m_codeEditor;
+    FileView *m_view;
     std::vector<EditorFoldingButton*> m_foldingButtons;
 public:
-    explicit EditorFoldingArea(QWidget *parent, FileEdit *editor);
+    explicit EditorFoldingArea(FileView *parent);
 
     QSize sizeHint() const override;
     int calculateWidth() const;
@@ -37,7 +37,7 @@ protected:
 class EditorFoldingButton : public QWidget
 {
     Q_OBJECT
-    FileEdit *m_editor;
+    FileView *m_view;
     QTextBlock m_firstBlock;
     QTextBlock m_lastBlock;
 
@@ -48,7 +48,7 @@ class EditorFoldingButton : public QWidget
     bool m_containsMouse = false;
 public:
 
-    EditorFoldingButton(QWidget* parent, FileEdit *editor, int firstLine, int lastLine);
+    EditorFoldingButton(QWidget* parent, FileView *view, int firstLine, int lastLine);
 
     int getFirstLine() { return m_startLine; }
     QTextBlock getFirstLineBlock();

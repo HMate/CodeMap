@@ -3,15 +3,15 @@
 
 #include <QWidget>
 
-class FileEdit;
+class FileView;
 
 class LineNumberArea : public QWidget
 {
     Q_OBJECT
 
-    FileEdit *m_codeEditor;
+    FileView *m_view;
 public:
-    explicit LineNumberArea(QWidget *parent, FileEdit *editor);
+    explicit LineNumberArea(FileView *parent);
 
     QSize sizeHint() const override;
     int calculateWidth() const;
