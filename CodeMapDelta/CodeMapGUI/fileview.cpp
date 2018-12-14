@@ -191,7 +191,11 @@ void FileView::setText(const QString& t)
     m_editor->setPlainText(t);
     m_editor->document()->setModified(false);
 
-    m_foldingArea->addFoldingButton(5, 7);
+    m_foldingArea->addFoldingButton(10, 11);
+
+    m_foldingArea->addFoldingButton(4, 12);
+
+    m_foldingArea->addFoldingButton(6, 8);
 }
 
 struct IncludeRegion

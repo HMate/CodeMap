@@ -112,6 +112,17 @@ QTextBlock EditorFoldingButton::getFirstLineBlock()
     return m_firstBlock;
 }
 
+
+QTextBlock EditorFoldingButton::getLastVisibleBlock()
+{
+    for(auto b = m_lastBlock; b != m_firstBlock; b = b.previous())
+    {
+        if(b.isValid() && b.isVisible())
+            return b;
+    }
+    return m_firstBlock;
+}
+
 void EditorFoldingButton::enterEvent(QEvent *event)
 {
     QWidget::enterEvent(event);
@@ -162,7 +173,6 @@ void EditorFoldingButton::fold()
 {
     /*TODO: Use block isVisible to fold lines 
       -> Needs to handle hierarchy of folding buttons.
-      -> Needs to paint overlay text on the editor.
     */
 
     auto& oneAfterLast = m_lastBlock.next();
@@ -209,16 +219,22 @@ void EditorFoldingButton::paintEvent(QPaintEvent *event)
     painter.drawImage(QRect(leftMargin, topMargin, s, s), plusImage);
     painter.drawRect(QRect(0, 0, width() - 1, lineHeight-1));
 
-    if(m_collapsed)
+    QTextBlock lastBlock = getLastVisibleBlock();
+
+    if(m_collapsed || m_firstBlock.firstLineNumber() == lastBlock.firstLineNumber())
     {
         return;
     }
 
+    auto& editor = m_view->getEditor();
+    auto offset = editor.contentOffset();
     // draw middle line
     auto half = width() / 2;
     int lineTop = lineHeight;
-    int lineLength = m_endLine - m_startLine - 1;
-    int lineBottom = lineTop + (lineHeight*lineLength);
+    int lastBlockTop = editor.blockBoundingGeometry(lastBlock).translated(offset).top();
+    int firstBlockBottom = editor.blockBoundingGeometry(m_firstBlock).translated(offset).bottom();
+    int lineLength  = lastBlockTop - firstBlockBottom;
+    int lineBottom = lineTop + lineLength;
     painter.drawLine(half, lineTop, half, lineBottom);
 
     // draw closing box

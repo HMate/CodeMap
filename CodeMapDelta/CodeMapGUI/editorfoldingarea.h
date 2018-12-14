@@ -52,6 +52,7 @@ public:
     EditorFoldingButton(QWidget* parent, FileView *view, int firstLine, int lastLine);
 
     QTextBlock getFirstLineBlock();
+    QTextBlock getLastVisibleBlock();
 
     bool isCollapsed() const { return m_collapsed; }
 
