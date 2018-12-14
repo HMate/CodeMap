@@ -23,6 +23,7 @@ public:
     int calculateWidth() const;
 
     void addFoldingButton(int firstLine, int lastLine);
+    std::vector<EditorFoldingButton*> getFoldingButtons() const { return m_foldingButtons; }
 
 public slots:
     void updateArea(const QRect &rect, int dy);
@@ -50,8 +51,9 @@ public:
 
     EditorFoldingButton(QWidget* parent, FileView *view, int firstLine, int lastLine);
 
-    int getFirstLine() { return m_startLine; }
     QTextBlock getFirstLineBlock();
+
+    bool isCollapsed() const { return m_collapsed; }
 
     void setContainsMouse(bool);
     QSize sizeHint() const override;

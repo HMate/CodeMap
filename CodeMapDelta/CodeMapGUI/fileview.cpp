@@ -42,6 +42,17 @@ FileView::FileView(QWidget *parent) : QWidget(parent)
             this, &FileView::fileContentModified);
 }
 
+FileEdit& FileView::getEditor() const
+{
+    Q_ASSERT(m_editor != nullptr);
+    return *m_editor;
+}
+
+EditorFoldingArea& FileView::getFoldingArea() const 
+{ 
+    return *m_foldingArea; 
+}
+
 QToolBar* FileView::createToolbar()
 {
     QToolBar* toolbar = new QToolBar("FileView", this);

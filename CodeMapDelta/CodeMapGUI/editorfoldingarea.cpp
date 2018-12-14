@@ -12,13 +12,12 @@ const int FOLD_AREA_WIDTH = 13;
 EditorFoldingArea::EditorFoldingArea(FileView *parent) : QWidget((QWidget*)parent)
 {
     m_view = parent;
-    Q_ASSERT(m_view->getEditor() != nullptr);
 
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     setMaximumWidth(calculateWidth());
 
     // Need this callback to handle scrolling and size update after editor content changed
-    connect(parent->getEditor(), &FileEdit::updateRequest, this, &EditorFoldingArea::updateArea);
+    connect(&parent->getEditor(), &FileEdit::updateRequest, this, &EditorFoldingArea::updateArea);
 }
 
 void EditorFoldingArea::paintEvent(QPaintEvent *event) {
@@ -77,8 +76,8 @@ void EditorFoldingArea::setFoldingButtonGeometry(EditorFoldingButton& fb)
 {
     // TODO: What if block is not visible? What does this give? Check it!
     QTextBlock block = fb.getFirstLineBlock();
-    auto editor = m_view->getEditor();
-    QRectF blockBB = editor->blockBoundingGeometry(block).translated(editor->contentOffset());
+    auto& editor = m_view->getEditor();
+    QRectF blockBB = editor.blockBoundingGeometry(block).translated(editor.contentOffset());
     auto s = fb.sizeHint();
     QRect cr = contentsRect();
     auto qr = QRect(cr.left(), blockBB.top(), cr.right(), s.height());
@@ -103,9 +102,9 @@ EditorFoldingButton::EditorFoldingButton(QWidget* parent, FileView *view, int fi
 {
     Q_ASSERT(firstLine < lastLine);
     
-    auto editor = m_view->getEditor();
-    m_firstBlock = editor->document()->findBlockByLineNumber(firstLine-1);
-    m_lastBlock = editor->document()->findBlockByLineNumber(lastLine-1);
+    auto& editor = m_view->getEditor();
+    m_firstBlock = editor.document()->findBlockByLineNumber(firstLine-1);
+    m_lastBlock = editor.document()->findBlockByLineNumber(lastLine-1);
 }
 
 QTextBlock EditorFoldingButton::getFirstLineBlock()
@@ -211,7 +210,9 @@ void EditorFoldingButton::paintEvent(QPaintEvent *event)
     painter.drawRect(QRect(0, 0, width() - 1, lineHeight-1));
 
     if(m_collapsed)
+    {
         return;
+    }
 
     // draw middle line
     auto half = width() / 2;

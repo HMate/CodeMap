@@ -3,7 +3,7 @@
 
 #include <QPlainTextEdit>
 #include <QFutureWatcher>
-
+#include <QTextBlock>
 
 class FileView;
 
@@ -12,7 +12,8 @@ class FileEdit : public QPlainTextEdit
     Q_OBJECT
 
     QString m_FilePath;
-    
+
+    FileView* m_view;
     FileView* m_PreprocessedFileView;
     QFutureWatcher<QString> m_foldWatcher;
 public:
@@ -25,12 +26,17 @@ public:
     void foldDefines(); 
     QString foldDefinesForFile(const QString& filePath) const;
     
+    QPointF contentOffset() const { return QPlainTextEdit::contentOffset(); }
+    QRectF blockBoundingGeometry(const QTextBlock& b) const { return QPlainTextEdit::blockBoundingGeometry(b); }
+    QRectF blockBoundingRect(const QTextBlock& b) const { return QPlainTextEdit::blockBoundingRect(b); }
+    QTextBlock firstVisibleBlock() const { return QPlainTextEdit::firstVisibleBlock(); }
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
+
 private slots:
     void foldDefinesFinished();
     void highlightCurrentLine();
-
-    friend class LineNumberArea;
-    friend class EditorFoldingArea;
 };
 
 #endif // FILEEDIT_H

@@ -9,13 +9,12 @@
 LineNumberArea::LineNumberArea(FileView *parent) : QWidget((QWidget*)parent)
 {
     m_view = parent;
-    Q_ASSERT(m_view->getEditor() != nullptr);
 
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     setMaximumWidth(calculateWidth());
 
     // Need this callback to handle scrolling and size update after editor content changed
-    connect(m_view->getEditor(), SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumberArea(QRect, int)));
+    connect(&m_view->getEditor(), SIGNAL(updateRequest(QRect, int)), this, SLOT(updateLineNumberArea(QRect, int)));
 }
 
 void LineNumberArea::paintEvent(QPaintEvent *event) {
@@ -23,11 +22,11 @@ void LineNumberArea::paintEvent(QPaintEvent *event) {
     QPainter painter(this);
     painter.fillRect(event->rect(), Qt::lightGray);
 
-    auto editor = m_view->getEditor();
-    QTextBlock block = m_view->getEditor()->firstVisibleBlock();
+    auto& editor = m_view->getEditor();
+    QTextBlock block = editor.firstVisibleBlock();
     int lineNumber = block.blockNumber() + 1;
-    int top = (int)editor->blockBoundingGeometry(block).translated(editor->contentOffset()).top();
-    int bottom = top + (int)editor->blockBoundingRect(block).height();
+    int top = (int)editor.blockBoundingGeometry(block).translated(editor.contentOffset()).top();
+    int bottom = top + (int)editor.blockBoundingRect(block).height();
     
     const int rightMargin = 2;
     const int numAreaWidth = width();
@@ -43,7 +42,7 @@ void LineNumberArea::paintEvent(QPaintEvent *event) {
 
         block = block.next();
         top = bottom;
-        bottom = top + (int)editor->blockBoundingRect(block).height();
+        bottom = top + (int)editor.blockBoundingRect(block).height();
         ++lineNumber;
     }
 }
@@ -73,7 +72,7 @@ QSize LineNumberArea::sizeHint() const
 int LineNumberArea::calculateWidth() const
 {
     int digits = 1;
-    int max = qMax(1, m_view->getEditor()->blockCount());
+    int max = qMax(1, m_view->getEditor().blockCount());
     while(max >= 10) {
         max /= 10;
         ++digits;

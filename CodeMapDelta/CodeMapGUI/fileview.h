@@ -47,7 +47,8 @@ class FileView : public QWidget
 public:
     explicit FileView(QWidget *parent = nullptr);
 
-    FileEdit* getEditor() { return m_editor; }
+    FileEdit& getEditor() const ;
+    EditorFoldingArea& getFoldingArea() const;
 
     void setFilePath(const QString& path);
     const QString& getFilePath();

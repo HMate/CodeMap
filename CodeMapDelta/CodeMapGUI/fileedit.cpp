@@ -8,8 +8,9 @@
 #include "mainwindow.h"
 #include "codeparser.h"
 #include "fileview.h"
+#include "editorfoldingarea.h"
 
-FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent)
+FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent), m_view((FileView*)parent)
 {
     //m_regionFolder = new TextFolder(this, "ASD");
     
@@ -106,4 +107,45 @@ void FileEdit::highlightCurrentLine()
     }
 
     this->setExtraSelections(extraSelections);
+}
+
+
+void FileEdit::paintEvent(QPaintEvent *event)
+{
+    QPlainTextEdit::paintEvent(event);
+
+    QPainter painter(viewport());
+    QPointF offset = contentOffset();
+
+    EditorFoldingArea& fArea = m_view->getFoldingArea();
+
+    // draw text overlay for folded blocks
+    for(auto btn : fArea.getFoldingButtons())
+    {
+        auto block = btn->getFirstLineBlock();
+        if(!block.isVisible())
+            return;
+
+        if(btn->isCollapsed())
+        {
+            auto boundingRect = blockBoundingGeometry(block).translated(offset);
+
+            auto layout = block.layout();
+            QTextLine line = layout->lineAt(layout->lineCount() - 1);
+            QRectF lineRect = line.naturalTextRect().translated(offset.x(), boundingRect.top());
+            QString replacement = " ... ";
+
+            const qreal overlayLeftMargin = 12;
+            QRectF collapseRect(lineRect.right() + overlayLeftMargin, lineRect.top(),
+                fontMetrics().width(replacement), lineRect.height());
+            painter.setRenderHint(QPainter::Antialiasing, true);
+            painter.translate(.5, .5);
+            painter.drawRoundedRect(collapseRect.adjusted(0, 0, 0, -1), 1, 1);
+            painter.setRenderHint(QPainter::Antialiasing, false);
+            painter.translate(-.5, -.5);
+
+            painter.drawText(collapseRect, Qt::AlignCenter, replacement);
+        }
+    }
+
 }
