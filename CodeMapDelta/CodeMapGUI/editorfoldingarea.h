@@ -20,16 +20,19 @@ protected:
     std::vector<EditorFoldingButtonHierarchyNode> m_nodes;
     EditorFoldingButton* m_foldingButton = nullptr;
 
-    bool canContainLine(int lineNumber);
     void addButton(EditorFoldingButton* button);
-    EditorFoldingButtonHierarchyNode* findNode(EditorFoldingButton*);
 
     bool isNodeFor(EditorFoldingButton* button);
 
 
 public:
     EditorFoldingButtonHierarchyNode(EditorFoldingButton* button);
+
+    EditorFoldingButtonHierarchyNode* findNode(EditorFoldingButton*);
+    EditorFoldingButton* getButton() { return m_foldingButton; }
+    std::vector<EditorFoldingButtonHierarchyNode>& getChildNodes() { return m_nodes; }
     bool doAnyChildContainMouse();
+    bool canContainLine(int lineNumber);
     void correctVisualOrder();
 };
 

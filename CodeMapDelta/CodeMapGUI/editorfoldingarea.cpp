@@ -116,7 +116,6 @@ QTextBlock EditorFoldingButton::getFirstLineBlock() const
     return m_firstBlock;
 }
 
-
 QTextBlock EditorFoldingButton::getLastVisibleBlock() const
 {
     for(auto b = m_lastBlock; b != m_firstBlock; b = b.previous())
@@ -191,7 +190,7 @@ void EditorFoldingButton::setContainsMouse(bool c)
 void EditorFoldingButton::fold() 
 {
     auto& oneAfterLast = m_lastBlock.next();
-    for(auto block = m_firstBlock.next(); block != oneAfterLast; block = block.next())
+    for(auto block = m_firstBlock.next(); block.isValid() && block != oneAfterLast; block = block.next())
     {
         block.setVisible(false);
     }
@@ -199,11 +198,34 @@ void EditorFoldingButton::fold()
 
 void EditorFoldingButton::unfold() 
 {
-    // TODO: only unfold child node blocks if they are not collapsed
-    auto& oneAfterLast = m_lastBlock.next();
-    for(auto block = m_firstBlock.next(); block != oneAfterLast; block = block.next())
+    auto myNode = m_hierarchy.findNode(this);
+    Q_ASSERT(myNode != nullptr);
+    if(myNode == nullptr)
+        return;
+
+    auto childs = myNode->getChildNodes();
+
+    auto last = m_lastBlock.firstLineNumber();
+    for(auto block = m_firstBlock.next(); block.isValid() && block.firstLineNumber() <= last; block = block.next())
     {
-        block.setVisible(true);
+        bool handled = false;
+        int lineIndex = block.firstLineNumber();
+        for(auto child : childs)
+        {
+            if(child.canContainLine(lineIndex+1))
+            {
+                handled = true;
+            }
+        }
+        if(!handled)
+            block.setVisible(true);
+    }
+
+    for(auto child : childs)
+    {
+        auto button = child.getButton();
+        if(!button->isCollapsed())
+            button->unfold();
     }
 }
 
@@ -298,9 +320,10 @@ bool EditorFoldingButtonHierarchyNode::isNodeFor(EditorFoldingButton* button)
     return button == m_foldingButton;
 }
 
+// Tells if this node is responsible for folding this line (expects line number, not line index!)
 bool EditorFoldingButtonHierarchyNode::canContainLine(int lineNumber)
 {
-    bool res = m_foldingButton->getFirstLine() < lineNumber && m_foldingButton->getLastLine() >= lineNumber;
+    bool res = m_foldingButton->getFirstLine() < lineNumber && lineNumber <= m_foldingButton->getLastLine();
     return res;
 }
 
