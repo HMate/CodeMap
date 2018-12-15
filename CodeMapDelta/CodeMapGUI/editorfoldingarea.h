@@ -1,21 +1,48 @@
 #ifndef EDITORFOLDINGAREA_H
 #define EDITORFOLDINGAREA_H
 
+#include <vector>
+
 #include <QWidget>
 #include <QTextBlock>
-
-#include <vector>
 
 #include "textfolder.h"
 
 class FileView;
 class EditorFoldingButton;
 
+
+// Folding button hierarchy is an n-ary tree with nodes containing EditorFoldingButtons
+// The root node is special as its not a folding button itself.
+class EditorFoldingButtonHierarchyNode
+{
+    std::vector<EditorFoldingButtonHierarchyNode> m_childNodes;
+    EditorFoldingButton* m_foldingButton;
+
+    EditorFoldingButtonHierarchyNode(EditorFoldingButton* button);
+    EditorFoldingButtonHierarchyNode() = delete;
+
+    bool canContainLine(int lineNumber);
+    void addChildNode(EditorFoldingButton* button);
+
+    friend class EditorFoldingButtonHierarchy;
+};
+
+class EditorFoldingButtonHierarchy
+{
+    std::vector<EditorFoldingButtonHierarchyNode> m_topNodes;
+public:
+    void addButton(EditorFoldingButton*);
+    //std::vector<EditorFoldingButton*> enumerate() const;
+};
+
+
 class EditorFoldingArea : public QWidget
 {
     Q_OBJECT
     FileView *m_view;
     std::vector<EditorFoldingButton*> m_foldingButtons;
+    EditorFoldingButtonHierarchy m_foldingHierarchy;
 public:
     explicit EditorFoldingArea(FileView *parent);
 
@@ -51,8 +78,11 @@ public:
 
     EditorFoldingButton(QWidget* parent, FileView *view, int firstLine, int lastLine);
 
-    QTextBlock getFirstLineBlock();
-    QTextBlock getLastVisibleBlock();
+    QTextBlock getFirstLineBlock() const;
+    QTextBlock getLastVisibleBlock() const;
+
+    int getFirstLine() const { return m_startLine; }
+    int getLastLine() const { return m_endLine; }
 
     bool isCollapsed() const { return m_collapsed; }
 

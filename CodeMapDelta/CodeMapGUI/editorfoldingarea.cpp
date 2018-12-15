@@ -16,8 +16,11 @@ EditorFoldingArea::EditorFoldingArea(FileView *parent) : QWidget((QWidget*)paren
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     setMaximumWidth(calculateWidth());
 
+    auto& editor = parent->getEditor();
     // Need this callback to handle scrolling and size update after editor content changed
-    connect(&parent->getEditor(), &FileEdit::updateRequest, this, &EditorFoldingArea::updateArea);
+    connect(&editor, &FileEdit::updateRequest, this, &EditorFoldingArea::updateArea);
+    // update area after editor content changed -> folding bars can disappear if new lines are added
+    connect(editor.document(), &QTextDocument::modificationChanged, this, &EditorFoldingArea::updateSize);
 }
 
 void EditorFoldingArea::paintEvent(QPaintEvent *event) {
@@ -33,6 +36,7 @@ void EditorFoldingArea::addFoldingButton(int firstLine, int lastLine)
 {
     // TODO: build tree of foldingButtons?
     EditorFoldingButton *fb = new EditorFoldingButton(this, m_view, firstLine, lastLine);
+    m_foldingHierarchy.addButton(fb);
     connect(fb, &EditorFoldingButton::changedSize, this, &EditorFoldingArea::updateSize);
     fb->setVisible(true);
     m_foldingButtons.emplace_back(fb);
@@ -107,13 +111,13 @@ EditorFoldingButton::EditorFoldingButton(QWidget* parent, FileView *view, int fi
     m_lastBlock = editor.document()->findBlockByLineNumber(lastLine-1);
 }
 
-QTextBlock EditorFoldingButton::getFirstLineBlock()
+QTextBlock EditorFoldingButton::getFirstLineBlock() const
 {
     return m_firstBlock;
 }
 
 
-QTextBlock EditorFoldingButton::getLastVisibleBlock()
+QTextBlock EditorFoldingButton::getLastVisibleBlock() const
 {
     for(auto b = m_lastBlock; b != m_firstBlock; b = b.previous())
     {
@@ -152,15 +156,21 @@ void EditorFoldingButton::mousePressEvent(QMouseEvent *event)
 
 QSize EditorFoldingButton::sizeHint() const
 {
-    // TODO: This doesnt handle multi line blocks
-    const int lineHeight = fontMetrics().height();
+    auto& editor = m_view->getEditor();
+    auto offset = editor.contentOffset();
 
     if(m_collapsed)
     {
-        return QSize(FOLD_AREA_WIDTH, lineHeight);
+        auto block = editor.blockBoundingGeometry(m_firstBlock).translated(offset);
+        int top = block.top();
+        int bottom = block.bottom();
+        return QSize(FOLD_AREA_WIDTH, bottom-top);
     }
 
-    return QSize(FOLD_AREA_WIDTH, lineHeight*(m_endLine - m_startLine + 1));
+    int top = editor.blockBoundingGeometry(m_firstBlock).translated(offset).top();
+    QTextBlock lastBlock = getLastVisibleBlock();
+    int bottom = editor.blockBoundingGeometry(lastBlock).translated(offset).bottom();
+    return QSize(FOLD_AREA_WIDTH, bottom - top);
 }
 
 void EditorFoldingButton::setContainsMouse(bool c)
@@ -241,4 +251,85 @@ void EditorFoldingButton::paintEvent(QPaintEvent *event)
     auto minusImage = ImageHandler::loadIcon(icons::Minus);
     painter.drawImage(QRect(leftMargin, lineBottom + topMargin, s, s), minusImage);
     painter.drawRect(QRect(0, lineBottom, width() - 1, lineHeight-1));
+}
+
+// ------------ Folding Button hierarchy ----------
+
+
+void EditorFoldingButtonHierarchy::addButton(EditorFoldingButton* button)
+{
+    auto insertFirst = button->getFirstLine();
+    auto insertLast = button->getLastLine();
+
+    /* Possible scenarios:
+    - new section is child node
+    - new section is top node and doesnt contain anything
+    - new section is top node and contains older top nodes
+    */
+
+    for(auto& node : m_topNodes)
+    {
+        if((node.canContainLine(insertFirst) && !node.canContainLine(insertLast)) ||
+            (!node.canContainLine(insertFirst) && node.canContainLine(insertLast)))
+        {
+            // sections are crossing, should never happen
+            Q_UNREACHABLE();
+            return;
+        }
+
+        if(node.canContainLine(insertFirst) && node.canContainLine(insertLast))
+        {
+            node.addChildNode(button);
+            return;
+        }
+    }
+
+    m_topNodes.emplace_back(button);
+    EditorFoldingButtonHierarchyNode& newNode = m_topNodes[m_topNodes.size()-1];
+
+    for(auto it = begin(m_topNodes); it != end(m_topNodes);)
+    {
+        auto& node = *it;
+        if(&newNode == &node)
+            continue;
+
+        int first = node.m_foldingButton->getFirstLine();
+        int last = node.m_foldingButton->getLastLine();
+
+        if(newNode.canContainLine(first) && newNode.canContainLine(last))
+        {
+            newNode.m_childNodes.emplace_back(node);
+            it = m_topNodes.erase(it);
+            continue;
+        }
+        it++;
+    }
+}
+
+//std::vector<EditorFoldingButton*> EditorFoldingButtonHierarchy::enumerate() const
+//{
+//    return 
+//}
+
+EditorFoldingButtonHierarchyNode::EditorFoldingButtonHierarchyNode(EditorFoldingButton* button) : m_foldingButton(button)
+{
+
+}
+
+bool EditorFoldingButtonHierarchyNode::canContainLine(int lineNumber)
+{
+    bool res = m_foldingButton->getFirstLine() < lineNumber && m_foldingButton->getLastLine() >= lineNumber;
+    return res;
+}
+
+void EditorFoldingButtonHierarchyNode::addChildNode(EditorFoldingButton* button)
+{
+    auto insertFirst = button->getFirstLine();
+    auto insertLast = button->getLastLine();
+
+    /* Possible scenarios:
+    - new section is child node of my child node
+    - new section is a new child and doesnt contain anything
+    - new section is a new child and contains older child nodes
+    */
 }
