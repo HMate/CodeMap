@@ -35,7 +35,7 @@ void EditorFoldingArea::paintEvent(QPaintEvent *event) {
 void EditorFoldingArea::addFoldingButton(int firstLine, int lastLine)
 {
     // TODO: build tree of foldingButtons?
-    EditorFoldingButton *fb = new EditorFoldingButton(this, m_view, firstLine, lastLine);
+    EditorFoldingButton *fb = new EditorFoldingButton(this, m_view, m_foldingHierarchy, firstLine, lastLine);
     m_foldingHierarchy.addButton(fb);
     connect(fb, &EditorFoldingButton::changedSize, this, &EditorFoldingArea::updateSize);
     fb->setVisible(true);
@@ -101,8 +101,8 @@ int EditorFoldingArea::calculateWidth() const
 
 // --------------- Folding Button --------------------
 
-EditorFoldingButton::EditorFoldingButton(QWidget* parent, FileView *view, int firstLine, int lastLine)
-    : QWidget(parent), m_view(view), m_startLine(firstLine), m_endLine(lastLine)
+EditorFoldingButton::EditorFoldingButton(QWidget* parent, FileView *view, EditorFoldingButtonHierarchy& hierarchy, int firstLine, int lastLine)
+    : QWidget(parent), m_view(view), m_hierarchy(hierarchy), m_startLine(firstLine), m_endLine(lastLine)
 {
     Q_ASSERT(firstLine < lastLine);
     
@@ -143,15 +143,24 @@ void EditorFoldingButton::leaveEvent(QEvent *event)
 
 void EditorFoldingButton::mousePressEvent(QMouseEvent *event)
 {
-    m_collapsed = !m_collapsed;
+    if(m_hierarchy.isLowestButtonThatContainsMouse(this))
+    {
+        m_collapsed = !m_collapsed;
 
-    if(m_collapsed)
-        fold();
+        if(m_collapsed)
+            fold();
+        else
+            unfold();
+
+        changedSize();
+        m_view->update();
+
+        event->accept();
+    }
     else
-        unfold();
-
-    changedSize();
-    m_view->update();
+    {
+        event->setAccepted(false);
+    }
 }
 
 QSize EditorFoldingButton::sizeHint() const
@@ -181,10 +190,6 @@ void EditorFoldingButton::setContainsMouse(bool c)
 
 void EditorFoldingButton::fold() 
 {
-    /*TODO: Use block isVisible to fold lines 
-      -> Needs to handle hierarchy of folding buttons.
-    */
-
     auto& oneAfterLast = m_lastBlock.next();
     for(auto block = m_firstBlock.next(); block != oneAfterLast; block = block.next())
     {
@@ -194,6 +199,7 @@ void EditorFoldingButton::fold()
 
 void EditorFoldingButton::unfold() 
 {
+    // TODO: only unfold child node blocks if they are not collapsed
     auto& oneAfterLast = m_lastBlock.next();
     for(auto block = m_firstBlock.next(); block != oneAfterLast; block = block.next())
     {
@@ -214,7 +220,7 @@ void EditorFoldingButton::paintEvent(QPaintEvent *event)
     auto s = qMin(width() - 4, lineHeight - 4);
     auto topMargin = (lineHeight - s + 1) / 2;
     auto leftMargin = (width() - s + 1) / 2;
-    if(m_containsMouse)
+    if(m_containsMouse && m_hierarchy.isLowestButtonThatContainsMouse(this))
     {
         painter.setPen(Qt::darkGray);
         painter.fillRect(event->rect(), Qt::white);
@@ -256,18 +262,60 @@ void EditorFoldingButton::paintEvent(QPaintEvent *event)
 // ------------ Folding Button hierarchy ----------
 
 
+EditorFoldingButtonHierarchy::EditorFoldingButtonHierarchy() : EditorFoldingButtonHierarchyNode(nullptr)
+{
+
+}
+
 void EditorFoldingButtonHierarchy::addButton(EditorFoldingButton* button)
+{
+    EditorFoldingButtonHierarchyNode::addButton(button);
+
+    for(auto& node : m_nodes)
+    {
+        node.correctVisualOrder();
+    }
+}
+
+bool EditorFoldingButtonHierarchy::isLowestButtonThatContainsMouse(EditorFoldingButton* button)
+{
+    auto node = findNode(button);
+    if(node != nullptr)
+    {
+        return !node->doAnyChildContainMouse();
+    }
+
+    return false;
+}
+
+EditorFoldingButtonHierarchyNode::EditorFoldingButtonHierarchyNode(EditorFoldingButton* button) : m_foldingButton(button)
+{
+
+}
+
+bool EditorFoldingButtonHierarchyNode::isNodeFor(EditorFoldingButton* button)
+{
+    return button == m_foldingButton;
+}
+
+bool EditorFoldingButtonHierarchyNode::canContainLine(int lineNumber)
+{
+    bool res = m_foldingButton->getFirstLine() < lineNumber && m_foldingButton->getLastLine() >= lineNumber;
+    return res;
+}
+
+void EditorFoldingButtonHierarchyNode::addButton(EditorFoldingButton* button)
 {
     auto insertFirst = button->getFirstLine();
     auto insertLast = button->getLastLine();
 
     /* Possible scenarios:
-    - new section is child node
-    - new section is top node and doesnt contain anything
-    - new section is top node and contains older top nodes
+    - new section is child node of my child node
+    - new section is a new child and doesnt contain anything
+    - new section is a new child and contains older child nodes
     */
 
-    for(auto& node : m_topNodes)
+    for(auto& node : m_nodes)
     {
         if((node.canContainLine(insertFirst) && !node.canContainLine(insertLast)) ||
             (!node.canContainLine(insertFirst) && node.canContainLine(insertLast)))
@@ -279,57 +327,75 @@ void EditorFoldingButtonHierarchy::addButton(EditorFoldingButton* button)
 
         if(node.canContainLine(insertFirst) && node.canContainLine(insertLast))
         {
-            node.addChildNode(button);
+            node.addButton(button);
             return;
         }
     }
 
-    m_topNodes.emplace_back(button);
-    EditorFoldingButtonHierarchyNode& newNode = m_topNodes[m_topNodes.size()-1];
+    m_nodes.emplace_back(button);
+    EditorFoldingButtonHierarchyNode& newNode = m_nodes[m_nodes.size() - 1];
 
-    for(auto it = begin(m_topNodes); it != end(m_topNodes);)
+    for(auto it = begin(m_nodes); it != end(m_nodes);)
     {
         auto& node = *it;
         if(&newNode == &node)
+        {
+            it++;
             continue;
+        }
 
         int first = node.m_foldingButton->getFirstLine();
         int last = node.m_foldingButton->getLastLine();
 
         if(newNode.canContainLine(first) && newNode.canContainLine(last))
         {
-            newNode.m_childNodes.emplace_back(node);
-            it = m_topNodes.erase(it);
+            newNode.m_nodes.emplace_back(node);
+            it = m_nodes.erase(it);
             continue;
         }
         it++;
     }
 }
 
-//std::vector<EditorFoldingButton*> EditorFoldingButtonHierarchy::enumerate() const
-//{
-//    return 
-//}
-
-EditorFoldingButtonHierarchyNode::EditorFoldingButtonHierarchyNode(EditorFoldingButton* button) : m_foldingButton(button)
+EditorFoldingButtonHierarchyNode* EditorFoldingButtonHierarchyNode::findNode(EditorFoldingButton* button)
 {
+    if(isNodeFor(button))
+    {
+        return this;
+    }
 
+    auto first = button->getFirstLine();
+    auto last = button->getLastLine();
+    for(auto& node : m_nodes)
+    {
+        if(node.isNodeFor(button))
+        {
+            return &node;
+        }
+        if(node.canContainLine(first) && node.canContainLine(last))
+        {
+            return node.findNode(button);
+        }
+    }
+    return nullptr;
 }
 
-bool EditorFoldingButtonHierarchyNode::canContainLine(int lineNumber)
+bool EditorFoldingButtonHierarchyNode::doAnyChildContainMouse()
 {
-    bool res = m_foldingButton->getFirstLine() < lineNumber && m_foldingButton->getLastLine() >= lineNumber;
-    return res;
+    for(auto& node : m_nodes)
+    {
+        if(node.m_foldingButton->isContainingMouse())
+            return true;
+    }
+    return false;
 }
 
-void EditorFoldingButtonHierarchyNode::addChildNode(EditorFoldingButton* button)
+// Makes child nodes to be painted later, so they are painted on top of this node
+void EditorFoldingButtonHierarchyNode::correctVisualOrder()
 {
-    auto insertFirst = button->getFirstLine();
-    auto insertLast = button->getLastLine();
-
-    /* Possible scenarios:
-    - new section is child node of my child node
-    - new section is a new child and doesnt contain anything
-    - new section is a new child and contains older child nodes
-    */
+    m_foldingButton->raise();
+    for(auto& node : m_nodes)
+    {
+        node.correctVisualOrder();
+    }
 }

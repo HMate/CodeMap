@@ -16,24 +16,29 @@ class EditorFoldingButton;
 // The root node is special as its not a folding button itself.
 class EditorFoldingButtonHierarchyNode
 {
-    std::vector<EditorFoldingButtonHierarchyNode> m_childNodes;
-    EditorFoldingButton* m_foldingButton;
-
-    EditorFoldingButtonHierarchyNode(EditorFoldingButton* button);
-    EditorFoldingButtonHierarchyNode() = delete;
+protected:
+    std::vector<EditorFoldingButtonHierarchyNode> m_nodes;
+    EditorFoldingButton* m_foldingButton = nullptr;
 
     bool canContainLine(int lineNumber);
-    void addChildNode(EditorFoldingButton* button);
+    void addButton(EditorFoldingButton* button);
+    EditorFoldingButtonHierarchyNode* findNode(EditorFoldingButton*);
 
-    friend class EditorFoldingButtonHierarchy;
+    bool isNodeFor(EditorFoldingButton* button);
+
+
+public:
+    EditorFoldingButtonHierarchyNode(EditorFoldingButton* button);
+    bool doAnyChildContainMouse();
+    void correctVisualOrder();
 };
 
-class EditorFoldingButtonHierarchy
+class EditorFoldingButtonHierarchy : public EditorFoldingButtonHierarchyNode
 {
-    std::vector<EditorFoldingButtonHierarchyNode> m_topNodes;
 public:
-    void addButton(EditorFoldingButton*);
-    //std::vector<EditorFoldingButton*> enumerate() const;
+    EditorFoldingButtonHierarchy();
+    void addButton(EditorFoldingButton* button);
+    bool isLowestButtonThatContainsMouse(EditorFoldingButton* button);
 };
 
 
@@ -66,6 +71,7 @@ class EditorFoldingButton : public QWidget
 {
     Q_OBJECT
     FileView *m_view;
+    EditorFoldingButtonHierarchy& m_hierarchy;
     QTextBlock m_firstBlock;
     QTextBlock m_lastBlock;
 
@@ -76,7 +82,7 @@ class EditorFoldingButton : public QWidget
     bool m_containsMouse = false;
 public:
 
-    EditorFoldingButton(QWidget* parent, FileView *view, int firstLine, int lastLine);
+    EditorFoldingButton(QWidget* parent, FileView *view, EditorFoldingButtonHierarchy& hierarchy, int firstLine, int lastLine);
 
     QTextBlock getFirstLineBlock() const;
     QTextBlock getLastVisibleBlock() const;
@@ -85,6 +91,7 @@ public:
     int getLastLine() const { return m_endLine; }
 
     bool isCollapsed() const { return m_collapsed; }
+    bool isContainingMouse() const { return m_containsMouse; }
 
     void setContainsMouse(bool);
     QSize sizeHint() const override;
