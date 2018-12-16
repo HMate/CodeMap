@@ -25,7 +25,6 @@ add_executable(${PROJECT_NAME}
     stringlisteditordialog.cpp)
 
 target_include_directories(${PROJECT_NAME} 
-    PRIVATE CMakeParser
     PRIVATE CodeParser)
 
 target_link_libraries(${PROJECT_NAME} 
