@@ -11,6 +11,7 @@ find_package(Catch2 CONFIG REQUIRED)
 find_package(Qt5 CONFIG REQUIRED Core)
 
 add_executable(${PROJECT_NAME}
+	test.cpp
     TestParser.cpp)
 
 target_link_libraries(${PROJECT_NAME} 

@@ -14,7 +14,7 @@ QString readFileContent(const QString& filePath)
     if(!ok)
     {
         auto errorMessage = QStringLiteral("Failed to open file: %1").arg(filePath);
-        WARN(errorMessage.toStdString());
+        FAIL(errorMessage.toStdString());
         return "";
     }
     QTextStream fileStream(&fileHandler);
@@ -29,7 +29,6 @@ QString getTestPatternPath(const QString& testName, const QString& fileName)
     return filePath;
 }
 
-
 bool writeFileContent(const QString& filePath, const QString& content)
 {
     QFile fileHandler(filePath);
@@ -37,7 +36,7 @@ bool writeFileContent(const QString& filePath, const QString& content)
     if(!ok)
     {
         auto errorMessage = QStringLiteral("Failed to open file: %1").arg(filePath);
-        WARN(errorMessage.toStdString());
+        FAIL(errorMessage.toStdString());
         return false;
     }
     QTextStream fileStream(&fileHandler);
