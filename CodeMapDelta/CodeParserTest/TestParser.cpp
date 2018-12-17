@@ -16,7 +16,7 @@ TEST_CASE("Preprocess from string", "[preprocessor][cpp]")
             "   return input+2\n"
             "}\n";
     QString result = cm::CodeParser().getPreprocessedCode(code);
-    REQUIRE(result.toStdString() == expected.toStdString());
+    REQUIRE(result == expected);
 }
 
 /* Test if preprocessor substitution is working*/
@@ -38,6 +38,10 @@ TEST_CASE("Preprocess if there are includes", "[preprocessor][cpp]")
 
     auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
     REQUIRE(result.code.content == expected);
+    REQUIRE(result.includes.size() == 1);
+    CHECK(result.includes[0].filename == "lib.h");
+    CHECK(result.includes[0].firstline == 1);
+    CHECK(result.includes[0].endline == 4);
 }
 
 /* Test if preprocessor include substitution is working,

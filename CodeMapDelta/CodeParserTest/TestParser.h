@@ -44,4 +44,16 @@ bool writeFileContent(const QString& filePath, const QString& content)
     return true;
 }
 
+// Custom Matcher
+
+namespace Catch {
+namespace Detail {
+
+    template<>
+    std::string stringify<QString>(const QString& e) {
+        return e.toStdString();
+    }
+}
+}
+
 #endif // !TEST_HELPER_H
