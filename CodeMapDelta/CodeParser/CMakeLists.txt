@@ -14,8 +14,9 @@ find_package(llvm REQUIRED)
 find_package(clang REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC
+    codeparser.cpp
     parsererror.cpp
-    codeparser.cpp)
+	linemarkers.cpp)
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${LLVM_INCLUDE_DIR}
