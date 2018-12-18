@@ -57,7 +57,7 @@ public:
     QSize sizeHint() const override;
     int calculateWidth() const;
 
-    void addFoldingButton(int firstLine, int lastLine);
+    EditorFoldingButton& addFoldingButton(int firstLine, int lastLine);
     std::vector<EditorFoldingButton*> getFoldingButtons() const { return m_foldingButtons; }
 
 public slots:
@@ -100,6 +100,9 @@ public:
     void setContainsMouse(bool);
     QSize sizeHint() const override;
 
+    void fold();
+    void unfold();
+
 signals:
     void changedSize();
 
@@ -108,9 +111,6 @@ protected:
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
-
-    void fold();
-    void unfold();
 };
 
 #endif // EDITORFOLDINGAREA_H

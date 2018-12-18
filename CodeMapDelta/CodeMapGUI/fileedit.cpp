@@ -81,9 +81,11 @@ void FileEdit::foldDefinesFinished()
 {
     cm::ParsedCodeFile result = m_foldWatcher.future().result();
     m_PreprocessedFileView->setText(result.content);
+    auto& foldingArea = m_PreprocessedFileView->getFoldingArea();
     for(auto& include : result.includes)
     {
-        m_PreprocessedFileView->addIncludeCollapser(include.firstLine, include.lastLine);
+        auto& fb = foldingArea.addFoldingButton(include.firstLine, include.lastLine);
+        fb.fold();
     }
 }
 

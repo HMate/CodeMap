@@ -32,9 +32,8 @@ void EditorFoldingArea::paintEvent(QPaintEvent *event) {
 }
 
 // *layout like behaviour*
-void EditorFoldingArea::addFoldingButton(int firstLine, int lastLine)
+EditorFoldingButton& EditorFoldingArea::addFoldingButton(int firstLine, int lastLine)
 {
-    // TODO: build tree of foldingButtons?
     EditorFoldingButton *fb = new EditorFoldingButton(this, m_view, m_foldingHierarchy, firstLine, lastLine);
     m_foldingHierarchy.addButton(fb);
     connect(fb, &EditorFoldingButton::changedSize, this, &EditorFoldingArea::updateSize);
@@ -42,6 +41,7 @@ void EditorFoldingArea::addFoldingButton(int firstLine, int lastLine)
     m_foldingButtons.emplace_back(fb);
 
     setFoldingButtonGeometry(*fb);
+    return *fb;
 }
 
 // *layout like behaviour -> should call setGeometry on every child to update them*
@@ -78,7 +78,6 @@ void EditorFoldingArea::updateSize()
 
 void EditorFoldingArea::setFoldingButtonGeometry(EditorFoldingButton& fb)
 {
-    // TODO: What if block is not visible? What does this give? Check it!
     QTextBlock block = fb.getFirstLineBlock();
     auto& editor = m_view->getEditor();
     QRectF blockBB = editor.blockBoundingGeometry(block).translated(editor.contentOffset());
@@ -343,6 +342,7 @@ void EditorFoldingButtonHierarchyNode::addButton(EditorFoldingButton* button)
     - new section is a new child and contains older child nodes
     */
 
+    // TODO: Theres a bug here, hierarchy doesnt contain everything thats added
     for(auto& node : m_nodes)
     {
         if((node.canContainLine(insertFirst) && !node.canContainLine(insertLast)) ||
