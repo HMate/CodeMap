@@ -6,7 +6,6 @@
 #include <QtConcurrent>
 
 #include "mainwindow.h"
-#include "codeparser.h"
 #include "fileview.h"
 #include "editorfoldingarea.h"
 
@@ -54,7 +53,7 @@ void FileEdit::foldDefines()
     m_foldWatcher.setFuture(foldFuture);
 }
 
-QString FileEdit::foldDefinesForFile(const QString& filePath) const
+cm::ParsedCodeFile FileEdit::foldDefinesForFile(const QString& filePath) const
 {
     auto mw = MainWindow::instance();
     const auto& terminal = mw->getTerminalView();
@@ -75,14 +74,17 @@ QString FileEdit::foldDefinesForFile(const QString& filePath) const
             terminal->showMessage(e);
         }
     }
-    return processed.code.content;
+    return processed.code;
 }
 
 void FileEdit::foldDefinesFinished()
 {
-    QString result = m_foldWatcher.future().result();
-    m_PreprocessedFileView->setText(result);
-    m_PreprocessedFileView->setIncludeCollapsers();
+    cm::ParsedCodeFile result = m_foldWatcher.future().result();
+    m_PreprocessedFileView->setText(result.content);
+    for(auto& include : result.includes)
+    {
+        m_PreprocessedFileView->addIncludeCollapser(include.firstLine, include.lastLine);
+    }
 }
 
 void FileEdit::setFilePath(const QString& path)
@@ -133,7 +135,7 @@ void FileEdit::paintEvent(QPaintEvent *event)
             auto layout = block.layout();
             QTextLine line = layout->lineAt(layout->lineCount() - 1);
             QRectF lineRect = line.naturalTextRect().translated(offset.x(), boundingRect.top());
-            QString replacement = " ... ";
+            QString replacement = btn->getReplacementText();
 
             const qreal overlayLeftMargin = 12;
             QRectF collapseRect(lineRect.right() + overlayLeftMargin, lineRect.top(),

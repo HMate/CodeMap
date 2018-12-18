@@ -229,6 +229,11 @@ void EditorFoldingButton::unfold()
     }
 }
 
+QString EditorFoldingButton::getReplacementText() const
+{
+    return " ... ";
+}
+
 void EditorFoldingButton::paintEvent(QPaintEvent *event) 
 {
     QWidget::paintEvent(event);

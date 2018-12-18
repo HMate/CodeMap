@@ -92,6 +92,7 @@ public:
 
     int getFirstLine() const { return m_startLine; }
     int getLastLine() const { return m_endLine; }
+    QString getReplacementText() const;
 
     bool isCollapsed() const { return m_collapsed; }
     bool isContainingMouse() const { return m_containsMouse; }

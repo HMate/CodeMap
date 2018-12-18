@@ -190,24 +190,9 @@ void FileView::setText(const QString& t)
 {
     m_editor->setPlainText(t);
     m_editor->document()->setModified(false);
-
-    m_foldingArea->addFoldingButton(10, 11);
-
-    m_foldingArea->addFoldingButton(4, 12);
-
-    m_foldingArea->addFoldingButton(6, 8);
 }
 
-struct IncludeRegion
+void FileView::addIncludeCollapser(int firstLine, int lastLine)
 {
-    int firstLine, lastLine;
-
-    IncludeRegion(int firstLine, int lastLine) : firstLine(firstLine), lastLine(lastLine) {}
-};
-
-void FileView::setIncludeCollapsers()
-{
-    IncludeRegion region(2, 4);
-
-    //m_foldingArea->addFoldingButton(region.firstLine, region.lastLine);
+    m_foldingArea->addFoldingButton(firstLine, lastLine);
 }

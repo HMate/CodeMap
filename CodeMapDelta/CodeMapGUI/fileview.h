@@ -54,7 +54,7 @@ public:
     const QString& getFilePath();
     void setText(const QString& t);
 
-    void setIncludeCollapsers();
+    void addIncludeCollapser(int firstLine, int lastLine);
 
     void saveFile();
     void openFile(const QString &path);
