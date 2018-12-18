@@ -30,7 +30,7 @@ TEST_CASE("Preprocess from file", "[preprocessor][cpp]")
 }
 
 /* Test if preprocessor include substitution is working,
-    * when the include is inside the same folder as the cpp*/
+ * when the include is inside the same folder as the cpp*/
 TEST_CASE("Preprocess if there are includes", "[preprocessor][cpp]")
 {
     QString codePath = getTestPatternPath("testPreprocessorInclude", "test.cpp");
@@ -40,12 +40,12 @@ TEST_CASE("Preprocess if there are includes", "[preprocessor][cpp]")
     REQUIRE(result.code.content == expected);
     REQUIRE(result.includes.size() == 1);
     CHECK(result.includes[0].filename == "lib.h");
-    CHECK(result.includes[0].firstline == 1);
-    CHECK(result.includes[0].endline == 4);
+    CHECK(result.includes[0].firstLine == 1);
+    CHECK(result.includes[0].lastLine == 4);
 }
 
 /* Test if preprocessor include substitution is working,
-    * when the include is outside of the cpp folder*/
+ * when the include is outside of the cpp folder*/
 TEST_CASE("Preprocess if include is outside own directory", "[preprocessor][cpp]")
 {
     QString codePath = getTestPatternPath("testPreprocessorIncludeOuterDir", "test.cpp");

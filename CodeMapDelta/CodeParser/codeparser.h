@@ -17,8 +17,8 @@ struct ParsedCodeFile
 struct IncludeSection
 {
     QString filename;
-    long firstline;
-    long endline;
+    long firstLine;
+    long lastLine;
 };
 typedef std::vector<IncludeSection> IncludeSectionList;
 

@@ -4,6 +4,7 @@
 #include "clang/Frontend/CompilerInstance.h"
 
 #include <QStringList>
+#include <QRegularExpression>
 
 #include "parsererror.h"
 
@@ -96,6 +97,7 @@ ParserResult CodeParser::getPreprocessedCodeFromPath(const QString& srcPath, con
     ParserResult result;
     ParsedIncludes extracted = parseIncludes(QString::fromStdString(processedFile));
     result.code.content = extracted.code;
+    result.includes = extracted.includes;
     auto errors = errorCollector.GetErrorsList();
     for (const auto& it : errors)
     {
@@ -106,6 +108,7 @@ ParserResult CodeParser::getPreprocessedCodeFromPath(const QString& srcPath, con
 
 enum class LineMarkerType
 {
+    Missing = 0,
     EnterInclude = 1,
     ExitInclude = 2,
     EnterSystemFile = 3,
@@ -122,9 +125,19 @@ struct LineMarker
 
 LineMarker parseLineMarker(const QString& line)
 {
-    LineMarker marker;
-    // TODO: parse in a linemarker
-    marker.filename = "asd";
+    LineMarker marker{-1, "", LineMarkerType::Invalid};
+
+    // Example marker: # 1 "filename.h" 2
+    QRegularExpression re("^#\\s*(\\d+)\\s*\\\"(.+)\\\"\\s*(\\d*)");
+    QRegularExpressionMatch match = re.match(line);
+    if(match.hasMatch()) {
+        QString startLineString = match.captured(1);
+        marker.enteringLine = startLineString.toLong();
+        marker.filename = match.captured(2);
+        QString typeString = match.captured(3);
+        marker.type = LineMarkerType(typeString.toInt());
+    }
+
     return marker;
 }
 
@@ -135,20 +148,41 @@ ParsedIncludes CodeParser::parseIncludes(const QString& processed)
     auto lines = processed.split('\n');
 
     // TODO: include stack builder?
+
+    static QStringList builtinFilenames = { "<built-in>", "<command line>" };
+
+    IncludeSection section;
+
     bool isFirstLine = true;
     QString filename;
+    size_t lineIndex = 1;
     for(QStringList::iterator line = lines.begin(); line != lines.end(); ) {
         if(line->startsWith("#")) {
             LineMarker marker = parseLineMarker(*line);
             if(isFirstLine)
             {
                 filename = marker.filename;
+                isFirstLine = false;
             }
-            isFirstLine = false;
+            else if(!builtinFilenames.contains(marker.filename))
+            {
+                if(marker.type == LineMarkerType::EnterInclude)
+                {
+                    section.filename = marker.filename;
+                    section.firstLine = lineIndex;
+                }
+                else if(marker.type == LineMarkerType::ExitInclude &&
+                    section.filename != "")
+                {
+                    section.lastLine = lineIndex - 1;
+                    result.includes.emplace_back(section);
+                }
+            }
             line = lines.erase(line);
         }
         else {
             ++line;
+            ++lineIndex;
         }
     }
 
