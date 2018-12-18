@@ -49,6 +49,7 @@ public:
         */
         ppoo.ShowLineMarkers = 1;
         ppoo.UseLineDirectives = 0;
+        ppoo.ShowIncludeDirectives = 1;
         clang::DoPrintPreprocessedInput(CI.getPreprocessor(), &OS, ppoo);
         OS.flush();
     }
@@ -127,7 +128,8 @@ LineMarker parseLineMarker(const QString& line)
 {
     LineMarker marker{-1, "", LineMarkerType::Invalid};
 
-    // Example marker: # 1 "filename.h" 2
+    // Example marker: 
+    //# 1 "filename.h" 2
     QRegularExpression re("^#\\s*(\\d+)\\s*\\\"(.+)\\\"\\s*(\\d*)");
     QRegularExpressionMatch match = re.match(line);
     if(match.hasMatch()) {
@@ -139,6 +141,25 @@ LineMarker parseLineMarker(const QString& line)
     }
 
     return marker;
+}
+
+QString parseInclude(QString& line)
+{
+    QString result;
+
+    // Example include: 
+    //#include "filename.h" /* clang -E -dH */
+    QRegularExpression re("^#include\\s*[<\"](.+)[>\"]\\s+\\/\\*");
+    QRegularExpressionMatch match = re.match(line);
+    if(match.hasMatch()) {
+        result = match.captured(1);
+
+        // we dont want the clang comment at the end
+        auto index = line.indexOf(QRegularExpression("\\s+/\\*"));
+        line.truncate(index);
+    }
+
+    return result;
 }
 
 ParsedIncludes CodeParser::parseIncludes(const QString& processed)
@@ -159,26 +180,35 @@ ParsedIncludes CodeParser::parseIncludes(const QString& processed)
     for(QStringList::iterator line = lines.begin(); line != lines.end(); ) {
         if(line->startsWith("#")) {
             LineMarker marker = parseLineMarker(*line);
-            if(isFirstLine)
+            if(marker.type != LineMarkerType::Invalid)
             {
-                filename = marker.filename;
-                isFirstLine = false;
+                if(isFirstLine)
+                {
+                    filename = marker.filename;
+                    isFirstLine = false;
+                }
+                else if(!builtinFilenames.contains(marker.filename))
+                {
+                    if(marker.type == LineMarkerType::EnterInclude)
+                    {
+                    }
+                    else if(marker.type == LineMarkerType::ExitInclude &&
+                        section.filename != "")
+                    {
+                        section.lastLine = lineIndex - 1;
+                        result.includes.emplace_back(section);
+                    }
+                }
+                line = lines.erase(line);
             }
-            else if(!builtinFilenames.contains(marker.filename))
+            else
             {
-                if(marker.type == LineMarkerType::EnterInclude)
-                {
-                    section.filename = marker.filename;
-                    section.firstLine = lineIndex;
-                }
-                else if(marker.type == LineMarkerType::ExitInclude &&
-                    section.filename != "")
-                {
-                    section.lastLine = lineIndex - 1;
-                    result.includes.emplace_back(section);
-                }
+                // line is include directive
+                section.filename = parseInclude(*line);
+                section.firstLine = lineIndex;
+                ++line;
+                ++lineIndex;
             }
-            line = lines.erase(line);
         }
         else {
             ++line;

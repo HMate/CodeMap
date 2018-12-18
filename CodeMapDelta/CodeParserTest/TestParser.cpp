@@ -41,7 +41,7 @@ TEST_CASE("Preprocess if there are includes", "[preprocessor][cpp]")
     REQUIRE(result.includes.size() == 1);
     CHECK(result.includes[0].filename == "lib.h");
     CHECK(result.includes[0].firstLine == 1);
-    CHECK(result.includes[0].lastLine == 4);
+    CHECK(result.includes[0].lastLine == 5);
 }
 
 /* Test if preprocessor include substitution is working,
