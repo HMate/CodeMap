@@ -29,9 +29,16 @@ TEST_CASE("Preprocess from file", "[preprocessor][cpp]")
     REQUIRE(result.code.content == expected);
 }
 
+void check_include(cm::ParserResult result, int index, const QString& filename, long firstLine, long lastLine)
+{
+    CHECK(result.code.includes[index].filename == filename);
+    CHECK(result.code.includes[index].firstLine == firstLine);
+    CHECK(result.code.includes[index].lastLine == lastLine);
+}
+
 /* Test if preprocessor include substitution is working,
  * when the include is inside the same folder as the cpp*/
-TEST_CASE("Preprocess if there are includes", "[preprocessor][cpp]")
+TEST_CASE("Preprocess if there are includes", "[preprocessor][cpp][includes]")
 {
     QString codePath = getTestPatternPath("testPreprocessorInclude", "test.cpp");
     QString expected = readFileContent(getTestPatternPath("testPreprocessorInclude", "result.cpp"));
@@ -39,21 +46,35 @@ TEST_CASE("Preprocess if there are includes", "[preprocessor][cpp]")
     auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
     REQUIRE(result.code.content == expected);
     REQUIRE(result.code.includes.size() == 1);
-    CHECK(result.code.includes[0].filename == "lib.h");
-    CHECK(result.code.includes[0].firstLine == 1);
-    CHECK(result.code.includes[0].lastLine == 5);
+    check_include(result, 0, "lib.h", 1, 5);
 }
 
 /* Test if preprocessor include substitution is working,
  * when the include is outside of the cpp folder*/
-TEST_CASE("Preprocess if include is outside own directory", "[preprocessor][cpp]")
+TEST_CASE("Preprocess if include is outside own directory", "[preprocessor][cpp][includes]")
 {
     QString codePath = getTestPatternPath("testPreprocessorIncludeOuterDir", "test.cpp");
     QString expected = readFileContent(getTestPatternPath("testPreprocessorIncludeOuterDir", "result.cpp"));
 
     auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath, {getTestPatternPath("testPreprocessorIncludeOuterDir", "externalDependencies")});
     REQUIRE(result.code.content == expected);
+    REQUIRE(result.code.includes.size() == 1);
+    check_include(result, 0, "lib.h", 1, 5);
 }
+
+TEST_CASE("Preprocess a mini project", "[preprocessor][cpp][includes]")
+{
+    QString codePath = getTestPatternPath("projectNeumann", "main.cpp");
+    
+    auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
+    
+    REQUIRE(result.code.includes.size() == 4);
+    check_include(result, 0, "ram.h", 3, 10);
+    check_include(result, 1, "gpu.h", 14, 20);
+    check_include(result, 2, "monitor.h", 11, 29);
+    check_include(result, 3, "computer.h", 1, 39);
+}
+
 
 // Test if we can include stdlib code
 TEST_CASE("Preprocess if include is std lib", "[preprocessor][cpp]")

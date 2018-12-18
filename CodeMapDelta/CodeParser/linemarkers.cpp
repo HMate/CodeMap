@@ -1,6 +1,6 @@
 #include "linemarkers.h"
 
-
+#include <stack>
 #include <QStringList>
 #include <QRegularExpression>
 
@@ -62,17 +62,16 @@ QString parseInclude(QString& line)
     return result;
 }
 
+static QStringList builtinFilenames = { "<built-in>", "<command line>" };
+
 ParsedCodeFile parseLineMarkers(const QString& processed)
 {
     ParsedCodeFile result;
 
     auto lines = processed.split('\n');
 
-    // TODO: include stack builder?
-
-    static QStringList builtinFilenames = { "<built-in>", "<command line>" };
-
-    IncludeSection section;
+    IncludeSection lastSection;
+    std::stack<IncludeSection> includeStack;
 
     bool isFirstLine = true;
     QString filename;
@@ -91,12 +90,17 @@ ParsedCodeFile parseLineMarkers(const QString& processed)
                 {
                     if(marker.type == LineMarkerType::EnterInclude)
                     {
+                        includeStack.push(lastSection);
                     }
-                    else if(marker.type == LineMarkerType::ExitInclude &&
-                        section.filename != "")
+                    else if(marker.type == LineMarkerType::ExitInclude)
                     {
-                        section.lastLine = lineIndex - 1;
-                        result.includes.emplace_back(section);
+                        if(!includeStack.empty())
+                        {
+                            IncludeSection section = includeStack.top();
+                            includeStack.pop();
+                            section.lastLine = lineIndex - 1;
+                            result.includes.emplace_back(section);
+                        }
                     }
                 }
                 line = lines.erase(line);
@@ -104,8 +108,8 @@ ParsedCodeFile parseLineMarkers(const QString& processed)
             else
             {
                 // line is include directive
-                section.filename = parseInclude(*line);
-                section.firstLine = lineIndex;
+                lastSection.filename = parseInclude(*line);
+                lastSection.firstLine = lineIndex;
                 ++line;
                 ++lineIndex;
             }
