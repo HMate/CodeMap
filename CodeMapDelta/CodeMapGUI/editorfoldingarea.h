@@ -30,10 +30,11 @@ public:
 
     EditorFoldingButtonHierarchyNode* findNode(EditorFoldingButton*);
     EditorFoldingButton* getButton() { return m_foldingButton; }
-    std::vector<EditorFoldingButtonHierarchyNode>& getChildNodes() { return m_nodes; }
-    bool doAnyChildContainMouse();
-    bool canContainLine(int lineNumber);
-    void correctVisualOrder();
+    std::vector<EditorFoldingButtonHierarchyNode>& getChildNodes();
+    bool doAnyChildContainMouse() const;
+    bool canFoldLine(int lineNumber) const;
+    bool isSectionInvalid(int firstLine, int liastLine) const;
+    void correctVisualOrder() const;
 };
 
 class EditorFoldingButtonHierarchy : public EditorFoldingButtonHierarchyNode
@@ -42,6 +43,8 @@ public:
     EditorFoldingButtonHierarchy();
     void addButton(EditorFoldingButton* button);
     bool isLowestButtonThatContainsMouse(EditorFoldingButton* button);
+
+    void correctVisualOrder() const;
 };
 
 
@@ -51,6 +54,8 @@ class EditorFoldingArea : public QWidget
     FileView *m_view;
     std::vector<EditorFoldingButton*> m_foldingButtons;
     EditorFoldingButtonHierarchy m_foldingHierarchy;
+
+    QSize m_lastSize;
 public:
     explicit EditorFoldingArea(FileView *parent);
 
@@ -73,16 +78,16 @@ protected:
 class EditorFoldingButton : public QWidget
 {
     Q_OBJECT
-    FileView *m_view;
-    EditorFoldingButtonHierarchy& m_hierarchy;
     QTextBlock m_firstBlock;
     QTextBlock m_lastBlock;
-
     const int m_startLine;
     const int m_endLine;
 
     bool m_collapsed = false;
     bool m_containsMouse = false;
+
+    EditorFoldingButtonHierarchy& m_hierarchy;
+    FileView *m_view;
 public:
 
     EditorFoldingButton(QWidget* parent, FileView *view, EditorFoldingButtonHierarchy& hierarchy, int firstLine, int lastLine);

@@ -53,7 +53,7 @@ void FileEdit::foldDefines()
     m_foldWatcher.setFuture(foldFuture);
 }
 
-cm::ParsedCodeFile FileEdit::foldDefinesForFile(const QString& filePath) const
+cm::ParserResult FileEdit::foldDefinesForFile(const QString& filePath) const
 {
     auto mw = MainWindow::instance();
     const auto& terminal = mw->getTerminalView();
@@ -65,28 +65,33 @@ cm::ParsedCodeFile FileEdit::foldDefinesForFile(const QString& filePath) const
         includes.emplace_back(i);
     }
     auto processed = cm::CodeParser().getPreprocessedCodeFromPath(filePath, includes);
-
-    if(processed.hasErrors())
-    {
-        terminal->showMessage(tr("Had %1 errors:").arg(processed.errors.size()));
-        for(auto& e : processed.errors)
-        {
-            terminal->showMessage(e);
-        }
-    }
-    return processed.code;
+    return processed;
 }
 
 void FileEdit::foldDefinesFinished()
 {
-    cm::ParsedCodeFile result = m_foldWatcher.future().result();
-    m_PreprocessedFileView->setText(result.content);
+    cm::ParserResult result = m_foldWatcher.future().result();
+    if(result.hasErrors())
+    {
+        auto mw = MainWindow::instance();
+        const auto& terminal = mw->getTerminalView();
+        terminal->showMessage(tr("Had %1 errors:").arg(result.errors.size()));
+        for(auto& e : result.errors)
+        {
+            terminal->showMessage(e);
+        }
+    }
+    m_PreprocessedFileView->setText(result.code.content);
+    qDebug() << "start adding includes";
     auto& foldingArea = m_PreprocessedFileView->getFoldingArea();
-    for(auto& include : result.includes)
+
+    // TODO: This is really slow now, maybe try batching?
+    for(auto& include : result.code.includes)
     {
         auto& fb = foldingArea.addFoldingButton(include.firstLine, include.lastLine);
         fb.fold();
     }
+    qDebug() << "end adding includes";
 }
 
 void FileEdit::setFilePath(const QString& path)
@@ -113,7 +118,6 @@ void FileEdit::highlightCurrentLine()
     this->setExtraSelections(extraSelections);
 }
 
-
 void FileEdit::paintEvent(QPaintEvent *event)
 {
     QPlainTextEdit::paintEvent(event);
@@ -123,12 +127,17 @@ void FileEdit::paintEvent(QPaintEvent *event)
 
     EditorFoldingArea& fArea = m_view->getFoldingArea();
 
+    qDebug() << "fileedit overlay paint";
     // draw text overlay for folded blocks
     for(auto btn : fArea.getFoldingButtons())
     {
         auto block = btn->getFirstLineBlock();
         if(!block.isVisible())
-            return;
+            continue;
+
+        // TODO: Why do some nodes become invalid?
+        if(!block.isValid())
+            continue;
 
         if(btn->isCollapsed())
         {

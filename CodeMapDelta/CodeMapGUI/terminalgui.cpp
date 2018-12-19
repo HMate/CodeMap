@@ -66,6 +66,7 @@ void TerminalView::handleTerminalCommand()
     tInput->clear();
 }
 
+/* NOTE: This method can only be called from the gui thread! Otherwise it sometimes throws exception. */
 void TerminalView::showMessage(const QString& command)
 {
     tHistory->addItem(command);

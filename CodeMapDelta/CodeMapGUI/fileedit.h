@@ -17,7 +17,7 @@ class FileEdit : public QPlainTextEdit
 
     FileView* m_view;
     FileView* m_PreprocessedFileView;
-    QFutureWatcher<cm::ParsedCodeFile> m_foldWatcher;
+    QFutureWatcher<cm::ParserResult> m_foldWatcher;
 public:
     FileEdit(QWidget* parent);
     void setFilePath(const QString& path);
@@ -26,7 +26,7 @@ public:
     void contextMenuEvent(QContextMenuEvent *event);
 
     void foldDefines(); 
-    cm::ParsedCodeFile foldDefinesForFile(const QString& filePath) const;
+    cm::ParserResult foldDefinesForFile(const QString& filePath) const;
     
     QPointF contentOffset() const { return QPlainTextEdit::contentOffset(); }
     QRectF blockBoundingGeometry(const QTextBlock& b) const { return QPlainTextEdit::blockBoundingGeometry(b); }

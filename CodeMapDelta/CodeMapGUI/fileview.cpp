@@ -188,8 +188,10 @@ void FileView::fileContentModified(bool changed)
 
 void FileView::setText(const QString& t)
 {
+    qDebug() << "start set Text";
     m_editor->setPlainText(t);
     m_editor->document()->setModified(false);
+    qDebug() << "end set Text";
 }
 
 void FileView::addIncludeCollapser(int firstLine, int lastLine)
