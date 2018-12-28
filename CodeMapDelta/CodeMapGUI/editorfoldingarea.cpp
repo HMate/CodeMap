@@ -44,6 +44,7 @@ EditorFoldingButton& EditorFoldingArea::addFoldingButton(int firstLine, int last
     fb->setVisible(true);
     m_foldingButtons.emplace_back(fb);
 
+    m_lastSize = QSize(0, 0);
     setFoldingButtonGeometry(*fb);
     return *fb;
 }
@@ -106,7 +107,7 @@ void EditorFoldingArea::updateVisibleButtonGeometries()
 
 void EditorFoldingArea::setFoldingButtonGeometry(EditorFoldingButton& fb)
 {
-    QTextBlock block = fb.getFirstLineBlock();
+    QTextBlock block = fb.getFirstBlock();
     auto& editor = m_view->getEditor();
     QRectF blockBB = editor.blockBoundingGeometry(block).translated(editor.contentOffset());
     auto s = fb.sizeHint();
@@ -138,9 +139,14 @@ EditorFoldingButton::EditorFoldingButton(QWidget* parent, FileView *view, Editor
     m_lastBlock = editor.document()->findBlockByLineNumber(lastLine-1);
 }
 
-QTextBlock EditorFoldingButton::getFirstLineBlock() const
+QTextBlock EditorFoldingButton::getFirstBlock() const
 {
     return m_firstBlock;
+}
+
+QTextBlock EditorFoldingButton::getLastBlock() const
+{
+    return m_lastBlock;
 }
 
 QTextBlock EditorFoldingButton::getLastVisibleBlock() const
@@ -216,8 +222,10 @@ void EditorFoldingButton::fold()
 {
     m_collapsed = true;
     auto& oneAfterLast = m_lastBlock.next();
-    for(auto block = m_firstBlock.next(); block.isValid() && block != oneAfterLast; block = block.next())
+    for(auto block = m_firstBlock.next(); block != oneAfterLast; block = block.next())
     {
+        Q_ASSERT(block.isValid());
+        if(!block.isValid()) continue;
         block.setVisible(false);
     }
 }
@@ -234,20 +242,47 @@ void EditorFoldingButton::unfold()
 
     // TODO: Something gets broken after fold/unfold in the underlying document -> debug and fix it
 
-    // TODO: Current implmentation still slow, optimize it by skipping collapsed child buttons blocks
-    // Collect children first/last blocks to vector, and check if we are in child block, dont change its visibility.
-
-    auto last = m_lastBlock.firstLineNumber();
-    for(auto block = m_firstBlock.next(); block.isValid() && block.firstLineNumber() <= last; block = block.next())
+    if(childs.size() > 0)
     {
-       block.setVisible(true);
+
+        std::vector<QTextBlock> blockRegions;
+        for(auto child : childs)
+        {
+            auto button = child.getButton();
+            if(button->isCollapsed())
+            {
+                blockRegions.emplace_back(button->getFirstBlock());
+                blockRegions.emplace_back(button->getLastBlock());
+            }
+        }
+
+        size_t regionIndex = 0;
+        QTextBlock nextRegion = blockRegions[regionIndex];
+        auto last = m_lastBlock.blockNumber();
+        for(auto block = m_firstBlock.next(); block.blockNumber() <= last; block = block.next())
+        {
+            Q_ASSERT(block.isValid());
+            if(!block.isValid()) continue;
+            block.setVisible(true);
+            if(block == nextRegion)
+            {
+                regionIndex++;
+                block = blockRegions[regionIndex]; //set to region ending block
+                regionIndex++;
+                if(blockRegions.size() > regionIndex)
+                    nextRegion = blockRegions[regionIndex];
+            }
+        }
     }
-
-    for(auto child : childs)
+    else
     {
-        auto button = child.getButton();
-        if(button->isCollapsed())
-            button->fold();
+        auto last = m_lastBlock.blockNumber();
+        for(auto block = m_firstBlock.next(); block.blockNumber() <= last; block = block.next())
+        {
+            Q_ASSERT(block.isValid());
+            if(!block.isValid()) continue;
+            block.setVisible(true);
+        }
     }
 }
 

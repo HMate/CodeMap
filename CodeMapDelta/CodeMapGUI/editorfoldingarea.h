@@ -95,7 +95,8 @@ public:
 
     EditorFoldingButton(QWidget* parent, FileView *view, EditorFoldingButtonHierarchy& hierarchy, int firstLine, int lastLine);
 
-    QTextBlock getFirstLineBlock() const;
+    QTextBlock getFirstBlock() const;
+    QTextBlock getLastBlock() const;
     QTextBlock getLastVisibleBlock() const;
 
     int getFirstLine() const { return m_startLine; }

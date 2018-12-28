@@ -134,7 +134,7 @@ void FileEdit::paintEvent(QPaintEvent *event)
     // draw text overlay for folded blocks
     for(auto btn : fArea.getFoldingButtons())
     {
-        auto block = btn->getFirstLineBlock();
+        auto block = btn->getFirstBlock();
         if(!block.isVisible())
             continue;
 
