@@ -40,7 +40,7 @@ EditorFoldingButton& EditorFoldingArea::addFoldingButton(int firstLine, int last
     }
     EditorFoldingButton *fb = new EditorFoldingButton(this, m_view, m_foldingHierarchy, firstLine, lastLine);
     m_foldingHierarchy.addButton(fb);
-    connect(fb, &EditorFoldingButton::changedSize, this, &EditorFoldingArea::updateButtonGeometries);
+    connect(fb, &EditorFoldingButton::changedState, this, &EditorFoldingArea::updateButtonGeometries);
     fb->setVisible(true);
     m_foldingButtons.emplace_back(fb);
 
@@ -61,8 +61,7 @@ void EditorFoldingArea::updateArea(const QRect &rect, int dy)
     if(dy)
     {
         this->scroll(0, dy);
-        // TODO: optimize this by only updateing those buttons that are actually visible, or at least visible in the hierarchy.
-        updateButtonGeometries();
+        updateVisibleButtonGeometries();
     }
     else
         this->update(0, rect.y(), this->width(), rect.height());
@@ -89,6 +88,16 @@ void EditorFoldingArea::updateSize()
 void EditorFoldingArea::updateButtonGeometries()
 {
     for(auto b : m_foldingButtons)
+    {
+        setFoldingButtonGeometry(*b);
+    }
+    m_foldingHierarchy.correctVisualOrder();
+}
+
+void EditorFoldingArea::updateVisibleButtonGeometries()
+{
+    std::vector<EditorFoldingButton*> buttons = m_foldingHierarchy.getVisibleChildButtons();
+    for(auto b : buttons)
     {
         setFoldingButtonGeometry(*b);
     }
@@ -167,7 +176,7 @@ void EditorFoldingButton::mousePressEvent(QMouseEvent *event)
         else
             unfold();
 
-        changedSize();
+        changedState();
         m_view->update();
 
         event->accept();
@@ -417,6 +426,22 @@ void EditorFoldingButtonHierarchyNode::addButton(EditorFoldingButton* button)
 std::vector<EditorFoldingButtonHierarchyNode>& EditorFoldingButtonHierarchyNode::getChildNodes() 
 { 
     return m_nodes; 
+}
+
+std::vector<EditorFoldingButton*> EditorFoldingButtonHierarchyNode::getVisibleChildButtons()
+{
+    std::vector<EditorFoldingButton*> buttons;
+    for(auto& node : m_nodes)
+    {
+        auto child = node.getButton();
+        buttons.emplace_back(child);
+        if(!child->isCollapsed())
+        {
+            auto& visibles = node.getVisibleChildButtons();
+            buttons.insert(buttons.end(), visibles.begin(), visibles.end());
+        }
+    }
+    return buttons;
 }
 
 EditorFoldingButtonHierarchyNode* EditorFoldingButtonHierarchyNode::findNode(EditorFoldingButton* button)

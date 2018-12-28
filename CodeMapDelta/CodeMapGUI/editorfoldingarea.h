@@ -31,6 +31,7 @@ public:
     EditorFoldingButtonHierarchyNode* findNode(EditorFoldingButton*);
     EditorFoldingButton* getButton() { return m_foldingButton; }
     std::vector<EditorFoldingButtonHierarchyNode>& getChildNodes();
+    std::vector<EditorFoldingButton*> getVisibleChildButtons();
     bool doAnyChildContainMouse() const;
     bool canFoldLine(int lineNumber) const;
     bool isSectionInvalid(int firstLine, int liastLine) const;
@@ -73,6 +74,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *e) override;
     void updateButtonGeometries();
+    void updateVisibleButtonGeometries();
     void setFoldingButtonGeometry(EditorFoldingButton& fb);
 };
 
@@ -110,7 +112,7 @@ public:
     void unfold();
 
 signals:
-    void changedSize();
+    void changedState();
 
 protected:
     void paintEvent(QPaintEvent *event) override;
