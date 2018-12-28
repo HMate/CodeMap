@@ -72,6 +72,7 @@ public slots:
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *e) override;
+    void updateButtonGeometries();
     void setFoldingButtonGeometry(EditorFoldingButton& fb);
 };
 

@@ -31,7 +31,7 @@ void FileEdit::contextMenuEvent(QContextMenuEvent* event)
     // TODO: write help in context menu, show what is missing
     // in case action is not available
     std::unique_ptr<QMenu> menu(this->createStandardContextMenu());
-    menu->addAction(tr("Fold defines"), this, &FileEdit::foldDefines);
+    menu->addAction(tr("Expand macros"), this, &FileEdit::foldDefines);
     menu->exec(event->globalPos());
 }
 
@@ -88,8 +88,11 @@ void FileEdit::foldDefinesFinished()
     // TODO: This is really slow now, maybe try batching?
     for(auto& include : result.code.includes)
     {
-        auto& fb = foldingArea.addFoldingButton(include.firstLine, include.lastLine);
-        fb.fold();
+        foldingArea.addFoldingButton(include.firstLine, include.lastLine);
+    }
+    for(auto& fb : foldingArea.getFoldingButtons())
+    {
+        fb->fold();
     }
     qDebug() << "end adding includes";
 }

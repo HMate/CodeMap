@@ -40,7 +40,7 @@ EditorFoldingButton& EditorFoldingArea::addFoldingButton(int firstLine, int last
     }
     EditorFoldingButton *fb = new EditorFoldingButton(this, m_view, m_foldingHierarchy, firstLine, lastLine);
     m_foldingHierarchy.addButton(fb);
-    connect(fb, &EditorFoldingButton::changedSize, this, &EditorFoldingArea::updateSize);
+    connect(fb, &EditorFoldingButton::changedSize, this, &EditorFoldingArea::updateButtonGeometries);
     fb->setVisible(true);
     m_foldingButtons.emplace_back(fb);
 
@@ -57,12 +57,16 @@ void EditorFoldingArea::resizeEvent(QResizeEvent *e)
 
 void EditorFoldingArea::updateArea(const QRect &rect, int dy)
 {
+    qDebug() << "updateArea y: " << dy;
     if(dy)
+    {
         this->scroll(0, dy);
+        // TODO: optimize this by only updateing those buttons that are actually visible, or at least visible in the hierarchy.
+        updateButtonGeometries();
+    }
     else
         this->update(0, rect.y(), this->width(), rect.height());
 
-    updateSize();
 }
 
 // When a button is changed/clicked/added/removed this should be called to update the position
@@ -70,6 +74,7 @@ void EditorFoldingArea::updateArea(const QRect &rect, int dy)
 // *layout like behaviour*
 void EditorFoldingArea::updateSize()
 {
+    qDebug() << "updateSize";
     auto s = sizeHint();
     resize(s);
     setMaximumWidth(s.width());
@@ -77,12 +82,17 @@ void EditorFoldingArea::updateSize()
     if(m_lastSize != s)
     {
         m_lastSize = s;
-        for(auto b : m_foldingButtons)
-        {
-            setFoldingButtonGeometry(*b);
-        }
-        m_foldingHierarchy.correctVisualOrder();
+        updateButtonGeometries();
     }
+}
+
+void EditorFoldingArea::updateButtonGeometries()
+{
+    for(auto b : m_foldingButtons)
+    {
+        setFoldingButtonGeometry(*b);
+    }
+    m_foldingHierarchy.correctVisualOrder();
 }
 
 void EditorFoldingArea::setFoldingButtonGeometry(EditorFoldingButton& fb)
@@ -212,6 +222,11 @@ void EditorFoldingButton::unfold()
         return;
 
     auto childs = myNode->getChildNodes();
+
+    // TODO: Something gets broken after fold/unfold in the underlying document -> debug and fix it
+
+    // TODO: Current implmentation still slow, optimize it by skipping collapsed child buttons blocks
+    // Collect children first/last blocks to vector, and check if we are in child block, dont change its visibility.
 
     auto last = m_lastBlock.firstLineNumber();
     for(auto block = m_firstBlock.next(); block.isValid() && block.firstLineNumber() <= last; block = block.next())
