@@ -7,6 +7,7 @@
 
 #include "mainwindow.h"
 
+
 const int FOLD_AREA_WIDTH = 13;
 
 EditorFoldingArea::EditorFoldingArea(FileView *parent) : QWidget((QWidget*)parent)
@@ -58,7 +59,7 @@ void EditorFoldingArea::resizeEvent(QResizeEvent *e)
 
 void EditorFoldingArea::updateArea(const QRect &rect, int dy)
 {
-    qDebug() << "updateArea y: " << dy;
+    qDebug() << "updateArea y: " << dy << " rect: " << rect;
     if(dy)
     {
         this->scroll(0, dy);
@@ -182,8 +183,16 @@ void EditorFoldingButton::mousePressEvent(QMouseEvent *event)
         else
             unfold();
 
+        // TODO: We have to somehow sign for the QPlainTextEdit that its size has 
+        // changed, but I'm not sure what is the correct event/method for that.
         changedState();
-        m_view->update();
+
+        m_view->getEditor().document()->contentsChanged();
+        // from: qt-creator\src\plugins\texteditor\texteditor.cpp line 7472
+        auto layout = qobject_cast<QPlainTextDocumentLayout*>(m_view->getEditor().document()->documentLayout());
+        layout->requestUpdate();
+        //m_view->update();
+        m_view->repaint();
 
         event->accept();
     }
@@ -241,21 +250,21 @@ void EditorFoldingButton::unfold()
     auto childs = myNode->getChildNodes();
 
     // TODO: Something gets broken after fold/unfold in the underlying document -> debug and fix it
+    // Some liens seems to become nonexistent and the editor skips them during scroll
 
-    if(childs.size() > 0)
+    std::vector<QTextBlock> blockRegions;
+    for(auto child : childs)
     {
-
-        std::vector<QTextBlock> blockRegions;
-        for(auto child : childs)
+        auto button = child.getButton();
+        if(button->isCollapsed())
         {
-            auto button = child.getButton();
-            if(button->isCollapsed())
-            {
-                blockRegions.emplace_back(button->getFirstBlock());
-                blockRegions.emplace_back(button->getLastBlock());
-            }
+            blockRegions.emplace_back(button->getFirstBlock());
+            blockRegions.emplace_back(button->getLastBlock());
         }
+    }
 
+    if(blockRegions.size() > 0)
+    {
         size_t regionIndex = 0;
         QTextBlock nextRegion = blockRegions[regionIndex];
         auto last = m_lastBlock.blockNumber();

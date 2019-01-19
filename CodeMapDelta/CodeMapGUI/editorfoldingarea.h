@@ -63,6 +63,8 @@ public:
     QSize sizeHint() const override;
     int calculateWidth() const;
 
+    void updateButtonGeometries();
+
     EditorFoldingButton& addFoldingButton(int firstLine, int lastLine);
     std::vector<EditorFoldingButton*> getFoldingButtons() const { return m_foldingButtons; }
 
@@ -73,7 +75,6 @@ public slots:
 protected:
     void paintEvent(QPaintEvent *event) override;
     void resizeEvent(QResizeEvent *e) override;
-    void updateButtonGeometries();
     void updateVisibleButtonGeometries();
     void setFoldingButtonGeometry(EditorFoldingButton& fb);
 };
