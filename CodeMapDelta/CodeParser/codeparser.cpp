@@ -3,6 +3,9 @@
 #include "clang/Tooling/Tooling.h"
 #include "clang/Frontend/CompilerInstance.h"
 
+#include "clang/AST/RecursiveASTVisitor.h"
+#include "clang/Frontend/ASTUnit.h"
+
 
 #include "parsererror.h"
 #include "linemarkers.h"
@@ -103,6 +106,54 @@ ParserResult CodeParser::getPreprocessedCodeFromPath(const QString& srcPath, con
         result.errors.emplace_back(QString::fromStdString(it));
     }
     return result;
+}
+
+
+class SuperVisitor : public clang::RecursiveASTVisitor<SuperVisitor> 
+{
+    struct Node
+    {
+        std::string name;
+        unsigned int row;
+        unsigned int col;
+    };
+public:
+    std::vector<Node> VisitedNodes;
+
+    bool VisitVarDecl(clang::VarDecl* D) {
+        auto& ctx = D->getASTContext();
+        auto& sm = ctx.getSourceManager();
+        auto& location = ctx.getFullLoc(D->getLocation());
+        
+        Node n{ D->getNameAsString(), location.getSpellingLineNumber(), location.getSpellingColumnNumber() };
+        VisitedNodes.push_back(n);
+        return true;
+    }
+};
+
+void CodeParser::parseAST(const QString& srcPath, const std::vector<QString>& includeDirs)
+{
+    std::vector<std::string> includes(includeDirs.size());
+    for(auto& dir : includeDirs)
+    {
+        includes.emplace_back(QString("-I%1").arg(dir).toStdString());
+    }
+
+
+    clang::tooling::FixedCompilationDatabase cdb("/", includes);
+    std::vector<std::string> src{ srcPath.toStdString() };
+    clang::tooling::ClangTool tool(cdb, src);
+
+    ParserErrorCollector errorCollector;
+    tool.setDiagnosticConsumer(&errorCollector);
+    
+    std::vector<std::unique_ptr<clang::ASTUnit>> Asts;
+    tool.buildASTs(Asts);
+    
+    SuperVisitor v;
+    v.TraverseTranslationUnitDecl(Asts[0]->getASTContext().getTranslationUnitDecl());
+
+    ParserResult result;
 }
 
 }

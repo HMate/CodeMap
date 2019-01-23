@@ -6,7 +6,7 @@ class Monitor
 {
     Gpu m_gpu;
 public:
-    addGpu(const Gpu& gpu);
+    void addGpu(const Gpu& gpu);
     Gpu& getGpu();
     void Show();
 };

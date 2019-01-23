@@ -43,6 +43,9 @@ public:
     /* Returns the preprocessed content of the file.
      * includeDirs is a list of directory paths. They are searched for resolving includes.*/
     ParserResult getPreprocessedCodeFromPath(const QString& srcPath, const std::vector<QString>& includeDirs = std::vector<QString>());
+
+
+    void CodeParser::parseAST(const QString& srcPath, const std::vector<QString>& includeDirs = std::vector<QString>());
 };
 
 }

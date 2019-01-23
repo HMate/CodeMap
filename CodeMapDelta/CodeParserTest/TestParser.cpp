@@ -75,7 +75,6 @@ TEST_CASE("Preprocess a mini project", "[preprocessor][cpp][includes]")
     check_include(result, 3, "computer.h", 1, 39);
 }
 
-
 // Test if we can include stdlib code
 TEST_CASE("Preprocess if include is std lib", "[preprocessor][cpp]")
 {
@@ -97,5 +96,13 @@ TEST_CASE("Preprocess non source code file", "[preprocessor][cpp]")
 
     auto result = cm::CodeParser().getPreprocessedCodeFromPath(codePath);
     REQUIRE(result.code.content.contains(expected));
+}
+
+// Test if the file is not a source code
+TEST_CASE("Parse AST", "[ast][cpp]")
+{
+    QString codePath = getTestPatternPath("projectNeumann", "main.cpp");
+
+    cm::CodeParser().parseAST(codePath);
 }
 

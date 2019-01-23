@@ -4,5 +4,5 @@
 class Ram
 {
     int size = 0;
-}
+};
 #endif //RAM_H

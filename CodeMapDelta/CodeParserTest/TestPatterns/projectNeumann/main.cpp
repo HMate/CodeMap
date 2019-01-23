@@ -1,10 +1,11 @@
 #include "computer.h"
 #include "monitor.h"
 
-int main(char argc, char** argv)
+int main(int argc, char** argv)
 {
     Gpu g;
-    Monitor m(g);
+    Monitor m;
+    m.addGpu(g);
     Computer c(m);
     c.addRam(3);
     m.Show();
