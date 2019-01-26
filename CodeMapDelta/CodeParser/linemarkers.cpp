@@ -99,7 +99,10 @@ ParsedCodeFile parseLineMarkers(const QString& processed)
                             IncludeSection section = includeStack.top();
                             includeStack.pop();
                             section.lastLine = lineIndex - 1;
-                            result.includes.emplace_back(section);
+                            if(section.firstLine != section.lastLine)
+                            {
+                                result.includes.emplace_back(section);
+                            }
                         }
                     }
                 }

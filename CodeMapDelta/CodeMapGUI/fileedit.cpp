@@ -35,6 +35,11 @@ void FileEdit::contextMenuEvent(QContextMenuEvent* event)
     menu->exec(event->globalPos());
 }
 
+void FileEdit::resizeEvent(QResizeEvent* e)
+{
+    QPlainTextEdit::resizeEvent(e);
+}
+
 void FileEdit::foldDefines()
 {
     if(m_FilePath == "")

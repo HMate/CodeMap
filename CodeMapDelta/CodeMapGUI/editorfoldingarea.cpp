@@ -182,18 +182,12 @@ void EditorFoldingButton::mousePressEvent(QMouseEvent *event)
             fold();
         else
             unfold();
-
-        // TODO: We have to somehow sign for the QPlainTextEdit that its size has 
-        // changed, but I'm not sure what is the correct event/method for that.
-        changedState();
-
-        m_view->getEditor().document()->contentsChanged();
-        // from: qt-creator\src\plugins\texteditor\texteditor.cpp line 7472
-        auto layout = qobject_cast<QPlainTextDocumentLayout*>(m_view->getEditor().document()->documentLayout());
-        layout->requestUpdate();
-        //m_view->update();
-        m_view->repaint();
-
+        
+        // resizeevent manages to signal to the textedit that the blocks became visible
+        // and makes the layout to update itself.
+        // QSize values doesnt matter, only matters that their widths are different.
+        QResizeEvent forceUpdateEvent(QSize(1,1), QSize(0,0));
+        m_view->getEditor().resizeEvent(&forceUpdateEvent);
         event->accept();
     }
     else
@@ -425,7 +419,6 @@ void EditorFoldingButtonHierarchyNode::addButton(EditorFoldingButton* button)
     - new section is a new child and contains older child nodes
     */
 
-    // TODO: Theres a bug here, hierarchy doesnt contain everything thats added
     for(auto& node : m_nodes)
     {
         if(node.isSectionInvalid(insertFirst, insertLast))

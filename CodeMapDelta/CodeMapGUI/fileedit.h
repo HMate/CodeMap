@@ -33,6 +33,8 @@ public:
     QRectF blockBoundingRect(const QTextBlock& b) const { return QPlainTextEdit::blockBoundingRect(b); }
     QTextBlock firstVisibleBlock() const { return QPlainTextEdit::firstVisibleBlock(); }
 
+    void resizeEvent(QResizeEvent* e);
+
 protected:
     void paintEvent(QPaintEvent *event) override;
 
