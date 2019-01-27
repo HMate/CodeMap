@@ -15,8 +15,10 @@ find_package(clang REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC
     codeparser.cpp
+    includecollector.cpp
     parsererror.cpp
-	linemarkers.cpp)
+	linemarkers.cpp
+	utils.cpp)
 
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${LLVM_INCLUDE_DIR}

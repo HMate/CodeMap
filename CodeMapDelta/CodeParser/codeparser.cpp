@@ -7,6 +7,7 @@
 #include "clang/Frontend/ASTUnit.h"
 
 
+#include "utils.h"
 #include "parsererror.h"
 #include "linemarkers.h"
 
@@ -72,21 +73,15 @@ public:
 
 QString CodeParser::getPreprocessedCode(const QString& source)
 {
-    std::string result;
-    auto ppe = new PreprocessorEliminatorFrontendAction(result);
+    std::string processedFile;
+    auto ppe = new PreprocessorEliminatorFrontendAction(processedFile);
     clang::tooling::runToolOnCode(ppe, source.toStdString());
-    return parseLineMarkers(QString::fromStdString(result)).content;
+    return parseLineMarkers(QString::fromStdString(processedFile)).content;
 }
 
 ParserResult CodeParser::getPreprocessedCodeFromPath(const QString& srcPath, const std::vector<QString>& includeDirs)
 {
-    std::vector<std::string> includes(includeDirs.size());
-    for(auto& dir : includeDirs)
-    {
-        includes.emplace_back(QString("-I%1").arg(dir).toStdString());
-    }
-
-    clang::tooling::FixedCompilationDatabase cdb("/", includes);
+    clang::tooling::FixedCompilationDatabase cdb = createCompilationDatabase(srcPath, includeDirs);
     std::vector<std::string> src{ srcPath.toStdString() };
     clang::tooling::ClangTool tool(cdb, src);
 
@@ -133,14 +128,7 @@ public:
 
 void CodeParser::parseAST(const QString& srcPath, const std::vector<QString>& includeDirs)
 {
-    std::vector<std::string> includes(includeDirs.size());
-    for(auto& dir : includeDirs)
-    {
-        includes.emplace_back(QString("-I%1").arg(dir).toStdString());
-    }
-
-
-    clang::tooling::FixedCompilationDatabase cdb("/", includes);
+    clang::tooling::FixedCompilationDatabase cdb = createCompilationDatabase(srcPath, includeDirs);
     std::vector<std::string> src{ srcPath.toStdString() };
     clang::tooling::ClangTool tool(cdb, src);
 

@@ -99,6 +99,16 @@ TEST_CASE("Preprocess non source code file", "[preprocessor][cpp]")
 }
 
 // Test if the file is not a source code
+TEST_CASE("Parse include hierarchy", "[includes][cpp]")
+{
+    QString codePath = getTestPatternPath("projectNeumann", "main.cpp");
+    QString expected = readFileContent(getTestPatternPath("testPreprocessorNonSourceCode", "test.cpp"));
+
+    auto result = cm::CodeParser().getIncludeTree(codePath);
+    REQUIRE(result.root.name == "main.cpp");
+}
+
+// Test if the file is not a source code
 TEST_CASE("Parse AST", "[ast][cpp]")
 {
     QString codePath = getTestPatternPath("projectNeumann", "main.cpp");
