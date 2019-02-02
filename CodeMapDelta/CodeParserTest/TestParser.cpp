@@ -105,7 +105,20 @@ TEST_CASE("Parse include hierarchy", "[includes][cpp]")
     QString expected = readFileContent(getTestPatternPath("testPreprocessorNonSourceCode", "test.cpp"));
 
     auto result = cm::CodeParser().getIncludeTree(codePath);
-    REQUIRE(result.root.name == "main.cpp");
+    REQUIRE(result->root().name() == "main.cpp");
+    REQUIRE(result->root().includes().size() == 2);
+    REQUIRE(result->root().includes()[0].name() == "computer.h");
+    REQUIRE(result->root().includes()[0].includes().size() == 2);
+    REQUIRE(result->root().includes()[0].includes()[0].name() == "ram.h");
+    REQUIRE(result->root().includes()[0].includes()[0].includes().size() == 0);
+    REQUIRE(result->root().includes()[0].includes()[1].name() == "monitor.h");
+    REQUIRE(result->root().includes()[0].includes()[1].includes().size() == 1);
+    REQUIRE(result->root().includes()[0].includes()[1].includes()[0].name() == "gpu.h");
+    REQUIRE(result->root().includes()[0].includes()[1].includes()[0].includes().size() == 0);
+    REQUIRE(result->root().includes()[1].name() == "monitor.h");
+    REQUIRE(result->root().includes()[1].includes().size() == 1);
+    REQUIRE(result->root().includes()[1].includes()[0].name() == "gpu.h");
+    REQUIRE(result->root().includes()[1].includes()[0].includes().size() == 0);
 }
 
 // Test if the file is not a source code

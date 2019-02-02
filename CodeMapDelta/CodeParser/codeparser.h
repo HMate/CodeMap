@@ -32,16 +32,37 @@ struct ParserResult
     bool hasErrors();
 };
 
+struct IncludeTree;
+
+class IncludeNodeRef
+{
+    IncludeTree& tree;
+public:
+    size_t index;
+
+    IncludeNodeRef(IncludeTree& tree, size_t index) : tree(tree), index(index) {}
+    IncludeNodeRef& operator=(const IncludeNodeRef& o);
+    void setIndex(size_t index);
+    const std::string name() const;
+    const std::string path() const;
+    std::vector<IncludeNodeRef>& includes();
+};
+
 struct IncludeNode
 {
-    std::string name;
-    std::string id;
-    std::vector<IncludeNode> includes;
+    const std::string name;
+    const std::string path;
+    std::vector<IncludeNodeRef> includes;
+
+    IncludeNode(std::string name, std::string path) : name(name), path(path){}
 };
 
 struct IncludeTree
 {
-    IncludeNode root;
+    std::vector<IncludeNode> nodes;
+
+    IncludeNodeRef root();
+    IncludeNode& node(const IncludeNodeRef& ref);
 };
 
 
@@ -55,7 +76,7 @@ public:
     /* Returns the preprocessed content of the file.
      * includeDirs is a list of directory paths. They are searched for resolving includes.*/
     ParserResult getPreprocessedCodeFromPath(const QString& srcPath, const std::vector<QString>& includeDirs = std::vector<QString>());
-    IncludeTree getIncludeTree(const QString& srcPath, const std::vector<QString>& includeDirs = std::vector<QString>());
+    std::unique_ptr<IncludeTree> getIncludeTree(const QString& srcPath, const std::vector<QString>& includeDirs = std::vector<QString>());
 
     void parseAST(const QString& srcPath, const std::vector<QString>& includeDirs = std::vector<QString>());
 };

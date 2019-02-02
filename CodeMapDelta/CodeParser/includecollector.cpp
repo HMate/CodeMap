@@ -1,7 +1,8 @@
-#include "codeparser.h"
+#include "includecollector.h"
 
 #include "llvm/Support/Format.h"
 #include "llvm/Support/FormatVariadic.h"
+#include "llvm/Support/Path.h"
 
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Frontend/CompilerInstance.h"
@@ -14,18 +15,131 @@
 namespace cm
 {
 
+/**************** IncludeNodeRef *****************/
+
+IncludeNodeRef& IncludeNodeRef::operator=(const IncludeNodeRef& o)
+{
+    if(this == &o)
+        return *this;
+    this->index = o.index;
+}
+
+void IncludeNodeRef::setIndex(size_t index)
+{
+    this->index = index;
+}
+
+const std::string IncludeNodeRef::name() const
+{
+    return tree.node(*this).name;
+}
+
+const std::string IncludeNodeRef::path() const
+{
+    return tree.node(*this).path;
+}
+
+std::vector<IncludeNodeRef>& IncludeNodeRef::includes()
+{
+    return tree.node(*this).includes;
+}
+
+/**************** IncludeTree *****************/
+
+IncludeNodeRef IncludeTree::root()
+{
+    return IncludeNodeRef(*this, 0);
+}
+
+IncludeNode& IncludeTree::node(const IncludeNodeRef& ref)
+{
+    return nodes[ref.index];
+}
+
+/**************** IncludeTreeBuilder *****************/
+
+IncludeTreeBuilder::IncludeTreeBuilder(IncludeTree& tree) : m_tree(tree), m_currentNode(tree, 0) {}
+
+IncludeNodeRef IncludeTreeBuilder::getRoot() const
+{
+    return m_tree.root();
+}
+
+IncludeNodeRef IncludeTreeBuilder::currentNode()
+{
+    return m_currentNode;
+}
+
+void IncludeTreeBuilder::setRoot(std::string name, std::string path)
+{
+    assert(m_tree.nodes.empty());
+    if(m_tree.nodes.empty())
+        m_tree.nodes.emplace_back(name, path);
+}
+
+void IncludeTreeBuilder::addNode(std::string name, std::string path)
+{
+    bool found = false;
+    size_t index;
+    for(auto i = 0; i < m_tree.nodes.size(); i++)
+    {
+        auto node = m_tree.nodes[i];
+        if(node.path == path)
+        {
+            found = true;
+            index = i;
+        }
+    }
+
+    if(!found)
+    {
+        index = m_tree.nodes.size();
+        m_tree.nodes.emplace_back(name, path);
+    }
+    m_currentNode.includes().emplace_back(m_tree, index);
+}
+
+bool IncludeTreeBuilder::selectNode(std::string path)
+{
+    // NOTE: The current implementation uses that only the current node can get new includes
+    // If a parent node of the current node would grow, it could invalidate the current pointer.
+    for(auto i = 0; i < m_currentNode.includes().size(); i++)
+    {
+        auto node = m_currentNode.includes()[i];
+        if(node.path() == path)
+        {
+            m_selectionStack.push(m_currentNode);
+            m_currentNode.setIndex(node.index);
+            return true;
+        }
+    }
+    return false;
+}
+
+void IncludeTreeBuilder::selectParent()
+{
+    if(!isRootSelected())
+    {
+        m_currentNode = m_selectionStack.top();
+        m_selectionStack.pop();
+    }
+}
+
+bool IncludeTreeBuilder::isRootSelected()
+{
+    return m_currentNode.index == 0;
+}
+
+/**************** IncludeCollectorCallback *****************/
+
 class IncludeCollectorCallback : public clang::PPCallbacks
 {
-    IncludeTree& m_tree;
-    IncludeNode m_currentNode;
+    IncludeTreeBuilder m_builder;
     clang::SourceManager& m_sm;
-
-    bool m_isRootInited = false;
+    bool m_rootInited = false;
 
 public:
-    IncludeCollectorCallback(clang::SourceManager& sm, IncludeTree& tree) : m_sm(sm), m_tree(tree)
-    {
-    }
+    IncludeCollectorCallback(clang::SourceManager& sm, IncludeTree& tree) : m_sm(sm), m_builder(tree) {}
 
     virtual void InclusionDirective(clang::SourceLocation HashLoc,
         const clang::Token &IncludeTok,
@@ -37,12 +151,8 @@ public:
         StringRef RelativePath,
         const clang::Module *Imported) override
     {
-        IncludeNode node = IncludeNode();
-        node.name = FileName.str();
-        node.id = File->getName().str();
-
-        m_currentNode.includes.push_back(node);
-
+        m_builder.addNode(FileName.str(), File->getName().str());
+        
         clang::PresumedLoc PLoc = m_sm.getPresumedLoc(HashLoc);
         llvm::outs() << llvm::formatv("InclusionDirective {0} {1} {2} {3}\n", FileName, File->getName(), PLoc.getLine(), PLoc.getColumn());
     }
@@ -54,27 +164,20 @@ public:
         clang::PresumedLoc PLoc = m_sm.getPresumedLoc(Loc);
         if(Reason == FileChangeReason::EnterFile)
         {
-            if(!m_isRootInited)
+            if(!m_rootInited)
             {
-                m_tree.root.id = PLoc.getFilename();
-                m_isRootInited = true;
+                // We assume here that the first EnterFile will be to the main file.
+                m_builder.setRoot(llvm::sys::path::filename(PLoc.getFilename()), PLoc.getFilename());
+                m_rootInited = true;
             }
             else
             {
-                // search for node in includes, and make that the current node
-                for(auto& n : m_currentNode.includes)
-                {
-                    if(n.id == PLoc.getFilename())
-                    {
-                        m_currentNode = n;
-                        break;
-                    }
-                }
+                m_builder.selectNode(PLoc.getFilename());
             }
         }
         if(Reason == FileChangeReason::ExitFile)
         {
-            // change current to parent TODO
+            m_builder.selectParent();
         }
         llvm::outs() << llvm::formatv("FileChanged {0} {1} {2} {3}\n", PLoc.getFilename(), PLoc.getLine(), PLoc.getColumn(), (int)Reason);
     }
@@ -111,14 +214,14 @@ public:
     }
 };
 
-IncludeTree CodeParser::getIncludeTree(const QString& srcPath, const std::vector<QString>& includeDirs)
+std::unique_ptr<IncludeTree> CodeParser::getIncludeTree(const QString& srcPath, const std::vector<QString>& includeDirs)
 {
     clang::tooling::FixedCompilationDatabase cdb = createCompilationDatabase(srcPath, includeDirs);
     std::vector<std::string> src{ srcPath.toStdString() };
     clang::tooling::ClangTool tool(cdb, src);
 
-    IncludeTree tree;
-    std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<IncludeCollectorFrontendActionFactory>(tree);
+    std::unique_ptr<IncludeTree> tree = std::make_unique<IncludeTree>();
+    std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<IncludeCollectorFrontendActionFactory>(*tree);
     tool.run(actionFactory.get());
     return tree;
 }
