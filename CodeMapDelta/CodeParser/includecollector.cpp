@@ -83,8 +83,7 @@ void IncludeTreeBuilder::addNode(std::string name, std::string path)
     size_t index;
     for(auto i = 0; i < m_tree.nodes.size(); i++)
     {
-        auto node = m_tree.nodes[i];
-        if(node.path == path)
+        if(m_tree.nodes[i].path == path)
         {
             found = true;
             index = i;
@@ -101,11 +100,8 @@ void IncludeTreeBuilder::addNode(std::string name, std::string path)
 
 bool IncludeTreeBuilder::selectNode(std::string path)
 {
-    // NOTE: The current implementation uses that only the current node can get new includes
-    // If a parent node of the current node would grow, it could invalidate the current pointer.
-    for(auto i = 0; i < m_currentNode.includes().size(); i++)
+    for(auto& node : m_currentNode.includes())
     {
-        auto node = m_currentNode.includes()[i];
         if(node.path() == path)
         {
             m_selectionStack.push(m_currentNode);
@@ -153,8 +149,9 @@ public:
     {
         m_builder.addNode(FileName.str(), File->getName().str());
         
-        clang::PresumedLoc PLoc = m_sm.getPresumedLoc(HashLoc);
-        llvm::outs() << llvm::formatv("InclusionDirective {0} {1} {2} {3}\n", FileName, File->getName(), PLoc.getLine(), PLoc.getColumn());
+        //clang::PresumedLoc PLoc = m_sm.getPresumedLoc(HashLoc);
+        //llvm::outs() << llvm::formatv("InclusionDirective {0} {1} {2} {3}\n", FileName, File->getName(), PLoc.getLine(), PLoc.getColumn());
+        //llvm::outs().flush();
     }
 
     void FileChanged(clang::SourceLocation Loc, FileChangeReason Reason,
@@ -179,7 +176,8 @@ public:
         {
             m_builder.selectParent();
         }
-        llvm::outs() << llvm::formatv("FileChanged {0} {1} {2} {3}\n", PLoc.getFilename(), PLoc.getLine(), PLoc.getColumn(), (int)Reason);
+        //llvm::outs() << llvm::formatv("FileChanged {0} {1} {2} {3}\n", PLoc.getFilename(), PLoc.getLine(), PLoc.getColumn(), (int)Reason);
+        //llvm::outs().flush();
     }
 };
 
