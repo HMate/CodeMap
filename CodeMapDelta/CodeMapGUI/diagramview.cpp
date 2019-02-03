@@ -1,6 +1,37 @@
 #include "diagramview.h"
 
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
+
 #include "mainwindow.h"
+
+class BoxDGI : public QGraphicsItem
+{
+    QString m_name;
+public:
+    BoxDGI(const QString& name, QGraphicsItem* parent = nullptr) : QGraphicsItem(parent), m_name(name) 
+    {
+        setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+    }
+
+protected:
+    void paint(QPainter *painter, 
+        const QStyleOptionGraphicsItem *option, 
+        QWidget *widget = nullptr) override
+    {
+        painter->setBrush(QBrush(QColor(200, 200, 250)));
+        if(isSelected())
+            painter->setBrush(QBrush(QColor(200, 250, 250)));
+        painter->drawRoundedRect(0, 0, 50, 50, 10, 10);
+        painter->drawText(QRect(20, 10, 30, 40), m_name);
+    }
+
+    QRectF boundingRect() const override
+    {
+        return QRectF(0, 0, 50, 50);
+    }
+};
 
 DiagramView::DiagramView(QWidget *parent) : QWidget(parent)
 {
@@ -13,6 +44,16 @@ DiagramView::DiagramView(QWidget *parent) : QWidget(parent)
     QToolBar* toolbar = createToolbar();
     m_layout->addWidget(toolbar, 0, 0, 1, -1);
 
+    m_view = new QGraphicsView(this);
+    m_layout->addWidget(m_view, 1, 0, 1, -1);
+
+    m_scene = new QGraphicsScene(this);
+    m_scene->setBackgroundBrush(Qt::gray);
+    m_view->setScene(m_scene);
+
+    // lefttop is x-y-, middle is x0y0, rightbot is x+y+
+    m_scene->addItem(new BoxDGI("asd"));
+    m_scene->addItem(new BoxDGI("<valami.h>"));
 
 }
 

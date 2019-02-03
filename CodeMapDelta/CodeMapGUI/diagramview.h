@@ -7,6 +7,9 @@
 #include <QGridLayout>
 #include <QToolBar>
 
+class QGraphicsView;
+class QGraphicsScene;
+
 class DiagramView : public QWidget
 {
     Q_OBJECT
@@ -14,6 +17,9 @@ class DiagramView : public QWidget
     QGridLayout* m_layout = nullptr;
     QLabel* m_idLabel = nullptr;
     QString m_id;
+
+    QGraphicsView* m_view = nullptr;
+    QGraphicsScene* m_scene = nullptr;
 public:
     explicit DiagramView(QWidget *parent = nullptr);
     void setId(const QString id);
