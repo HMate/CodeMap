@@ -167,6 +167,10 @@ void MainWindow::createActions()
     connect(action.openSettingsView, &QAction::triggered,
         this, &MainWindow::openSettingsView);
 
+    action.openDiagram = new QAction(tr("Test Diagram"), this);
+    connect(action.openDiagram, &QAction::triggered,
+        this, &MainWindow::openDiagramView);
+
     action.quit = new QAction(tr("Quit"), this);
     connect(action.quit, &QAction::triggered,
             this, &MainWindow::quitApp);
@@ -176,6 +180,7 @@ void MainWindow::createFileMenu()
 {
     QMenu* fileMenu = menuBar()->addMenu(tr("File"));
     fileMenu->addAction(action.openFile);
+    fileMenu->addAction(action.openDiagram);
     fileMenu->addSeparator();
     fileMenu->addAction(action.openSettingsView);
     fileMenu->addAction(action.quit);
@@ -221,6 +226,14 @@ void MainWindow::openFileWithDialog()
             state.saveStateToDisk();
         }
     }
+}
+
+void MainWindow::openDiagramView()
+{
+    auto docManager = getDocumentManager();
+    docManager->openDiagramView("test Diag", 1);
+
+    // TODO: save to state?
 }
 
 void MainWindow::openSettingsView()

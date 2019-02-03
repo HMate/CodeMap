@@ -8,8 +8,11 @@
 #include <QSplitter>
 #include <QDockWidget>
 
+class DiagramView;
 class FileView;
 
+/* A widget to show a list of documents in string representation.
+*/
 class DocumentListView : public QWidget
 {
     Q_OBJECT
@@ -30,7 +33,7 @@ public slots:
 };
 
 /*
- * Handles document views, that are editors or usually do something for files.
+ * Handles document views in tabs, that are editors or usually do something for files.
  * */
 class TabbedDocumentView : public QWidget
 {
@@ -39,6 +42,7 @@ class TabbedDocumentView : public QWidget
     QLayout* layout = nullptr;
     QTabWidget* tabs = nullptr;
     std::vector<FileView*> fileViews;
+    DiagramView* m_diagramView;
 
 public:
     explicit TabbedDocumentView(QWidget *parent = nullptr);
@@ -46,13 +50,15 @@ public:
 
     FileView* openFileView(const QString& path);
     FileView* openStringFileView(const QString& path, const QString& content);
+    DiagramView* openDiagramView(const QString& id);
     void closeFileView(FileView* const view);
     bool hasFileView(FileView* const view);
+    void closeDiagramView(DiagramView* const view);
 
     bool event(QEvent *event);
 protected:
     FileView* addNewFileView(const QString& name);
-    long long getFileViewIndexByAddress(FileView* const view);
+    int getTabIndexByAddress(QWidget* const view);
 
     virtual QSize sizeHint() const;
 
@@ -63,7 +69,7 @@ public slots:
     void childGotFocus();
 };
 
-// Contains views of files through TabbedDocumentViews
+// Contains TabbedDocumentViews side by side
 class SplitDocumentView : public QWidget
 {
     Q_OBJECT
@@ -79,12 +85,14 @@ public:
 
     void addTabbedDocumentView();
     FileView* openFileView(const QString& path, size_t tabIndex);
-    void closeFileView(FileView* const view);
     FileView* openStringFileView(const QString& path, const QString& content);
+    void closeFileView(FileView* const view);
+    DiagramView* openDiagramView(const QString& id, size_t tabIndex);
+    void closeDiagramView(DiagramView* view);
 
     long long getLastFocusedTabIndex();
 protected:
-    long long getDocumentViewIndexFromAddress(FileView* const view);
+    long long getTabbedDocumentViewIndexFromAddress(FileView* const view);
 
     virtual QSize sizeHint() const;
 

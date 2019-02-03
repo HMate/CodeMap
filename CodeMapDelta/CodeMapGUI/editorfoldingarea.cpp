@@ -59,7 +59,7 @@ void EditorFoldingArea::resizeEvent(QResizeEvent *e)
 
 void EditorFoldingArea::updateArea(const QRect &rect, int dy)
 {
-    qDebug() << "updateArea y: " << dy << " rect: " << rect;
+    //qDebug() << "updateArea y: " << dy << " rect: " << rect;
     if(dy)
     {
         this->scroll(0, dy);
@@ -75,7 +75,7 @@ void EditorFoldingArea::updateArea(const QRect &rect, int dy)
 // *layout like behaviour*
 void EditorFoldingArea::updateSize()
 {
-    qDebug() << "updateSize";
+    //qDebug() << "updateSize";
     auto s = sizeHint();
     resize(s);
     setMaximumWidth(s.width());

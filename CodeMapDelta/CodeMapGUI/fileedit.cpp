@@ -11,10 +11,6 @@
 
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent), m_view((FileView*)parent)
 {
-    //m_regionFolder = new TextFolder(this, "ASD");
-    
-    //this->document()->documentLayout()->registerHandler(m_regionFolder->type(), m_regionFolder);
-
     this->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
     this->setFont(QFont("Consolas"));
     
@@ -135,7 +131,7 @@ void FileEdit::paintEvent(QPaintEvent *event)
 
     EditorFoldingArea& fArea = m_view->getFoldingArea();
 
-    qDebug() << "fileedit overlay paint";
+    // qDebug() << "fileedit overlay paint";
     // draw text overlay for folded blocks
     for(auto btn : fArea.getFoldingButtons())
     {

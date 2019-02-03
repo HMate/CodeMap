@@ -16,6 +16,7 @@ protected:
     struct Actions {
         QAction* openFile;
         QAction* openSettingsView;
+        QAction* openDiagram;
         QAction* quit;
 
         QAction* toggleTerminalHistory;
@@ -54,6 +55,7 @@ public:
 public slots:
     void toggleViewTerminalHistory(bool onoff);
     void openFileWithDialog();
+    void openDiagramView();
     void openSettingsView();
     void quitApp();
 

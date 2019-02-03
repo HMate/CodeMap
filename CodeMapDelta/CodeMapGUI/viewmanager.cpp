@@ -7,6 +7,7 @@
 #include "common_types.h"
 #include "mainwindow.h"
 #include "fileview.h"
+#include "diagramview.h"
 #include "filesystem.h"
 
 DocumentListView::DocumentListView(QWidget* parent) : QWidget(parent)
@@ -69,7 +70,7 @@ void DocumentListView::selectionChanged(QListWidgetItem *current)
     state.saveStateToDisk();
 }
 
-// ------------------------------------------
+// #############################################################################################################
 
 TabbedDocumentView::TabbedDocumentView(QWidget* parent) : QWidget(parent)
 {
@@ -111,7 +112,7 @@ FileView* TabbedDocumentView::openStringFileView(const QString& path,
 FileView* TabbedDocumentView::addNewFileView(const QString& name)
 {
     auto view = new FileView(this);
-    fileViews.push_back(view);
+    //fileViews.push_back(view);
     connect(view, &FileView::gotFocus,
         this, &TabbedDocumentView::childGotFocus);
 
@@ -120,10 +121,52 @@ FileView* TabbedDocumentView::addNewFileView(const QString& name)
     {
         tabName = QFileInfo(tabName).fileName();
     }
-    MainWindow::instance()->getTerminalView()->showMessage(tr("adding tab with name %1").arg(tabName));
+    logTerminal(tr("adding tab with name %1").arg(tabName));
     tabs->addTab(view, tabName);
 
     return view;
+}
+
+DiagramView* TabbedDocumentView::openDiagramView(const QString& id)
+{
+    auto view = new DiagramView(this);
+    view->setId(id);
+    logTerminal(tr("adding tab with id %1").arg(id));
+    tabs->addTab(view, id);
+    return view;
+}
+
+void TabbedDocumentView::closeFileView(FileView* const view)
+{
+    long long index = getTabIndexByAddress(view);
+    if(index != INVALID_INDEX)
+    {
+        //FileView* toRemove = fileViews[static_cast<size_t>(index)];
+        //toRemove->closeView();
+        tabs->widget(index)->close();
+        tabs->removeTab(static_cast<int>(index));
+        //fileViews.erase(fileViews.begin()+index);
+    }
+}
+
+void TabbedDocumentView::closeDiagramView(DiagramView* const view)
+{
+    long long index = getTabIndexByAddress(view);
+    if(index != INVALID_INDEX)
+    {
+        tabs->widget(index)->close();
+        tabs->removeTab(index);
+    }
+}
+
+bool TabbedDocumentView::hasFileView(FileView* const view)
+{
+    return getTabIndexByAddress(view) != INVALID_INDEX;
+}
+
+int TabbedDocumentView::getTabIndexByAddress(QWidget* const view)
+{
+    return tabs->indexOf(view);
 }
 
 bool TabbedDocumentView::event(QEvent *event)
@@ -142,39 +185,8 @@ void TabbedDocumentView::childGotFocus()
     gotFocus(this);
 }
 
-void TabbedDocumentView::closeFileView(FileView* const view)
-{
-    long long index = getFileViewIndexByAddress(view);
-    if(index != INVALID_INDEX)
-    {
-        FileView* toRemove = fileViews[static_cast<size_t>(index)];
-        toRemove->closeView();
-        tabs->removeTab(static_cast<int>(index));
-        fileViews.erase(fileViews.begin()+index);
-    }
-}
 
-bool TabbedDocumentView::hasFileView(FileView* const view)
-{
-    return getFileViewIndexByAddress(view) != INVALID_INDEX;
-}
-
-long long TabbedDocumentView::getFileViewIndexByAddress(FileView* const view)
-{
-    long long index = 0;
-    for(auto f : fileViews)
-    {
-        if(f == view)
-        {
-            return index;
-        }
-        index++;
-    }
-    return INVALID_INDEX;
-}
-
-
-// ----------------------------------------
+// #############################################################################################################
 
 SplitDocumentViewHolder::SplitDocumentViewHolder(QWidget* parent) : QDockWidget (tr("Documents"), parent)
 {
@@ -278,19 +290,20 @@ FileView* SplitDocumentView::openFileView(const QString& path, size_t tabIndex)
 FileView* SplitDocumentView::openStringFileView(const QString& path,
                                                 const QString& content)
 {
-    const MainWindow* mainW = MainWindow::instance();
-    mainW->getTerminalView()->showMessage("Opening: " + path);
+    logTerminal("Opening: " + path);
 
     if(tabbedViews.size() < 2)
         addTabbedDocumentView();
 
+    // TODO: Dont use burnt in indicies for tabbedviews
+    // I guess the index should be the next after the currently selected view
     FileView* v = tabbedViews[1]->openStringFileView(path, content);
     return v;
 }
 
 void SplitDocumentView::closeFileView(FileView* const view)
 {
-    long long index = getDocumentViewIndexFromAddress(view);
+    long long index = getTabbedDocumentViewIndexFromAddress(view);
     if(index != INVALID_INDEX)
     {
         tabbedViews[static_cast<size_t>(index)]->closeFileView(view);
@@ -301,7 +314,23 @@ void SplitDocumentView::closeFileView(FileView* const view)
     }
 }
 
-long long SplitDocumentView::getDocumentViewIndexFromAddress(FileView* const view)
+DiagramView* SplitDocumentView::openDiagramView(const QString& id, size_t tabIndex)
+{
+    logTerminal("Opening diagram");
+
+    if(tabbedViews.size() < 2)
+        addTabbedDocumentView();
+
+    // TODO: Dont use burnt in indicies for tabbedviews
+    return tabbedViews[1]->openDiagramView(id);
+}
+
+void SplitDocumentView::closeDiagramView(DiagramView* view)
+{
+    tabbedViews[1]->closeDiagramView(view);
+}
+
+long long SplitDocumentView::getTabbedDocumentViewIndexFromAddress(FileView* const view)
 {
     long long index = 0;
     for(auto& t : tabbedViews)

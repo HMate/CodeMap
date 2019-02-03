@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME}
     settings.cpp
     terminalgui.cpp
     viewmanager.cpp
+    diagramview.cpp
     fileview.cpp
     fileedit.cpp
     textfolder.cpp
