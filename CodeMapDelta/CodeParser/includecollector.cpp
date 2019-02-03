@@ -39,9 +39,14 @@ const std::string IncludeNodeRef::path() const
     return tree.node(*this).path;
 }
 
-std::vector<IncludeNodeRef>& IncludeNodeRef::includes()
+const std::vector<IncludeNodeRef>& IncludeNodeRef::includes() const
 {
     return tree.node(*this).includes;
+}
+
+void IncludeNodeRef::addInclude(IncludeTree& tree, size_t index)
+{
+    tree.node(*this).includes.emplace_back(tree, index);
 }
 
 /**************** IncludeTree *****************/
@@ -53,7 +58,12 @@ IncludeNodeRef IncludeTree::root()
 
 IncludeNode& IncludeTree::node(const IncludeNodeRef& ref)
 {
-    return nodes[ref.index];
+    return nodes.at(ref.index);
+}
+
+const IncludeNode& IncludeTree::node(const IncludeNodeRef& ref) const
+{
+    return nodes.at(ref.index);
 }
 
 /**************** IncludeTreeBuilder *****************/
@@ -95,7 +105,7 @@ void IncludeTreeBuilder::addNode(std::string name, std::string path)
         index = m_tree.nodes.size();
         m_tree.nodes.emplace_back(name, path);
     }
-    m_currentNode.includes().emplace_back(m_tree, index);
+    m_currentNode.addInclude(m_tree, index);
 }
 
 bool IncludeTreeBuilder::selectNode(std::string path)

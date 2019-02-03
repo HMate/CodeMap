@@ -43,9 +43,11 @@ public:
     IncludeNodeRef(IncludeTree& tree, size_t index) : tree(tree), index(index) {}
     IncludeNodeRef& operator=(const IncludeNodeRef& o);
     void setIndex(size_t index);
+    void addInclude(IncludeTree& tree, size_t index);
+
     const std::string name() const;
     const std::string path() const;
-    std::vector<IncludeNodeRef>& includes();
+    const std::vector<IncludeNodeRef>& includes() const;
 };
 
 struct IncludeNode
@@ -63,6 +65,7 @@ struct IncludeTree
 
     IncludeNodeRef root();
     IncludeNode& node(const IncludeNodeRef& ref);
+    const IncludeNode& node(const IncludeNodeRef& ref) const;
 };
 
 

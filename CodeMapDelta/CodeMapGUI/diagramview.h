@@ -6,9 +6,26 @@
 #include <QLabel>
 #include <QGridLayout>
 #include <QToolBar>
+#include <QGraphicsItem>
 
 class QGraphicsView;
 class QGraphicsScene;
+
+
+// BoxDiagramGraphicsItem
+class BoxDGI : public QGraphicsItem
+{
+    QString m_name;
+    QFont m_font;
+
+public:
+    BoxDGI(const QString& name, QGraphicsItem* parent = nullptr);
+    explicit BoxDGI(const std::string& name, QGraphicsItem* parent = nullptr);
+    QRectF boundingRect() const override;
+
+protected:
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
+};
 
 class DiagramView : public QWidget
 {
@@ -23,6 +40,8 @@ class DiagramView : public QWidget
 public:
     explicit DiagramView(QWidget *parent = nullptr);
     void setId(const QString id);
+    QGraphicsScene* getScene() { return m_scene; }
+
 protected:
     QToolBar* createToolbar();
 };

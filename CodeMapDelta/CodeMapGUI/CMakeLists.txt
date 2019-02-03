@@ -14,12 +14,16 @@ add_executable(${PROJECT_NAME}
     settings.cpp
     terminalgui.cpp
     viewmanager.cpp
-    diagramview.cpp
-    fileview.cpp
+    
+	diagramview.cpp
+	includetreediagrambuilder.cpp
+    
+	fileview.cpp
     fileedit.cpp
     textfolder.cpp
     linenumberarea.cpp
 	editorfoldingarea.cpp
+
     filesystem.cpp
     appstate.cpp
     imagehandler.cpp

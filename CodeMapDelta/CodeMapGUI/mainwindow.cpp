@@ -8,18 +8,24 @@
 #include "filesystem.h"
 #include "settingsview.h"
 
+#include "diagramview.h"
+#include "includecollector.h"
+#include "includetreediagrambuilder.h"
+
 /* DONE
     - Need to save/load appstate:
         - Save opened files
     - Views:
         - Opened fies view
+        - diagram view
     - Project recognizer:
         - Walk includes and try to find them?
             - For now just give includes in settings.
     - Editor features:
         - Line numbering
         
-    - Fold out defines
+    - Fold out defines, includes, preprocessor directives -> stil slow!
+        - With collapsing blocks
 */
 
 /* TODO
@@ -36,7 +42,7 @@
         - Parse cmake/sln descriptor and build project from that
             - (Failed) Cmake cannot be used as a library, too much hassle.
     - Fold out defines, includes, preprocessor directives
-        - create collapsible regions for #includes
+        - make this to work interactively with original source file
     - All kind of work with colors and stylesheets
         - changeable from settings
         - Change window/editor style
@@ -51,6 +57,10 @@
         - Key rebinding in settings
     - Control flow diagram
     - Dependency graph, parameter/variable dependencies
+        - diagram of dependencies
+            - could also show which are the headers that actually contain something, that is used by the selected box.
+            - Legend for coloring scheme?
+            - minimap fog big diagrams
         - function interpreter: put function to separate file, collect its dependencies, and call it in separate program.
         - this may need to mock input/ouput operations: maybe separate window for them to define them, trap them?
         - Custom includes window for these?
@@ -231,7 +241,26 @@ void MainWindow::openFileWithDialog()
 void MainWindow::openDiagramView()
 {
     auto docManager = getDocumentManager();
-    docManager->openDiagramView("test Diag", 1);
+    auto diagV = docManager->openDiagramView("test Diag", 1);
+
+    cm::IncludeTree tree;
+    cm::IncludeTreeBuilder builder(tree);
+    builder.setRoot("test", "testy");
+    builder.addNode("include1", "root/include1");
+    builder.selectNode("root/include1");
+    builder.addNode("include_inner1", "root/include1/include_inner1");
+    builder.addNode("include_inner2", "root/include1/include_inner2");
+
+    builder.selectNode("root/include1/include_inner2");
+    builder.addNode("include_inner3", "root/include1/include_inner3");
+    builder.addNode("include_inner4", "root/include1/include_inner4");
+    builder.addNode("include_inner5", "root/include1/include_inner5");
+
+    builder.selectParent();
+    builder.selectParent();
+    builder.addNode("include_inner2", "root/include1/include_inner2");
+
+    buildIncludeTreeDiagram(*(diagV->getScene()), tree);
 
     // TODO: save to state?
 }
