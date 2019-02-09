@@ -28,9 +28,16 @@ void buildIncludeTreeDiagram(QGraphicsScene& scene, cm::IncludeTree& tree)
     std::vector < std::vector<BoxDGI*>> levels;
     levels.emplace_back(levelBoxes);
     
+    // TODO: Add class that coordinates the coloring of nodes and knows about which boxes are for the same include
+    // TODO: Have to add arrows too from parent to child, and align those too
     recursiveBuildIncludeTreeLevel(scene, current, pos, levels, 1);
 
     // Align the boxes of levels to be centered relative to the prev level.
+    // TODO: I need somehow to align boxes under theirparent locally not just to level center
+    // This becomes interesting when two neighbour parents have many children, which will overlap
+    // The pretty solution is to move the parents further apart, but the questions is by how much?
+    // use std::vector<std::vector<std::vector<BoxDGI*>>> for this?
+    // basically std::vector<Level<BoxGroup>>
     qreal prevLevelCenter = 0;
     for(auto& level : levels)
     {
