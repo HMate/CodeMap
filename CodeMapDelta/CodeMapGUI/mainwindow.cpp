@@ -123,6 +123,9 @@ MainWindow::MainWindow(QApplication& app, QWidget *parent) :
     createFileMenu();
     createViewMenu(documentsToggleAction, documentListToggleAction, terminalToggleAction);
 
+    // Test action
+    menuBar()->addAction(action.openDiagram);
+
     show();
     terminalView->setFocus();
 
@@ -190,7 +193,6 @@ void MainWindow::createFileMenu()
 {
     QMenu* fileMenu = menuBar()->addMenu(tr("File"));
     fileMenu->addAction(action.openFile);
-    fileMenu->addAction(action.openDiagram);
     fileMenu->addSeparator();
     fileMenu->addAction(action.openSettingsView);
     fileMenu->addAction(action.quit);

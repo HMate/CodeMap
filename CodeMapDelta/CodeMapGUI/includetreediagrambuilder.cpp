@@ -3,41 +3,92 @@
 
 #include "diagramview.h"
 
-void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, QPointF& pos);
+
+const qreal xMargin = 10;
+const qreal yMargin = 15;
+
+void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, QPointF& pos, 
+    std::vector<std::vector<BoxDGI*>>& levels, int currentLevel);
 
 void buildIncludeTreeDiagram(QGraphicsScene& scene, cm::IncludeTree& tree)
 {
     // lefttop is x-y-, middle is x0y0, rightbot is x+y+
 
     auto pos = QPointF(0, 0);
+    std::vector<BoxDGI*> levelBoxes;
 
     auto current = tree.root();
     auto box = new BoxDGI(current.name());
     box->setPos(pos);
-    scene.addItem(box);
-    pos = pos + QPointF(0, box->boundingRect().height());
+    scene.addItem(box); 
+    levelBoxes.emplace_back(box);
+    auto rect = box->boundingRect();
+    pos = pos + QPointF(0, rect.height() + yMargin);
 
-    recursiveBuildIncludeTreeLevel(scene, current, pos);
+    std::vector < std::vector<BoxDGI*>> levels;
+    levels.emplace_back(levelBoxes);
+    
+    recursiveBuildIncludeTreeLevel(scene, current, pos, levels, 1);
+
+    // Align the boxes of levels to be centered relative to the prev level.
+    qreal prevLevelCenter = 0;
+    for(auto& level : levels)
+    {
+        Q_ASSERT(level.size() > 0);
+        qreal x0 = level.front()->x();
+        auto& last = level.back();
+        qreal x1 = last->x() + last->boundingRect().width();
+
+        qreal levelCenter = (x1 - x0) / 2.0;
+        qreal cDiff = prevLevelCenter - levelCenter;
+        for(auto& box : level)
+        {
+            box->setX(box->x() + cDiff);
+        }
+        levelCenter += cDiff;
+        prevLevelCenter = levelCenter;
+    }
 }
 
-void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, QPointF& pos)
+void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, QPointF& pos, 
+    std::vector<std::vector<BoxDGI*>>& levels, int currentLevel)
 {
     auto pos2 = pos;
-    int h = 0;
+    std::vector<BoxDGI*> levelBoxes;
+
+    qreal h = 0;
     for(auto& inc : current.includes())
     {
         auto box = new BoxDGI(inc.name());
         box->setPos(pos2);
         scene.addItem(box);
-        pos2 = pos2 + QPointF(box->boundingRect().width(), 0);
+        levelBoxes.emplace_back(box);
+
+        pos2 = pos2 + QPointF(box->boundingRect().width() + xMargin, 0);
         h = box->boundingRect().height();
     }
-    pos = pos + QPointF(0, h);
 
-    for(auto& inc : current.includes())
+    Q_ASSERT(levels.size() >= currentLevel);
+    if(levels.size() == currentLevel)
     {
-        recursiveBuildIncludeTreeLevel(scene, inc, pos);
+        if(levelBoxes.size() > 0)
+            levels.emplace_back(levelBoxes);
+    }
+    else
+    {
+        auto& level = levels[currentLevel];
+        level.insert(level.end(), levelBoxes.begin(), levelBoxes.end());
     }
 
-    pos = QPointF(pos2.x(), pos.y() - h);
+    // set next levels y coordinate
+    pos = pos + QPointF(0, h + yMargin);
+
+    std::vector<BoxDGI*> childLevelBoxes;
+    for(auto& inc : current.includes())
+    {
+        recursiveBuildIncludeTreeLevel(scene, inc, pos, levels, currentLevel+1);
+    }
+
+    // set back this levels y coordinate and x coordinate for next boxes on this level.
+    pos = QPointF(pos2.x(), pos.y() - h - yMargin);
 }
