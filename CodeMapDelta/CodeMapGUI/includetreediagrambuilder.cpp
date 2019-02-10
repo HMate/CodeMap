@@ -7,7 +7,7 @@
 const qreal xMargin = 10;
 const qreal yMargin = 15;
 
-void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, QPointF& pos, 
+void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, BoxDGI* currentBox, QPointF& pos,
     std::vector<std::vector<BoxDGI*>>& levels, int currentLevel);
 
 void buildIncludeTreeDiagram(QGraphicsScene& scene, cm::IncludeTree& tree)
@@ -30,7 +30,7 @@ void buildIncludeTreeDiagram(QGraphicsScene& scene, cm::IncludeTree& tree)
     
     // TODO: Add class that coordinates the coloring of nodes and knows about which boxes are for the same include
     // TODO: Have to add arrows too from parent to child, and align those too
-    recursiveBuildIncludeTreeLevel(scene, current, pos, levels, 1);
+    recursiveBuildIncludeTreeLevel(scene, current, box, pos, levels, 1);
 
     // Align the boxes of levels to be centered relative to the prev level.
     // TODO: I need somehow to align boxes under theirparent locally not just to level center
@@ -57,19 +57,22 @@ void buildIncludeTreeDiagram(QGraphicsScene& scene, cm::IncludeTree& tree)
     }
 }
 
-void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, QPointF& pos, 
+void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, BoxDGI* currentBox, QPointF& pos,
     std::vector<std::vector<BoxDGI*>>& levels, int currentLevel)
 {
     auto pos2 = pos;
     std::vector<BoxDGI*> levelBoxes;
 
     qreal h = 0;
-    for(auto& inc : current.includes())
+    auto& includes = current.includes();
+    for(auto& inc : includes)
     {
         auto box = new BoxDGI(inc.name());
         box->setPos(pos2);
         scene.addItem(box);
         levelBoxes.emplace_back(box);
+
+        scene.addItem(new ArrowDGI(currentBox, box));
 
         pos2 = pos2 + QPointF(box->boundingRect().width() + xMargin, 0);
         h = box->boundingRect().height();
@@ -90,10 +93,12 @@ void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNode
     // set next levels y coordinate
     pos = pos + QPointF(0, h + yMargin);
 
-    std::vector<BoxDGI*> childLevelBoxes;
-    for(auto& inc : current.includes())
+    Q_ASSERT(includes.size() == levelBoxes.size());
+    for(auto i = 0; i < includes.size(); i++)
     {
-        recursiveBuildIncludeTreeLevel(scene, inc, pos, levels, currentLevel+1);
+        auto& inc = includes[i];
+        auto box = levelBoxes[i];
+        recursiveBuildIncludeTreeLevel(scene, inc, box, pos, levels, currentLevel+1);
     }
 
     // set back this levels y coordinate and x coordinate for next boxes on this level.

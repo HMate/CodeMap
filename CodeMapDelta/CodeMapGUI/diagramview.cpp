@@ -5,6 +5,36 @@
 
 #include "mainwindow.h"
 
+ArrowDGI::ArrowDGI(QGraphicsItem* startItem, QGraphicsItem* endItem, QGraphicsItem* parent) 
+    : m_startItem(startItem), m_endItem(endItem), QGraphicsItem(parent) {}
+
+void ArrowDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    // TODO: needs to repaint arrows when a box is moved. Find out where to send update event.
+    painter->setBrush(Qt::black);
+
+    painter->drawLine(startPoint(), endPoint());
+}
+
+QRectF ArrowDGI::boundingRect() const
+{
+    return QRectF(startPoint(), endPoint());
+}
+
+QPointF ArrowDGI::startPoint() const
+{
+    Q_ASSERT(m_startItem != nullptr);
+    auto& rect = m_startItem->boundingRect();
+    return QPointF(m_startItem->x() + (rect.width() / 2.0), m_startItem->y() + rect.height());
+}
+
+QPointF ArrowDGI::endPoint() const
+{
+    Q_ASSERT(m_endItem != nullptr);
+    auto& rect = m_endItem->boundingRect();
+    return QPointF(m_endItem->x() + (rect.width() / 2.0), m_endItem->y());
+}
+
 BoxDGI::BoxDGI(const std::string& name, QGraphicsItem* parent) : 
     BoxDGI(QString(name.c_str()), parent) {}
 
@@ -14,9 +44,7 @@ BoxDGI::BoxDGI(const QString& name, QGraphicsItem* parent) : QGraphicsItem(paren
     m_font = QFont("Helvetica");
 }
 
-void BoxDGI::paint(QPainter *painter,
-    const QStyleOptionGraphicsItem *option, 
-    QWidget *widget)
+void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     // TODO: The actually rendered font is not Helvetica. Find out what happens.
     painter->setFont(m_font);

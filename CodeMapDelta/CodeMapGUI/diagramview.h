@@ -11,6 +11,21 @@
 class QGraphicsView;
 class QGraphicsScene;
 
+class ArrowDGI : public QGraphicsItem
+{
+    QGraphicsItem* m_startItem;
+    QGraphicsItem* m_endItem;
+
+public:
+    ArrowDGI(QGraphicsItem* startItem, QGraphicsItem* endItem, QGraphicsItem* parent = nullptr);
+
+protected:
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
+    QRectF boundingRect() const override;
+
+    QPointF startPoint() const;
+    QPointF endPoint() const;
+};
 
 // BoxDiagramGraphicsItem
 class BoxDGI : public QGraphicsItem
