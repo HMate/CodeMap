@@ -24,6 +24,7 @@ public:
     explicit DiagramView(QWidget *parent = nullptr);
     void setId(const QString id);
     QGraphicsScene* getScene() { return m_scene; }
+    QGraphicsView* getView() { return m_view; }
 
 protected:
     QToolBar* createToolbar();

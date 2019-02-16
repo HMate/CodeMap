@@ -3,12 +3,21 @@
 
 #include "includediagramview.h"
 
+#include <QGraphicsScene>
 
-const qreal xMargin = 10;
-const qreal yMargin = 15;
+const QSizeF margin = QSizeF(10, 15);
+
+typedef std::vector<BoxDGI*> IncludeDiagramTreeLevel;
+typedef std::vector <IncludeDiagramTreeLevel> IncludeDiagramTree;
 
 void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, BoxDGI* currentBox, QPointF& pos,
-    std::vector<std::vector<BoxDGI*>>& levels, int currentLevel);
+    IncludeDiagramTree& levels, int currentLevel);
+
+class IncludeDiagramBuilder
+{
+public:
+
+};
 
 void buildIncludeTreeDiagram(IncludeDiagramView& diagram, cm::IncludeTree& tree)
 {
@@ -16,7 +25,7 @@ void buildIncludeTreeDiagram(IncludeDiagramView& diagram, cm::IncludeTree& tree)
     QGraphicsScene& scene = *diagram.getScene();
 
     auto pos = QPointF(0, 0);
-    std::vector<BoxDGI*> levelBoxes;
+    IncludeDiagramTreeLevel levelBoxes;
 
     auto current = tree.root();
     auto box = new BoxDGI(current.name());
@@ -24,9 +33,9 @@ void buildIncludeTreeDiagram(IncludeDiagramView& diagram, cm::IncludeTree& tree)
     scene.addItem(box); 
     levelBoxes.emplace_back(box);
     auto rect = box->boundingRect();
-    pos = pos + QPointF(0, rect.height() + yMargin);
+    pos = pos + QPointF(0, rect.height() + margin.height());
 
-    std::vector < std::vector<BoxDGI*>> levels;
+    IncludeDiagramTree levels;
     levels.emplace_back(levelBoxes);
     
     // TODO: Add class that coordinates the coloring of nodes and knows about which boxes are for the same include
@@ -59,10 +68,10 @@ void buildIncludeTreeDiagram(IncludeDiagramView& diagram, cm::IncludeTree& tree)
 }
 
 void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, BoxDGI* currentBox, QPointF& pos,
-    std::vector<std::vector<BoxDGI*>>& levels, int currentLevel)
+    IncludeDiagramTree& levels, int currentLevel)
 {
     auto pos2 = pos;
-    std::vector<BoxDGI*> levelBoxes;
+    IncludeDiagramTreeLevel levelBoxes;
 
     qreal h = 0;
     auto& includes = current.includes();
@@ -75,7 +84,7 @@ void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNode
 
         scene.addItem(new ArrowDGI(currentBox, box));
 
-        pos2 = pos2 + QPointF(box->boundingRect().width() + xMargin, 0);
+        pos2 = pos2 + QPointF(box->boundingRect().width() + margin.width(), 0);
         h = box->boundingRect().height();
     }
 
@@ -92,7 +101,7 @@ void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNode
     }
 
     // set next levels y coordinate
-    pos = pos + QPointF(0, h + yMargin);
+    pos = pos + QPointF(0, h + margin.height());
 
     Q_ASSERT(includes.size() == levelBoxes.size());
     for(auto i = 0; i < includes.size(); i++)
@@ -103,5 +112,5 @@ void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNode
     }
 
     // set back this levels y coordinate and x coordinate for next boxes on this level.
-    pos = QPointF(pos2.x(), pos.y() - h - yMargin);
+    pos = QPointF(pos2.x(), pos.y() - h - margin.height());
 }

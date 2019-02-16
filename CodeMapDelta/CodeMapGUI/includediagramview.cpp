@@ -1,13 +1,13 @@
 #include "includediagramview.h"
 
 #include <QPainter>
+#include <QGraphicsScene>
 
 ArrowDGI::ArrowDGI(QGraphicsItem* startItem, QGraphicsItem* endItem, QGraphicsItem* parent)
     : m_startItem(startItem), m_endItem(endItem), QGraphicsItem(parent) {}
 
 void ArrowDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    // TODO: needs to repaint arrows when a box is moved. Find out where to send update event.
     painter->setBrush(Qt::black);
 
     painter->drawLine(startPoint(), endPoint());
@@ -37,7 +37,8 @@ BoxDGI::BoxDGI(const std::string& name, QGraphicsItem* parent) :
 
 BoxDGI::BoxDGI(const QString& name, QGraphicsItem* parent) : QGraphicsItem(parent), m_name(name)
 {
-    setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable);
+    setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | 
+        QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsScenePositionChanges);
     m_font = QFont("Helvetica");
 }
 
@@ -69,6 +70,14 @@ QRectF BoxDGI::boundingRect() const
     const int w = fmetric.width(m_name);
     const int h = fmetric.height();
     return QRectF(0, 0, 2 * margin + w, 2 * margin + h);
+}
+
+QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
+{
+    if(scene() != nullptr && 
+        change == GraphicsItemChange::ItemPositionHasChanged)
+        scene()->update(scene()->sceneRect());
+    return QGraphicsItem::itemChange(change, value);
 }
 
 IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
