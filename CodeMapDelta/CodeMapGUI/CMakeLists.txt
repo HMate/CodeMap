@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}
     viewmanager.cpp
     
 	diagramview.cpp
+	includediagramview.cpp
 	includetreediagrambuilder.cpp
     
 	fileview.cpp

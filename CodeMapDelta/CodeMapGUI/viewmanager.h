@@ -9,6 +9,7 @@
 #include <QDockWidget>
 
 class DiagramView;
+class IncludeDiagramView;
 class FileView;
 
 /* A widget to show a list of documents in string representation.
@@ -50,7 +51,7 @@ public:
 
     FileView* openFileView(const QString& path);
     FileView* openStringFileView(const QString& path, const QString& content);
-    DiagramView* openDiagramView(const QString& id);
+    IncludeDiagramView* openIncludeDiagramView(const QString& id);
     void closeFileView(FileView* const view);
     bool hasFileView(FileView* const view);
     void closeDiagramView(DiagramView* const view);
@@ -87,7 +88,7 @@ public:
     FileView* openFileView(const QString& path, size_t tabIndex);
     FileView* openStringFileView(const QString& path, const QString& content);
     void closeFileView(FileView* const view);
-    DiagramView* openDiagramView(const QString& id, size_t tabIndex);
+    IncludeDiagramView* openIncludeDiagramView(const QString& id, size_t tabIndex);
     void closeDiagramView(DiagramView* view);
 
     long long getLastFocusedTabIndex();

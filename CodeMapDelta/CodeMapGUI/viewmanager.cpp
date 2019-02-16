@@ -7,7 +7,7 @@
 #include "common_types.h"
 #include "mainwindow.h"
 #include "fileview.h"
-#include "diagramview.h"
+#include "includediagramview.h"
 #include "filesystem.h"
 
 DocumentListView::DocumentListView(QWidget* parent) : QWidget(parent)
@@ -127,9 +127,9 @@ FileView* TabbedDocumentView::addNewFileView(const QString& name)
     return view;
 }
 
-DiagramView* TabbedDocumentView::openDiagramView(const QString& id)
+IncludeDiagramView* TabbedDocumentView::openIncludeDiagramView(const QString& id)
 {
-    auto view = new DiagramView(this);
+    auto view = new IncludeDiagramView(this);
     view->setId(id);
     logTerminal(tr("adding tab with id %1").arg(id));
     tabs->addTab(view, id);
@@ -314,7 +314,7 @@ void SplitDocumentView::closeFileView(FileView* const view)
     }
 }
 
-DiagramView* SplitDocumentView::openDiagramView(const QString& id, size_t tabIndex)
+IncludeDiagramView* SplitDocumentView::openIncludeDiagramView(const QString& id, size_t tabIndex)
 {
     logTerminal("Opening diagram");
 
@@ -322,7 +322,7 @@ DiagramView* SplitDocumentView::openDiagramView(const QString& id, size_t tabInd
         addTabbedDocumentView();
 
     // TODO: Dont use burnt in indicies for tabbedviews
-    return tabbedViews[1]->openDiagramView(id);
+    return tabbedViews[1]->openIncludeDiagramView(id);
 }
 
 void SplitDocumentView::closeDiagramView(DiagramView* view)

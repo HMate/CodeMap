@@ -8,7 +8,6 @@
 #include "filesystem.h"
 #include "settingsview.h"
 
-#include "diagramview.h"
 #include "includecollector.h"
 #include "includetreediagrambuilder.h"
 
@@ -243,7 +242,7 @@ void MainWindow::openFileWithDialog()
 void MainWindow::openDiagramView()
 {
     auto docManager = getDocumentManager();
-    auto diagV = docManager->openDiagramView("test Diag", 1);
+    auto diagV = docManager->openIncludeDiagramView("test Diag", 1);
 
     cm::IncludeTree tree;
     cm::IncludeTreeBuilder builder(tree);
@@ -262,7 +261,7 @@ void MainWindow::openDiagramView()
     builder.selectParent();
     builder.addNode("include_inner2", "root/include1/include_inner2");
 
-    buildIncludeTreeDiagram(*(diagV->getScene()), tree);
+    buildIncludeTreeDiagram(*diagV, tree);
 
     // TODO: save to state?
 }

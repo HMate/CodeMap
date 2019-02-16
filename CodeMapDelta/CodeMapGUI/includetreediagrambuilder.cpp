@@ -1,7 +1,7 @@
 #include "includetreediagrambuilder.h"
 
 
-#include "diagramview.h"
+#include "includediagramview.h"
 
 
 const qreal xMargin = 10;
@@ -10,9 +10,10 @@ const qreal yMargin = 15;
 void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, BoxDGI* currentBox, QPointF& pos,
     std::vector<std::vector<BoxDGI*>>& levels, int currentLevel);
 
-void buildIncludeTreeDiagram(QGraphicsScene& scene, cm::IncludeTree& tree)
+void buildIncludeTreeDiagram(IncludeDiagramView& diagram, cm::IncludeTree& tree)
 {
     // lefttop is x-y-, middle is x0y0, rightbot is x+y+
+    QGraphicsScene& scene = *diagram.getScene();
 
     auto pos = QPointF(0, 0);
     std::vector<BoxDGI*> levelBoxes;
