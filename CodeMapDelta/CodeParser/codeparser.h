@@ -37,17 +37,21 @@ struct IncludeTree;
 class IncludeNodeRef
 {
     IncludeTree& tree;
+    bool fullInclude;
 public:
     size_t index;
 
-    IncludeNodeRef(IncludeTree& tree, size_t index) : tree(tree), index(index) {}
+    IncludeNodeRef(IncludeTree& tree, size_t index, bool fullInclude);
     IncludeNodeRef& operator=(const IncludeNodeRef& o);
-    void setIndex(size_t index);
-    void addInclude(IncludeTree& tree, size_t index);
+    void addInclude(IncludeTree& tree, size_t index, bool fullInclude);
 
     const std::string name() const;
     const std::string path() const;
     const std::vector<IncludeNodeRef>& includes() const;
+    // Returns false if the include is skipped due to header guard
+    void setFullInclude(bool fullInclude);
+    bool isFullInclude() const;
+    bool isRecursive() const;
 };
 
 struct IncludeNode

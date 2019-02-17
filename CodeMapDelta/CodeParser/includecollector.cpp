@@ -16,17 +16,23 @@ namespace cm
 {
 
 /**************** IncludeNodeRef *****************/
+/* TODO: Remove IncludeNodeRef and build the tree with IncludeNodes 
+    which represents the actually entered nodes.
+    Build a special reference net in the view to highlight equal nodes.
+*/
+
+IncludeNodeRef::IncludeNodeRef(IncludeTree& tree, size_t index, bool fullInclude) 
+    : tree(tree), index(index), fullInclude(fullInclude) 
+{
+
+}
 
 IncludeNodeRef& IncludeNodeRef::operator=(const IncludeNodeRef& o)
 {
     if(this == &o)
         return *this;
     this->index = o.index;
-}
-
-void IncludeNodeRef::setIndex(size_t index)
-{
-    this->index = index;
+    this->fullInclude = o.fullInclude;
 }
 
 const std::string IncludeNodeRef::name() const
@@ -44,16 +50,31 @@ const std::vector<IncludeNodeRef>& IncludeNodeRef::includes() const
     return tree.node(*this).includes;
 }
 
-void IncludeNodeRef::addInclude(IncludeTree& tree, size_t index)
+void IncludeNodeRef::setFullInclude(bool fullInclude)
 {
-    tree.node(*this).includes.emplace_back(tree, index);
+    this->fullInclude = fullInclude;
+}
+
+bool IncludeNodeRef::isFullInclude() const
+{
+    return fullInclude;
+}
+
+bool IncludeNodeRef::isRecursive() const
+{
+    return false;
+}
+
+void IncludeNodeRef::addInclude(IncludeTree& tree, size_t index, bool fullInclude)
+{
+    tree.node(*this).includes.emplace_back(tree, index, fullInclude);
 }
 
 /**************** IncludeTree *****************/
 
 IncludeNodeRef IncludeTree::root()
 {
-    return IncludeNodeRef(*this, 0);
+    return IncludeNodeRef(*this, 0, true);
 }
 
 IncludeNode& IncludeTree::node(const IncludeNodeRef& ref)
@@ -68,7 +89,7 @@ const IncludeNode& IncludeTree::node(const IncludeNodeRef& ref) const
 
 /**************** IncludeTreeBuilder *****************/
 
-IncludeTreeBuilder::IncludeTreeBuilder(IncludeTree& tree) : m_tree(tree), m_currentNode(tree, 0) {}
+IncludeTreeBuilder::IncludeTreeBuilder(IncludeTree& tree) : m_tree(tree), m_currentNode(tree, 0, true) {}
 
 IncludeNodeRef IncludeTreeBuilder::getRoot() const
 {
@@ -105,7 +126,8 @@ void IncludeTreeBuilder::addNode(std::string name, std::string path)
         index = m_tree.nodes.size();
         m_tree.nodes.emplace_back(name, path);
     }
-    m_currentNode.addInclude(m_tree, index);
+    // TODO: handle unguarded recursive includes
+    m_currentNode.addInclude(m_tree, index, false);
 }
 
 bool IncludeTreeBuilder::selectNode(std::string path)
@@ -115,7 +137,7 @@ bool IncludeTreeBuilder::selectNode(std::string path)
         if(node.path() == path)
         {
             m_selectionStack.push(m_currentNode);
-            m_currentNode.setIndex(node.index);
+            m_currentNode = node;
             return true;
         }
     }
@@ -179,7 +201,10 @@ public:
             }
             else
             {
-                m_builder.selectNode(PLoc.getFilename());
+                if(m_builder.selectNode(PLoc.getFilename()))
+                {
+                    m_builder.currentNode().setFullInclude(true);
+                }
             }
         }
         if(Reason == FileChangeReason::ExitFile)

@@ -98,27 +98,47 @@ TEST_CASE("Preprocess non source code file", "[preprocessor][cpp]")
     REQUIRE(result.code.content.contains(expected));
 }
 
-// Test if the file is not a source code
+// Test parsing the inlcude hierarchy of a file
 TEST_CASE("Parse include hierarchy", "[includes][cpp]")
 {
     QString codePath = getTestPatternPath("projectNeumann", "main.cpp");
-    QString expected = readFileContent(getTestPatternPath("testPreprocessorNonSourceCode", "test.cpp"));
 
     auto result = cm::CodeParser().getIncludeTree(codePath);
     REQUIRE(result->root().name() == "main.cpp");
+    REQUIRE(result->root().isFullInclude());
     REQUIRE(result->root().includes().size() == 2);
     REQUIRE(result->root().includes()[0].name() == "computer.h");
     REQUIRE(result->root().includes()[0].includes().size() == 2);
     REQUIRE(result->root().includes()[0].includes()[0].name() == "ram.h");
+    REQUIRE(result->root().includes()[0].includes()[0].isFullInclude());
     REQUIRE(result->root().includes()[0].includes()[0].includes().size() == 0);
     REQUIRE(result->root().includes()[0].includes()[1].name() == "monitor.h");
+    REQUIRE(result->root().includes()[0].includes()[1].isFullInclude());
     REQUIRE(result->root().includes()[0].includes()[1].includes().size() == 1);
     REQUIRE(result->root().includes()[0].includes()[1].includes()[0].name() == "gpu.h");
     REQUIRE(result->root().includes()[0].includes()[1].includes()[0].includes().size() == 0);
     REQUIRE(result->root().includes()[1].name() == "monitor.h");
-    REQUIRE(result->root().includes()[1].includes().size() == 1);
-    REQUIRE(result->root().includes()[1].includes()[0].name() == "gpu.h");
-    REQUIRE(result->root().includes()[1].includes()[0].includes().size() == 0);
+    REQUIRE(result->root().includes()[1].isFullInclude() == false);
+    REQUIRE(result->root().includes()[1].includes().size() == 0); // not a full include, we only show what is actually included
+}
+
+// Test include hierarchy parsing, when includes are recursive, and dont have a header guard
+TEST_CASE("Parse recursive includes without header guard", "[includes][cpp]")
+{
+    QString codePath = getTestPatternPath("testIncludeRecursive", "main.cpp");
+
+    auto result = cm::CodeParser().getIncludeTree(codePath);
+    REQUIRE(result->root().name() == "main.cpp");
+    REQUIRE(result->root().includes().size() == 1);
+    REQUIRE(result->root().includes()[0].name() == "recursive.h");
+    REQUIRE(result->root().includes()[0].isFullInclude());
+    REQUIRE(result->root().includes()[0].isRecursive());
+    REQUIRE(result->root().includes()[0].includes().size() == 2);
+    REQUIRE(result->root().includes()[0].includes()[0].name() == "recursive.h");
+    REQUIRE(result->root().includes()[0].includes()[0].isRecursive());
+    REQUIRE(result->root().includes()[0].includes()[0].includes().size() == 0); // 0 because have to stop recursion somehow
+    REQUIRE(result->root().includes()[0].includes()[1].name() == "other.h");
+    REQUIRE(result->root().includes()[0].includes()[1].isFullInclude());
 }
 
 // Test if the file is not a source code
