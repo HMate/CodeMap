@@ -1,12 +1,15 @@
 #ifndef INCLUDECOLLECTOR_H
 #define INCLUDECOLLECTOR_H
 
-#include "codeparser.h"
+#include "IncludeTree.h"
 
 #include <stack>
+#include <QString>
 
 namespace cm
 {
+
+std::unique_ptr<IncludeTree> getIncludeTree(const QString& srcPath, const std::vector<QString>& includeDirs);
 
 class IncludeTreeBuilder
 {

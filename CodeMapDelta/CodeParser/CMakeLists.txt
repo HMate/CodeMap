@@ -15,7 +15,8 @@ find_package(clang REQUIRED)
 
 add_library(${PROJECT_NAME} STATIC
     codeparser.cpp
-    includecollector.cpp
+	IncludeTree.cpp
+    IncludeTreeBuilder.cpp
     parsererror.cpp
 	linemarkers.cpp
 	utils.cpp)

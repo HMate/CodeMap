@@ -1,4 +1,4 @@
-#include "includecollector.h"
+#include "IncludeTreeBuilder.h"
 
 #include "llvm/Support/Format.h"
 #include "llvm/Support/FormatVariadic.h"
@@ -11,82 +11,10 @@
 //#include "clang/Basic/SourceManager.h"
 
 #include "utils.h"
+#include "codeparser.h"
 
 namespace cm
 {
-
-/**************** IncludeNodeRef *****************/
-/* TODO: Remove IncludeNodeRef and build the tree with IncludeNodes 
-    which represents the actually entered nodes.
-    Build a special reference net in the view to highlight equal nodes.
-*/
-
-IncludeNodeRef::IncludeNodeRef(IncludeTree& tree, size_t index, bool fullInclude) 
-    : tree(tree), index(index), fullInclude(fullInclude) 
-{
-
-}
-
-IncludeNodeRef& IncludeNodeRef::operator=(const IncludeNodeRef& o)
-{
-    if(this == &o)
-        return *this;
-    this->index = o.index;
-    this->fullInclude = o.fullInclude;
-}
-
-const std::string IncludeNodeRef::name() const
-{
-    return tree.node(*this).name;
-}
-
-const std::string IncludeNodeRef::path() const
-{
-    return tree.node(*this).path;
-}
-
-const std::vector<IncludeNodeRef>& IncludeNodeRef::includes() const
-{
-    return tree.node(*this).includes;
-}
-
-void IncludeNodeRef::setFullInclude(bool fullInclude)
-{
-    this->fullInclude = fullInclude;
-}
-
-bool IncludeNodeRef::isFullInclude() const
-{
-    return fullInclude;
-}
-
-bool IncludeNodeRef::isRecursive() const
-{
-    return false;
-}
-
-void IncludeNodeRef::addInclude(IncludeTree& tree, size_t index, bool fullInclude)
-{
-    tree.node(*this).includes.emplace_back(tree, index, fullInclude);
-}
-
-/**************** IncludeTree *****************/
-
-IncludeNodeRef IncludeTree::root()
-{
-    return IncludeNodeRef(*this, 0, true);
-}
-
-IncludeNode& IncludeTree::node(const IncludeNodeRef& ref)
-{
-    return nodes.at(ref.index);
-}
-
-const IncludeNode& IncludeTree::node(const IncludeNodeRef& ref) const
-{
-    return nodes.at(ref.index);
-}
-
 /**************** IncludeTreeBuilder *****************/
 
 IncludeTreeBuilder::IncludeTreeBuilder(IncludeTree& tree) : m_tree(tree), m_currentNode(tree, 0, true) {}
@@ -169,6 +97,7 @@ class IncludeCollectorCallback : public clang::PPCallbacks
 public:
     IncludeCollectorCallback(clang::SourceManager& sm, IncludeTree& tree) : m_sm(sm), m_builder(tree) {}
 
+    /// Called then the parser found an include directive
     virtual void InclusionDirective(clang::SourceLocation HashLoc,
         const clang::Token &IncludeTok,
         StringRef FileName,
@@ -186,6 +115,8 @@ public:
         //llvm::outs().flush();
     }
 
+    /// Called when the parser actually steps into an included file.
+    /// For example this wont be called if the included file has a header guard, and was already parsed once
     void FileChanged(clang::SourceLocation Loc, FileChangeReason Reason,
         clang::SrcMgr::CharacteristicKind FileType,
         clang::FileID PrevFID = clang::FileID()) override
@@ -247,7 +178,7 @@ public:
     }
 };
 
-std::unique_ptr<IncludeTree> CodeParser::getIncludeTree(const QString& srcPath, const std::vector<QString>& includeDirs)
+std::unique_ptr<IncludeTree> getIncludeTree(const QString& srcPath, const std::vector<QString>& includeDirs)
 {
     clang::tooling::FixedCompilationDatabase cdb = createCompilationDatabase(srcPath, includeDirs);
     std::vector<std::string> src{ srcPath.toStdString() };

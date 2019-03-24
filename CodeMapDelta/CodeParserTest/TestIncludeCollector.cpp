@@ -1,6 +1,6 @@
 #include "catch2/catch.hpp"
 
-#include "includecollector.h"
+#include "IncludeTreeBuilder.h"
 
 
 // Test if the file is not a source code

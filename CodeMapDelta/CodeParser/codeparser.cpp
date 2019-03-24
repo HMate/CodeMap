@@ -10,6 +10,7 @@
 #include "utils.h"
 #include "parsererror.h"
 #include "linemarkers.h"
+#include "IncludeTreeBuilder.h"
 
 namespace cm
 {
@@ -142,6 +143,13 @@ void CodeParser::parseAST(const QString& srcPath, const std::vector<QString>& in
     v.TraverseTranslationUnitDecl(Asts[0]->getASTContext().getTranslationUnitDecl());
 
     ParserResult result;
+}
+
+
+
+std::unique_ptr<IncludeTree> CodeParser::getIncludeTree(const QString& srcPath, const std::vector<QString>& includeDirs)
+{
+    return cm::getIncludeTree(srcPath, includeDirs);
 }
 
 }
