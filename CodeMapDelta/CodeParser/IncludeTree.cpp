@@ -4,76 +4,43 @@
 namespace cm
 {
 
-/**************** IncludeNodeRef *****************/
-/* TODO: Remove IncludeNodeRef and build the tree with IncludeNodes
-    which represents the actually entered nodes.
-    Build a special reference net in the view to highlight equal nodes.
-*/
+/**************** IncludeNode *****************/
 
-IncludeNodeRef::IncludeNodeRef(IncludeTree& tree, size_t index, bool fullInclude)
-    : tree(tree), index(index), fullInclude(fullInclude)
+const std::string IncludeNode::name() const
 {
-
+    return this->m_name;
 }
 
-IncludeNodeRef& IncludeNodeRef::operator=(const IncludeNodeRef& o)
+const std::string IncludeNode::path() const
 {
-    if(this == &o)
-        return *this;
-    this->index = o.index;
-    this->fullInclude = o.fullInclude;
+    return this->m_path;
 }
 
-const std::string IncludeNodeRef::name() const
+std::vector<IncludeNode>& IncludeNode::includes()
 {
-    return tree.node(*this).name;
+    return this->m_includes;
 }
 
-const std::string IncludeNodeRef::path() const
+void IncludeNode::setFullInclude(bool fullInclude)
 {
-    return tree.node(*this).path;
+    this->m_fullInclude = fullInclude;
 }
 
-const std::vector<IncludeNodeRef>& IncludeNodeRef::includes() const
+bool IncludeNode::isFullInclude() const
 {
-    return tree.node(*this).includes;
+    return m_fullInclude;
 }
 
-void IncludeNodeRef::setFullInclude(bool fullInclude)
+void IncludeNode::addInclude(std::string name, std::string path)
 {
-    this->fullInclude = fullInclude;
-}
-
-bool IncludeNodeRef::isFullInclude() const
-{
-    return fullInclude;
-}
-
-bool IncludeNodeRef::isRecursive() const
-{
-    return false;
-}
-
-void IncludeNodeRef::addInclude(IncludeTree& tree, size_t index, bool fullInclude)
-{
-    tree.node(*this).includes.emplace_back(tree, index, fullInclude);
+    this->m_includes.emplace_back(name, path);
 }
 
 /**************** IncludeTree *****************/
 
-IncludeNodeRef IncludeTree::root()
+IncludeNode& IncludeTree::root()
 {
-    return IncludeNodeRef(*this, 0, true);
-}
-
-IncludeNode& IncludeTree::node(const IncludeNodeRef& ref)
-{
-    return nodes.at(ref.index);
-}
-
-const IncludeNode& IncludeTree::node(const IncludeNodeRef& ref) const
-{
-    return nodes.at(ref.index);
+    return m_root;
 }
 
 }

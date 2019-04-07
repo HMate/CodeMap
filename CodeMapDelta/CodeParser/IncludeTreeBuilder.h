@@ -3,6 +3,8 @@
 
 #include "IncludeTree.h"
 
+
+#include <memory>
 #include <stack>
 #include <QString>
 
@@ -14,12 +16,12 @@ std::unique_ptr<IncludeTree> getIncludeTree(const QString& srcPath, const std::v
 class IncludeTreeBuilder
 {
     IncludeTree& m_tree;
-    IncludeNodeRef m_currentNode;
-    std::stack<IncludeNodeRef> m_selectionStack;
+    IncludeNode* m_currentNode;
+    std::stack<IncludeNode*> m_selectionStack;
 public:
     IncludeTreeBuilder(IncludeTree& tree);
-    IncludeNodeRef getRoot() const;
-    IncludeNodeRef currentNode();
+    IncludeNode& getRoot() const;
+    IncludeNode& currentNode();
     void setRoot(std::string name, std::string path);
     void addNode(std::string name, std::string path);
 
@@ -27,7 +29,7 @@ public:
     * The node must be a child node of the current selected node
     * The mathod fails if there is no child node of the current node with this path*/
     bool selectNode(std::string path);
-    void selectParent();
+    void selectPreviousNode();
     bool isRootSelected();
 };
 

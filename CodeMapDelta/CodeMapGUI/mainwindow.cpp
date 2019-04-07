@@ -257,8 +257,8 @@ void MainWindow::openDiagramView()
     builder.addNode("include_inner4", "root/include1/include_inner4");
     builder.addNode("include_inner5", "root/include1/include_inner5");
 
-    builder.selectParent();
-    builder.selectParent();
+    builder.selectPreviousNode();
+    builder.selectPreviousNode();
     builder.addNode("include_inner2", "root/include1/include_inner2");
 
     buildIncludeTreeDiagram(*diagV, tree);

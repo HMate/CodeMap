@@ -7,72 +7,59 @@
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Frontend/CompilerInstance.h"
 
-//#include "clang/Basic/SourceLocation.h"
-//#include "clang/Basic/SourceManager.h"
-
 #include "utils.h"
+#include "parsererror.h"
 #include "codeparser.h"
 
 namespace cm
 {
 /**************** IncludeTreeBuilder *****************/
 
-IncludeTreeBuilder::IncludeTreeBuilder(IncludeTree& tree) : m_tree(tree), m_currentNode(tree, 0, true) {}
+IncludeTreeBuilder::IncludeTreeBuilder(IncludeTree& tree) : 
+    m_tree(tree), m_currentNode(nullptr) {}
 
-IncludeNodeRef IncludeTreeBuilder::getRoot() const
+IncludeNode& IncludeTreeBuilder::getRoot() const
 {
     return m_tree.root();
 }
 
-IncludeNodeRef IncludeTreeBuilder::currentNode()
+IncludeNode& IncludeTreeBuilder::currentNode()
 {
-    return m_currentNode;
+    return *m_currentNode;
 }
 
 void IncludeTreeBuilder::setRoot(std::string name, std::string path)
 {
-    assert(m_tree.nodes.empty());
-    if(m_tree.nodes.empty())
-        m_tree.nodes.emplace_back(name, path);
+    m_tree.m_root.m_name = name;
+    m_tree.m_root.m_path = path;
+    m_tree.m_root.m_includes.clear();
+    m_tree.m_root.setFullInclude(true);
+    m_currentNode = &(m_tree.m_root);
 }
 
 void IncludeTreeBuilder::addNode(std::string name, std::string path)
 {
-    bool found = false;
-    size_t index;
-    for(auto i = 0; i < m_tree.nodes.size(); i++)
+    if(m_currentNode != nullptr)
     {
-        if(m_tree.nodes[i].path == path)
-        {
-            found = true;
-            index = i;
-        }
+        m_currentNode->addInclude(name, path);
     }
-
-    if(!found)
-    {
-        index = m_tree.nodes.size();
-        m_tree.nodes.emplace_back(name, path);
-    }
-    // TODO: handle unguarded recursive includes
-    m_currentNode.addInclude(m_tree, index, false);
 }
 
 bool IncludeTreeBuilder::selectNode(std::string path)
 {
-    for(auto& node : m_currentNode.includes())
+    for(auto& node : m_currentNode->includes())
     {
         if(node.path() == path)
         {
             m_selectionStack.push(m_currentNode);
-            m_currentNode = node;
+            m_currentNode = &node;
             return true;
         }
     }
     return false;
 }
 
-void IncludeTreeBuilder::selectParent()
+void IncludeTreeBuilder::selectPreviousNode()
 {
     if(!isRootSelected())
     {
@@ -83,7 +70,7 @@ void IncludeTreeBuilder::selectParent()
 
 bool IncludeTreeBuilder::isRootSelected()
 {
-    return m_currentNode.index == 0;
+    return m_currentNode == &m_tree.m_root;
 }
 
 /**************** IncludeCollectorCallback *****************/
@@ -97,7 +84,7 @@ class IncludeCollectorCallback : public clang::PPCallbacks
 public:
     IncludeCollectorCallback(clang::SourceManager& sm, IncludeTree& tree) : m_sm(sm), m_builder(tree) {}
 
-    /// Called then the parser found an include directive
+    /// Called when the parser found an include directive
     virtual void InclusionDirective(clang::SourceLocation HashLoc,
         const clang::Token &IncludeTok,
         StringRef FileName,
@@ -140,7 +127,7 @@ public:
         }
         if(Reason == FileChangeReason::ExitFile)
         {
-            m_builder.selectParent();
+            m_builder.selectPreviousNode();
         }
         //llvm::outs() << llvm::formatv("FileChanged {0} {1} {2} {3}\n", PLoc.getFilename(), PLoc.getLine(), PLoc.getColumn(), (int)Reason);
         //llvm::outs().flush();
@@ -183,6 +170,9 @@ std::unique_ptr<IncludeTree> getIncludeTree(const QString& srcPath, const std::v
     clang::tooling::FixedCompilationDatabase cdb = createCompilationDatabase(srcPath, includeDirs);
     std::vector<std::string> src{ srcPath.toStdString() };
     clang::tooling::ClangTool tool(cdb, src);
+
+    ParserErrorCollector errorCollector;
+    tool.setDiagnosticConsumer(&errorCollector);
 
     std::unique_ptr<IncludeTree> tree = std::make_unique<IncludeTree>();
     std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<IncludeCollectorFrontendActionFactory>(*tree);
