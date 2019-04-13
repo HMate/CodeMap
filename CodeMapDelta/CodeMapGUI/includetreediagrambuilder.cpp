@@ -10,7 +10,7 @@ const QSizeF margin = QSizeF(10, 15);
 typedef std::vector<BoxDGI*> IncludeDiagramTreeLevel;
 typedef std::vector <IncludeDiagramTreeLevel> IncludeDiagramTree;
 
-void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, BoxDGI* currentBox, QPointF& pos,
+void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNode& current, BoxDGI* currentBox, QPointF& pos,
     IncludeDiagramTree& levels, int currentLevel);
 
 class IncludeDiagramBuilder
@@ -67,7 +67,7 @@ void buildIncludeTreeDiagram(IncludeDiagramView& diagram, cm::IncludeTree& tree)
     }
 }
 
-void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNodeRef& current, BoxDGI* currentBox, QPointF& pos,
+void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNode& current, BoxDGI* currentBox, QPointF& pos,
     IncludeDiagramTree& levels, int currentLevel)
 {
     auto pos2 = pos;

@@ -21,6 +21,11 @@ std::vector<IncludeNode>& IncludeNode::includes()
     return this->m_includes;
 }
 
+const std::vector<IncludeNode>& IncludeNode::includes() const
+{
+    return this->m_includes;
+}
+
 void IncludeNode::setFullInclude(bool fullInclude)
 {
     this->m_fullInclude = fullInclude;

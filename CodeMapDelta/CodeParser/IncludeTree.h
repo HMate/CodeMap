@@ -16,6 +16,7 @@ struct IncludeNode
     const std::string name() const;
     const std::string path() const;
     std::vector<IncludeNode>& includes();
+    const std::vector<IncludeNode>& includes() const;
     void addInclude(std::string name, std::string path);
     void setFullInclude(bool fullInclude);
     bool isFullInclude() const;
