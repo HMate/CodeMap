@@ -5,7 +5,7 @@
 #include <QString>
 #include <QStringList>
 
-#include "settings.h"
+#include "Settings.h"
 
 struct FileViewStateItem
 {

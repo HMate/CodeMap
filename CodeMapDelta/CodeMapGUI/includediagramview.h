@@ -2,7 +2,7 @@
 
 #include <QGraphicsItem>
 
-#include "diagramview.h"
+#include "DiagramView.h"
 
 class ArrowDGI : public QGraphicsItem
 {

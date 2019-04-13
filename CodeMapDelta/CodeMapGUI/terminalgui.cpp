@@ -1,11 +1,11 @@
-#include "terminalgui.h"
+#include "TerminalGui.h"
 
 #include <QBoxLayout>
 #include <QAction>
 #include <QListWidgetItem>
 
-#include "mainwindow.h"
-#include "filesystem.h"
+#include "MainWindow.h"
+#include "FileSystem.h"
 
 TerminalView::TerminalView(QWidget* parent)
     : QWidget(parent)

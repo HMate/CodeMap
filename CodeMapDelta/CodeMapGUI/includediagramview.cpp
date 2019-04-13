@@ -1,4 +1,4 @@
-#include "includediagramview.h"
+#include "IncludeDiagramView.h"
 
 #include <QPainter>
 #include <QGraphicsScene>

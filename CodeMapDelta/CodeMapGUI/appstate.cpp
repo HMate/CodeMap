@@ -1,4 +1,4 @@
-#include "appstate.h"
+#include "AppState.h"
 
 #include <QDebug>
 
@@ -6,8 +6,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-#include "common_types.h"
-#include "filesystem.h"
+#include "CommonTypes.h"
+#include "FileSystem.h"
 
 const QString STATE_FILE_NAME = "state.cms";
 

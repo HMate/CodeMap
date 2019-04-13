@@ -1,13 +1,13 @@
-#include "fileedit.h"
+#include "FileEdit.h"
 
 #include <QMenu>
 #include <QContextMenuEvent>
 
 #include <QtConcurrent>
 
-#include "mainwindow.h"
-#include "fileview.h"
-#include "editorfoldingarea.h"
+#include "MainWindow.h"
+#include "FileView.h"
+#include "EditorFoldingArea.h"
 
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent), m_view((FileView*)parent)
 {
@@ -131,7 +131,7 @@ void FileEdit::paintEvent(QPaintEvent *event)
 
     EditorFoldingArea& fArea = m_view->getFoldingArea();
 
-    // qDebug() << "fileedit overlay paint";
+    // qDebug() << "FileEdit overlay paint";
     // draw text overlay for folded blocks
     for(auto btn : fArea.getFoldingButtons())
     {

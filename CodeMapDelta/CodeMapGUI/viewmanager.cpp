@@ -1,14 +1,14 @@
-#include "viewmanager.h"
+#include "ViewManager.h"
 
 #include <QDebug>
 #include <QPushButton>
 #include <QStackedLayout>
 
-#include "common_types.h"
-#include "mainwindow.h"
-#include "fileview.h"
-#include "includediagramview.h"
-#include "filesystem.h"
+#include "CommonTypes.h"
+#include "MainWindow.h"
+#include "FileView.h"
+#include "IncludeDiagramView.h"
+#include "FileSystem.h"
 
 DocumentListView::DocumentListView(QWidget* parent) : QWidget(parent)
 {

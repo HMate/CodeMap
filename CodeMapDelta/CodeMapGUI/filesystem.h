@@ -5,7 +5,7 @@
 #include <QDir>
 
 /*
- * Manages where are we in the filesystem,
+ * Manages where are we in the FileSystem,
  * and stores/handles paths that are important for the application
  * like: save path, project paths, current working dir, files in dir
  * */

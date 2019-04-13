@@ -1,6 +1,6 @@
-#include "imagehandler.h"
+#include "ImageHandler.h"
 
-#include "filesystem.h"
+#include "FileSystem.h"
 
 QImage ImageHandler::loadIcon(const QString& name)
 {

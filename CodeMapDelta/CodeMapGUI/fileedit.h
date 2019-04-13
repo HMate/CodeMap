@@ -5,7 +5,7 @@
 #include <QFutureWatcher>
 #include <QTextBlock>
 
-#include "codeparser.h"
+#include "CodeParser.h"
 
 class FileView;
 

@@ -1,10 +1,10 @@
-#include "diagramview.h"
+#include "DiagramView.h"
 
 #include <QGridLayout>
 #include <QGraphicsView>
 #include <QGraphicsScene>
 
-#include "mainwindow.h"
+#include "MainWindow.h"
 
 
 DiagramView::DiagramView(QWidget *parent) : QWidget(parent)

@@ -1,18 +1,18 @@
-#include "mainwindow.h"
+#include "MainWindow.h"
 
 #include <QMenuBar>
 #include <QFileDialog>
 #include <QDockWidget>
 #include <QResizeEvent>
 
-#include "filesystem.h"
-#include "settingsview.h"
+#include "FileSystem.h"
+#include "SettingsView.h"
 
 #include "IncludeTreeBuilder.h"
-#include "includetreediagrambuilder.h"
+#include "IncludeTreeDiagramBuilder.h"
 
 /* DONE
-    - Need to save/load appstate:
+    - Need to save/load AppState:
         - Save opened files
     - Views:
         - Opened fies view
@@ -28,7 +28,7 @@
 */
 
 /* TODO
-    - Need to save/load appstate:
+    - Need to save/load AppState:
         - opened project
         - toggled views
         - app user options

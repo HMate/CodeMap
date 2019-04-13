@@ -1,10 +1,10 @@
-#include "linenumberarea.h"
+#include "LinenumberArea.h"
 
 #include <QTextBlock>
 #include <QPainter>
 
-#include "fileedit.h"
-#include "fileview.h"
+#include "FileEdit.h"
+#include "FileView.h"
 
 LineNumberArea::LineNumberArea(FileView *parent) : QWidget((QWidget*)parent)
 {

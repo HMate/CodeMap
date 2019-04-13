@@ -1,4 +1,4 @@
-#include "textfolder.h"
+#include "TextFolder.h"
 
 #include <QTextDocumentFragment>
 

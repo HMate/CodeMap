@@ -1,7 +1,7 @@
 #include "catch2/catch.hpp"
 
 #include "TestParser.h"
-#include "codeparser.h"
+#include "CodeParser.h"
 
 
 TEST_CASE("Preprocess from string", "[preprocessor][cpp]")

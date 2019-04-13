@@ -1,11 +1,11 @@
-#include "editorfoldingarea.h"
+#include "EditorFoldingArea.h"
 
 
-#include "imagehandler.h"
-#include "fileedit.h"
-#include "fileview.h"
+#include "ImageHandler.h"
+#include "FileEdit.h"
+#include "FileView.h"
 
-#include "mainwindow.h"
+#include "MainWindow.h"
 
 
 const int FOLD_AREA_WIDTH = 13;

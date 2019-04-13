@@ -8,27 +8,27 @@ set(CMAKE_AUTOMOC ON)
 find_package(Qt5 CONFIG REQUIRED Widgets Concurrent)
 
 add_executable(${PROJECT_NAME}
-    main.cpp
-    mainwindow.cpp
-    settingsview.cpp
-    settings.cpp
-    terminalgui.cpp
-    viewmanager.cpp
+    Main.cpp
+    MainWindow.cpp
+    SettingsView.cpp
+    Settings.cpp
+    TerminalGui.cpp
+    ViewManager.cpp
     
-	diagramview.cpp
-	includediagramview.cpp
-	includetreediagrambuilder.cpp
+    DiagramView.cpp
+    IncludeDiagramView.cpp
+    IncludeTreeDiagramBuilder.cpp
     
-	fileview.cpp
-    fileedit.cpp
-    textfolder.cpp
-    linenumberarea.cpp
-	editorfoldingarea.cpp
+    FileView.cpp
+    FileEdit.cpp
+    TextFolder.cpp
+    LinenumberArea.cpp
+    EditorFoldingArea.cpp
 
-    filesystem.cpp
-    appstate.cpp
-    imagehandler.cpp
-    stringlisteditordialog.cpp)
+    FileSystem.cpp
+    AppState.cpp
+    ImageHandler.cpp
+    StringListEditorDialog.cpp)
 
 target_include_directories(${PROJECT_NAME} 
     PRIVATE CodeParser)

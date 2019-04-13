@@ -1,9 +1,9 @@
 #ifndef INCLUDETREEDIAGRAMBUILDER_H
 #define INCLUDETREEDIAGRAMBUILDER_H
 
-#include "includediagramview.h"
+#include "IncludeDiagramView.h"
 
-#include "codeparser.h"
+#include "CodeParser.h"
 
 void buildIncludeTreeDiagram(IncludeDiagramView& diagram, cm::IncludeTree& tree);
 

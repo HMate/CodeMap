@@ -1,7 +1,4 @@
-#include "includetreediagrambuilder.h"
-
-
-#include "includediagramview.h"
+#include "IncludeTreeDiagramBuilder.h"
 
 #include <QGraphicsScene>
 

@@ -3,7 +3,6 @@
 
 #include "IncludeTree.h"
 
-
 #include <memory>
 #include <stack>
 #include <QString>

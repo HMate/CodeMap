@@ -1,11 +1,11 @@
-#include "stringlisteditordialog.h"
+#include "StringListEditorDialog.h"
 
 #include <QDialogButtonBox>
 #include <QGridLayout>
 #include <QPushButton>
 #include <QFileDialog>
 
-#include "mainwindow.h"
+#include "MainWindow.h"
 
 StringListEditorDialog::StringListEditorDialog(QWidget* parent, const QStringList& initialList)
 {

@@ -7,9 +7,9 @@
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Frontend/CompilerInstance.h"
 
-#include "utils.h"
-#include "parsererror.h"
-#include "codeparser.h"
+#include "Utils.h"
+#include "ParserError.h"
+#include "CodeParser.h"
 
 namespace cm
 {

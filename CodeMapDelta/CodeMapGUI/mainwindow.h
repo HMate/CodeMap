@@ -4,9 +4,9 @@
 #include <QMainWindow>
 #include <QApplication>
 
-#include "viewmanager.h"
-#include "terminalgui.h"
-#include "appstate.h"
+#include "ViewManager.h"
+#include "TerminalGui.h"
+#include "AppState.h"
 
 class MainWindow : public QMainWindow
 {

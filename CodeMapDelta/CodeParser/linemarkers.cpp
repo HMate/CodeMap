@@ -1,4 +1,4 @@
-#include "linemarkers.h"
+#include "LineMarkers.h"
 
 #include <stack>
 #include <QStringList>

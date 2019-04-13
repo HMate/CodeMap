@@ -1,4 +1,4 @@
-#include "codeparser.h"
+#include "CodeParser.h"
 
 #include "clang/Tooling/Tooling.h"
 #include "clang/Frontend/CompilerInstance.h"
@@ -7,9 +7,9 @@
 #include "clang/Frontend/ASTUnit.h"
 
 
-#include "utils.h"
-#include "parsererror.h"
-#include "linemarkers.h"
+#include "Utils.h"
+#include "ParserError.h"
+#include "LineMarkers.h"
 #include "IncludeTreeBuilder.h"
 
 namespace cm

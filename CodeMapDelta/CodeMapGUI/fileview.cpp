@@ -1,4 +1,4 @@
-#include "fileview.h"
+#include "FileView.h"
 
 #include <QFile>
 #include <QTextStream>
@@ -8,11 +8,11 @@
 
 #include <QFileDialog>
 
-#include "mainwindow.h"
-#include "fileedit.h"
-#include "filesystem.h"
-#include "linenumberarea.h"
-#include "editorfoldingarea.h"
+#include "MainWindow.h"
+#include "FileEdit.h"
+#include "FileSystem.h"
+#include "LinenumberArea.h"
+#include "EditorFoldingArea.h"
 
 #define NEW_FILE "{new file}"
 
@@ -114,7 +114,7 @@ void FileView::closeView()
 void FileView::keyPressEvent(QKeyEvent* ke)
 {
     //Handle Ctrl+S as save file
-    // TODO: make keybinding configurable from settings
+    // TODO: make keybinding configurable from Settings
 
 
     if(ke->key() == Qt::Key_S && ke->modifiers().testFlag(Qt::ControlModifier))

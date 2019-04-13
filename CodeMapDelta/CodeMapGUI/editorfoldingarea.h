@@ -6,7 +6,7 @@
 #include <QWidget>
 #include <QTextBlock>
 
-#include "textfolder.h"
+#include "TextFolder.h"
 
 class FileView;
 class EditorFoldingButton;

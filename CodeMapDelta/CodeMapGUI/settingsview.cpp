@@ -1,12 +1,12 @@
-#include "settingsview.h"
+#include "SettingsView.h"
 
 #include <QLabel>
 #include <QPushButton>
 #include <QDialogButtonBox>
 #include <QGridLayout>
 
-#include "mainwindow.h"
-#include "stringlisteditordialog.h"
+#include "MainWindow.h"
+#include "StringListEditorDialog.h"
 
 SettingsView::SettingsView(QWidget* parent) : QDialog(parent)
 {
