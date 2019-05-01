@@ -38,6 +38,7 @@ public:
     QRectF boundingRect() const override;
     QString getFullName() { return m_fullName; }
 
+    void hoverMoveEvent(QGraphicsSceneHoverEvent* event);
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 

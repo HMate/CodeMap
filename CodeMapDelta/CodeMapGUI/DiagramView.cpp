@@ -55,6 +55,7 @@ QToolBar* DiagramView::createToolbar()
 
 bool DiagramView::eventFilter(QObject *object, QEvent *ev)
 {
+    // zooming based on https://stackoverflow.com/questions/19113532/qgraphicsview-zooming-in-and-out-under-mouse-position-using-mouse-wheel
     auto type = ev->type();
     if(ev->type() == QEvent::MouseMove) {
         QMouseEvent* mouse_event = static_cast<QMouseEvent*>(ev);

@@ -2,6 +2,7 @@
 
 #include <QPainter>
 #include <QGraphicsScene>
+#include <QGraphicsSceneHoverEvent>
 
 ArrowDGI::ArrowDGI(QGraphicsItem* startItem, QGraphicsItem* endItem, QGraphicsItem* parent)
     : m_startItem(startItem), m_endItem(endItem), QGraphicsItem(parent) {}
@@ -41,6 +42,7 @@ BoxDGI::BoxDGI(IncludeDiagramView& parentView, const QString& displayName, const
     setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | 
         QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsScenePositionChanges);
     m_font = QFont("Helvetica");
+    setAcceptHoverEvents(true);
 }
 
 void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -106,6 +108,14 @@ QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVar
         scene()->update(scene()->sceneRect());
     }
     return result;
+}
+
+void BoxDGI::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
+{
+    if(event->type() == QEvent::GraphicsSceneHoverEnter || event->type() == QEvent::GraphicsSceneHoverMove)
+    {
+        setToolTip(m_fullName);
+    }
 }
 
 IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
