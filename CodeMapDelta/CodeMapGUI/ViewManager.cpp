@@ -318,11 +318,12 @@ IncludeDiagramView* SplitDocumentView::openIncludeDiagramView(const QString& id)
 {
     logTerminal("Opening diagram");
 
-    if(tabbedViews.size() < 2)
+    size_t usedTab = 0;
+    if(tabbedViews.size() < usedTab+1)
         addTabbedDocumentView();
 
     // TODO: Dont use burnt in indicies for tabbedviews
-    return tabbedViews[1]->openIncludeDiagramView(id);
+    return tabbedViews[usedTab]->openIncludeDiagramView(id);
 }
 
 void SplitDocumentView::closeDiagramView(DiagramView* view)
