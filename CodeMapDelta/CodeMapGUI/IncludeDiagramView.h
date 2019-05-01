@@ -4,6 +4,8 @@
 
 #include "DiagramView.h"
 
+class IncludeDiagramView;
+
 class ArrowDGI : public QGraphicsItem
 {
     QGraphicsItem* m_startItem;
@@ -23,14 +25,16 @@ protected:
 // BoxDiagramGraphicsItem
 class BoxDGI : public QGraphicsItem
 {
+    IncludeDiagramView& m_parentView;
     QString m_displayName;
     QString m_fullName;
     QFont m_font;
 
 public:
-    explicit BoxDGI(const std::string& displayName, const std::string& fullName, QGraphicsItem* parent = nullptr);
-    BoxDGI(const QString& displayName, const QString& fullName, QGraphicsItem* parent = nullptr);
+    explicit BoxDGI(IncludeDiagramView& parentView, const std::string& displayName, const std::string& fullName, QGraphicsItem* parent = nullptr);
+    BoxDGI(IncludeDiagramView& parentView, const QString& displayName, const QString& fullName, QGraphicsItem* parent = nullptr);
     QRectF boundingRect() const override;
+    QString getFullName() { return m_fullName; }
 
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
@@ -41,8 +45,11 @@ protected:
 
 class IncludeDiagramView : public DiagramView
 {
+    QString m_selectedID;
     Q_OBJECT
 public:
     explicit IncludeDiagramView(QWidget *parent = nullptr);
 
+    void setSelectedID(const QString& id);
+    bool isBoxSelectedWithID(QString& id);
 };

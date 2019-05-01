@@ -32,11 +32,11 @@ QPointF ArrowDGI::endPoint() const
     return QPointF(m_endItem->x() + (rect.width() / 2.0), m_endItem->y());
 }
 
-BoxDGI::BoxDGI(const std::string& displayName, const std::string& fullName, QGraphicsItem* parent) 
-    : BoxDGI(QString(displayName.c_str()), QString(fullName.c_str()), parent) {}
+BoxDGI::BoxDGI(IncludeDiagramView& parentView, const std::string& displayName, const std::string& fullName, QGraphicsItem* parent)
+    : BoxDGI(parentView, QString(displayName.c_str()), QString(fullName.c_str()), parent) {}
 
-BoxDGI::BoxDGI(const QString& displayName, const QString& fullName, QGraphicsItem* parent) 
-    : QGraphicsItem(parent), m_displayName(displayName), m_fullName(fullName)
+BoxDGI::BoxDGI(IncludeDiagramView& parentView, const QString& displayName, const QString& fullName, QGraphicsItem* parent)
+    : QGraphicsItem(parent), m_parentView(parentView), m_displayName(displayName), m_fullName(fullName)
 {
     setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | 
         QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsScenePositionChanges);
@@ -51,7 +51,13 @@ void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 
     painter->setBrush(QBrush(QColor(200, 200, 250)));
     if(isSelected())
+    {
+        painter->setBrush(QBrush(QColor(100, 250, 250)));
+    }
+    else if(m_parentView.isBoxSelectedWithID(m_fullName))
+    {
         painter->setBrush(QBrush(QColor(200, 250, 250)));
+    }
 
     const int margin = 10;
     const int w = fmetric.width(m_displayName);
@@ -75,13 +81,39 @@ QRectF BoxDGI::boundingRect() const
 
 QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
-    if(scene() != nullptr && 
-        change == GraphicsItemChange::ItemPositionHasChanged)
+    if(change == GraphicsItemChange::ItemSelectedHasChanged && isSelected())
+    {
+        // TODO: Handle case when multiple boxes are selected
+        m_parentView.setSelectedID(m_fullName);
+    }
+
+    QVariant result = QGraphicsItem::itemChange(change, value);
+
+    // update for 2 purpose:
+    // 1) if item position change, have to update arrows
+    // 2) if selection changed, have to update boxes, because their color could have changed
+    if(scene() != nullptr)
+    {
         scene()->update(scene()->sceneRect());
-    return QGraphicsItem::itemChange(change, value);
+    }
+    return result;
 }
 
 IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
 {
 
+}
+
+void IncludeDiagramView::setSelectedID(const QString& id)
+{
+    m_selectedID = id;
+}
+
+bool IncludeDiagramView::isBoxSelectedWithID(QString& id)
+{
+    if(m_selectedID != "")
+    {
+        return m_selectedID == id;
+    }
+    return false;
 }

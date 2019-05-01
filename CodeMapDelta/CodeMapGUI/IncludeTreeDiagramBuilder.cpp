@@ -16,27 +16,29 @@ public:
 
     IncludeDiagramBuilder(){}
 
-    void build(QGraphicsScene& scene, cm::IncludeTree& tree)
+    void build(IncludeDiagramView& diagram, cm::IncludeTree& tree)
     {
+        // lefttop is x-y-, middle is x0y0, rightbot is x+y+
+        QGraphicsScene& scene = *diagram.getScene();
         m_pos = QPointF(0, 0);
         m_levels = IncludeDiagramTree();
 
-        auto& [current, currentBox] = addRootBox(scene, tree);
+        auto& [current, currentBox] = addRootBox(diagram, scene, tree);
         
         // TODO: Add class that coordinates the coloring of nodes and knows about which boxes are for the same include
         // TODO: Have to add arrows too from parent to child, and align those too
-        recursiveBuildIncludeTreeLevel(scene, current, currentBox, 1);
+        recursiveBuildIncludeTreeLevel(diagram, scene, current, currentBox, 1);
 
         alignBoxesToCenter();
     }
 
 private:
-    std::tuple<cm::IncludeNode&, BoxDGI*> addRootBox(QGraphicsScene& scene, cm::IncludeTree& tree)
+    std::tuple<cm::IncludeNode&, BoxDGI*> addRootBox(IncludeDiagramView& diagram, QGraphicsScene& scene, cm::IncludeTree& tree)
     {
         auto& current = tree.root();
         auto levelBoxes = IncludeDiagramTreeLevel();
 
-        auto box = new BoxDGI(current.name(), current.path());
+        auto box = new BoxDGI(diagram, current.name(), current.path());
         box->setPos(m_pos);
         scene.addItem(box);
         levelBoxes.emplace_back(box);
@@ -47,7 +49,7 @@ private:
         return std::forward_as_tuple(current, box);
     }
 
-    void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNode& current, BoxDGI* currentBox, int currentLevel)
+    void recursiveBuildIncludeTreeLevel(IncludeDiagramView& diagram, QGraphicsScene& scene, const cm::IncludeNode& current, BoxDGI* currentBox, int currentLevel)
     {
         auto pos2 = m_pos;
         IncludeDiagramTreeLevel levelBoxes;
@@ -56,7 +58,7 @@ private:
         auto& includes = current.includes();
         for(auto& inc : includes)
         {
-            auto box = new BoxDGI(inc.name(), inc.path());
+            auto box = new BoxDGI(diagram, inc.name(), inc.path());
             box->setPos(pos2);
             scene.addItem(box);
             levelBoxes.emplace_back(box);
@@ -87,7 +89,7 @@ private:
         {
             auto& inc = includes[i];
             auto box = levelBoxes[i];
-            recursiveBuildIncludeTreeLevel(scene, inc, box, currentLevel + 1);
+            recursiveBuildIncludeTreeLevel(diagram, scene, inc, box, currentLevel + 1);
         }
 
         // set back this levels y coordinate and x coordinate for next boxes on this level.
@@ -124,10 +126,7 @@ private:
 
 void buildIncludeTreeDiagram(IncludeDiagramView& diagram, cm::IncludeTree& tree)
 {
-    // lefttop is x-y-, middle is x0y0, rightbot is x+y+
-    QGraphicsScene& scene = *diagram.getScene();
-
     IncludeDiagramBuilder builder;
-    builder.build(scene, tree);
+    builder.build(diagram, tree);
 }
 
