@@ -7,6 +7,12 @@ const QSizeF margin = QSizeF(10, 15);
 typedef std::vector<BoxDGI*> IncludeDiagramTreeLevel;
 typedef std::vector <IncludeDiagramTreeLevel> IncludeDiagramTree;
 
+struct BoxBuilder
+{
+    cm::IncludeNode& m_node;
+    BoxDGI* m_box;
+};
+
 class IncludeDiagramBuilder
 {
     QPointF m_pos = QPointF(0, 0);
@@ -23,17 +29,21 @@ public:
         m_pos = QPointF(0, 0);
         m_levels = IncludeDiagramTree();
 
-        auto& [current, currentBox] = addRootBox(diagram, scene, tree);
+        auto& box = addRootBox(diagram, scene, tree);
         
+        diagram.setUpdatesEnabled(false);
         // TODO: Add class that coordinates the coloring of nodes and knows about which boxes are for the same include
         // TODO: Have to add arrows too from parent to child, and align those too
-        recursiveBuildIncludeTreeLevel(diagram, scene, current, currentBox, 1);
+        recursiveBuildIncludeTreeLevel(diagram, scene, box.m_node, box.m_box, 1);
 
         alignBoxesToCenter();
+
+        diagram.setUpdatesEnabled(true);
+        diagram.update();
     }
 
 private:
-    std::tuple<cm::IncludeNode&, BoxDGI*> addRootBox(IncludeDiagramView& diagram, QGraphicsScene& scene, cm::IncludeTree& tree)
+    BoxBuilder addRootBox(IncludeDiagramView& diagram, QGraphicsScene& scene, cm::IncludeTree& tree)
     {
         auto& current = tree.root();
         auto levelBoxes = IncludeDiagramTreeLevel();
@@ -46,7 +56,12 @@ private:
         m_pos = m_pos + QPointF(0, rect.height() + margin.height());
 
         m_levels.emplace_back(levelBoxes);
-        return std::forward_as_tuple(current, box);
+        return BoxBuilder{ current, box };
+    }
+
+    void buildTreeLevel(IncludeDiagramView& diagram, QGraphicsScene& scene, const cm::IncludeNode& current, BoxDGI* currentBox, int currentLevel)
+    {
+
     }
 
     void recursiveBuildIncludeTreeLevel(IncludeDiagramView& diagram, QGraphicsScene& scene, const cm::IncludeNode& current, BoxDGI* currentBox, int currentLevel)

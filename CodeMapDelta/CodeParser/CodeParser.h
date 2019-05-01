@@ -8,10 +8,6 @@
 
 namespace cm
 {
-
-typedef std::vector<QString> StringList;
-
-
 struct IncludeSection
 {
     QString filename;
@@ -29,7 +25,7 @@ struct ParsedCodeFile
 struct ParserResult
 {
     ParsedCodeFile code;
-    StringList errors;
+    std::vector<QString> errors;
 
     bool hasErrors();
 };

@@ -9,6 +9,8 @@
 #include "FileView.h"
 #include "EditorFoldingArea.h"
 
+#include "IncludeTreeDiagramBuilder.h"
+
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent), m_view((FileView*)parent)
 {
     this->setLineWrapMode(QPlainTextEdit::LineWrapMode::NoWrap);
@@ -17,6 +19,7 @@ FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent), m_view((FileView*)
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
 
     connect(&m_foldWatcher, SIGNAL(finished()), this, SLOT(foldDefinesFinished()));
+    connect(&m_includeDiagramWatcher , SIGNAL(finished()), this, SLOT(showInludeTreeFinished()));
 
     highlightCurrentLine();
 }
@@ -28,6 +31,7 @@ void FileEdit::contextMenuEvent(QContextMenuEvent* event)
     // in case action is not available
     std::unique_ptr<QMenu> menu(this->createStandardContextMenu());
     menu->addAction(tr("Expand macros"), this, &FileEdit::foldDefines);
+    menu->addAction(tr("Show include diagram"), this, &FileEdit::showIncludeDiagram);
     menu->exec(event->globalPos());
 }
 
@@ -36,13 +40,37 @@ void FileEdit::resizeEvent(QResizeEvent* e)
     QPlainTextEdit::resizeEvent(e);
 }
 
+void FileEdit::showIncludeDiagram()
+{
+    if(m_FilePath == "")
+        return;
+    logTerminal(tr("Show Include Diagram for %1").arg(m_FilePath));
+
+    auto showFuture = QtConcurrent::run (this, &FileEdit::showIncludeDiagramAsync, m_FilePath);
+    m_includeDiagramWatcher.setFuture(showFuture);
+}
+
+void FileEdit::showIncludeDiagramAsync(const QString& filePath)
+{
+    auto mw = MainWindow::instance();
+    auto& appState = mw->getAppState();
+
+    std::vector<QString> includes;
+    m_IncludeDiagramResult = std::move(cm::CodeParser().getIncludeTree(filePath, appState.settings().globalIncludes.toVector().toStdVector()));
+}
+
+void FileEdit::showInludeTreeFinished()
+{
+    auto& result = *m_IncludeDiagramResult;
+    m_IncludeDiagramView = MainWindow::instance()->getDocumentManager()->openIncludeDiagramView(QString::fromStdString(result.root().path()));
+    buildIncludeTreeDiagram(*m_IncludeDiagramView, result);
+}
+
 void FileEdit::foldDefines()
 {
     if(m_FilePath == "")
         return;
-    auto mw = MainWindow::instance();
-    const auto& terminal = mw->getTerminalView();
-    terminal->showMessage(tr("Folding defines for %1").arg(m_FilePath));
+    logTerminal(tr("Folding defines for %1").arg(m_FilePath));
 
     QString name = tr("Folded defines for: %1").arg(m_FilePath);
     m_PreprocessedFileView = MainWindow::instance()->getDocumentManager()->openStringFileView(name, "Loading...");
@@ -57,7 +85,6 @@ void FileEdit::foldDefines()
 cm::ParserResult FileEdit::foldDefinesForFile(const QString& filePath) const
 {
     auto mw = MainWindow::instance();
-    const auto& terminal = mw->getTerminalView();
     auto& appState = mw->getAppState();
 
     std::vector<QString> includes;

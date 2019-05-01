@@ -5,6 +5,7 @@
 #include <QFutureWatcher>
 #include <QTextBlock>
 
+#include "IncludeDiagramView.h"
 #include "CodeParser.h"
 
 class FileView;
@@ -18,12 +19,20 @@ class FileEdit : public QPlainTextEdit
     FileView* m_view;
     FileView* m_PreprocessedFileView;
     QFutureWatcher<cm::ParserResult> m_foldWatcher;
+
+    IncludeDiagramView* m_IncludeDiagramView;
+    std::unique_ptr<cm::IncludeTree> m_IncludeDiagramResult;
+    QFutureWatcher<void> m_includeDiagramWatcher;
 public:
     FileEdit(QWidget* parent);
     void setFilePath(const QString& path);
     const QString& getFilePath() { return m_FilePath; }
 
     void contextMenuEvent(QContextMenuEvent *event);
+
+    void showIncludeDiagram();
+    void showIncludeDiagramAsync(const QString& filePath);
+
 
     void foldDefines(); 
     cm::ParserResult foldDefinesForFile(const QString& filePath) const;
@@ -39,6 +48,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
 
 private slots:
+    void showInludeTreeFinished();
     void foldDefinesFinished();
     void highlightCurrentLine();
 };

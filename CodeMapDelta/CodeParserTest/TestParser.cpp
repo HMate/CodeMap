@@ -137,6 +137,18 @@ TEST_CASE("Parse recursive includes without header guard", "[includes][cpp]")
     // that this case was acknowledged.
 }
 
+// Test include hierarchy parsing, when includes are recursive, and dont have a header guard
+TEST_CASE("Parse includes when an include is not in path", "[includes][cpp]")
+{
+    QString codePath = getTestPatternPath("testPreprocessorIncludeOuterDir", "test.cpp");
+
+    auto result = cm::CodeParser().getIncludeTree(codePath);
+    REQUIRE(result->root().name() == "test.cpp");
+    REQUIRE(result->root().includes().size() == 1);
+    REQUIRE(result->root().includes()[0].name() == "lib.h");
+    REQUIRE(result->root().includes()[0].isFullInclude() == false);
+}
+
 // Test if the file is not a source code
 TEST_CASE("Parse AST", "[ast][cpp]")
 {

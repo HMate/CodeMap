@@ -88,7 +88,7 @@ public:
     FileView* openFileView(const QString& path, size_t tabIndex);
     FileView* openStringFileView(const QString& path, const QString& content);
     void closeFileView(FileView* const view);
-    IncludeDiagramView* openIncludeDiagramView(const QString& id, size_t tabIndex);
+    IncludeDiagramView* openIncludeDiagramView(const QString& id);
     void closeDiagramView(DiagramView* view);
 
     long long getLastFocusedTabIndex();

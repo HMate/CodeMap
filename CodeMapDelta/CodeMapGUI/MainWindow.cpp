@@ -242,7 +242,7 @@ void MainWindow::openFileWithDialog()
 void MainWindow::openDiagramView()
 {
     auto docManager = getDocumentManager();
-    auto diagV = docManager->openIncludeDiagramView("test Diag", 1);
+    auto diagV = docManager->openIncludeDiagramView("test Diag");
 
     cm::IncludeTree tree;
     cm::IncludeTreeBuilder builder(tree);

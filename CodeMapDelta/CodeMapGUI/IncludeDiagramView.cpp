@@ -92,7 +92,7 @@ QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVar
     // update for 2 purpose:
     // 1) if item position change, have to update arrows
     // 2) if selection changed, have to update boxes, because their color could have changed
-    if(scene() != nullptr)
+    if(scene() != nullptr && m_parentView.updatesEnabled())
     {
         scene()->update(scene()->sceneRect());
     }

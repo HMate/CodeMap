@@ -314,7 +314,7 @@ void SplitDocumentView::closeFileView(FileView* const view)
     }
 }
 
-IncludeDiagramView* SplitDocumentView::openIncludeDiagramView(const QString& id, size_t tabIndex)
+IncludeDiagramView* SplitDocumentView::openIncludeDiagramView(const QString& id)
 {
     logTerminal("Opening diagram");
 

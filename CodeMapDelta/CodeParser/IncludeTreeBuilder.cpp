@@ -95,7 +95,14 @@ public:
         StringRef RelativePath,
         const clang::Module *Imported) override
     {
-        m_builder.addNode(FileName.str(), File->getName().str());
+        if(File != nullptr)
+        {
+            m_builder.addNode(FileName.str(), File->getName().str());
+        }
+        else
+        {
+            m_builder.addNode(FileName.str(), FileName.str());
+        }
         
         //clang::PresumedLoc PLoc = m_sm.getPresumedLoc(HashLoc);
         //llvm::outs() << llvm::formatv("InclusionDirective {0} {1} {2} {3}\n", FileName, File->getName(), PLoc.getLine(), PLoc.getColumn());
@@ -177,6 +184,7 @@ std::unique_ptr<IncludeTree> getIncludeTree(const QString& srcPath, const std::v
     std::unique_ptr<IncludeTree> tree = std::make_unique<IncludeTree>();
     std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<IncludeCollectorFrontendActionFactory>(*tree);
     tool.run(actionFactory.get());
+    // TODO: Include errors in result
     return tree;
 }
 
