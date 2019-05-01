@@ -253,6 +253,12 @@ void MainWindow::openDiagramView()
     builder.addNode("include_inner1", "root/include1/include_inner1");
     builder.addNode("include_inner2", "root/include1/include_inner2");
 
+    builder.selectNode("root/include1/include_inner1");
+    builder.currentNode().setFullInclude(true);
+    builder.addNode("fanthom.h", "root/include1/include_inner1/fanthom.h");
+    builder.addNode("shade.h", "root/include1/include_inner1/shade.h");
+
+    builder.selectPreviousNode();
     builder.selectNode("root/include1/include_inner2");
     builder.currentNode().setFullInclude(true);
     builder.addNode("include_inner3", "root/include1/include_inner3");
