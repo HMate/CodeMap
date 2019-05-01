@@ -23,12 +23,13 @@ protected:
 // BoxDiagramGraphicsItem
 class BoxDGI : public QGraphicsItem
 {
-    QString m_name;
+    QString m_displayName;
+    QString m_fullName;
     QFont m_font;
 
 public:
-    BoxDGI(const QString& name, QGraphicsItem* parent = nullptr);
-    explicit BoxDGI(const std::string& name, QGraphicsItem* parent = nullptr);
+    explicit BoxDGI(const std::string& displayName, const std::string& fullName, QGraphicsItem* parent = nullptr);
+    BoxDGI(const QString& displayName, const QString& fullName, QGraphicsItem* parent = nullptr);
     QRectF boundingRect() const override;
 
 protected:

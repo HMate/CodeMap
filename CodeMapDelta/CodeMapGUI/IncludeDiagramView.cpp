@@ -32,10 +32,11 @@ QPointF ArrowDGI::endPoint() const
     return QPointF(m_endItem->x() + (rect.width() / 2.0), m_endItem->y());
 }
 
-BoxDGI::BoxDGI(const std::string& name, QGraphicsItem* parent) :
-    BoxDGI(QString(name.c_str()), parent) {}
+BoxDGI::BoxDGI(const std::string& displayName, const std::string& fullName, QGraphicsItem* parent) 
+    : BoxDGI(QString(displayName.c_str()), QString(fullName.c_str()), parent) {}
 
-BoxDGI::BoxDGI(const QString& name, QGraphicsItem* parent) : QGraphicsItem(parent), m_name(name)
+BoxDGI::BoxDGI(const QString& displayName, const QString& fullName, QGraphicsItem* parent) 
+    : QGraphicsItem(parent), m_displayName(displayName), m_fullName(fullName)
 {
     setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | 
         QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsScenePositionChanges);
@@ -53,21 +54,21 @@ void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
         painter->setBrush(QBrush(QColor(200, 250, 250)));
 
     const int margin = 10;
-    const int w = fmetric.width(m_name);
+    const int w = fmetric.width(m_displayName);
     const int h = fmetric.height();
 
     auto rectSize = boundingRect();
     painter->drawRect(rectSize);
 
     auto textMargin = (rectSize.width() - w) / 2.0;
-    painter->drawText(textMargin, margin + h, m_name);
+    painter->drawText(textMargin, margin + h, m_displayName);
 }
 
 QRectF BoxDGI::boundingRect() const
 {
     QFontMetrics fmetric(m_font);
     const int margin = 10;
-    const int w = fmetric.width(m_name);
+    const int w = fmetric.width(m_displayName);
     const int h = fmetric.height();
     return QRectF(0, 0, 2 * margin + w, 2 * margin + h);
 }

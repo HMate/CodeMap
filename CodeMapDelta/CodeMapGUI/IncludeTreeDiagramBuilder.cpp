@@ -11,7 +11,6 @@ class IncludeDiagramBuilder
 {
     QPointF m_pos = QPointF(0, 0);
     IncludeDiagramTree m_levels;
-    BoxDGI* m_currentBox = nullptr;
 
 public:
 
@@ -21,34 +20,34 @@ public:
     {
         m_pos = QPointF(0, 0);
         m_levels = IncludeDiagramTree();
-        m_currentBox = nullptr;
 
-        auto current = addRootBox(scene, tree);
+        auto& [current, currentBox] = addRootBox(scene, tree);
         
         // TODO: Add class that coordinates the coloring of nodes and knows about which boxes are for the same include
         // TODO: Have to add arrows too from parent to child, and align those too
-        recursiveBuildIncludeTreeLevel(scene, current, 1);
+        recursiveBuildIncludeTreeLevel(scene, current, currentBox, 1);
 
         alignBoxesToCenter();
     }
 
 private:
-    cm::IncludeNode& addRootBox(QGraphicsScene& scene, cm::IncludeTree& tree)
+    std::tuple<cm::IncludeNode&, BoxDGI*> addRootBox(QGraphicsScene& scene, cm::IncludeTree& tree)
     {
-        auto current = tree.root();
+        auto& current = tree.root();
         auto levelBoxes = IncludeDiagramTreeLevel();
 
-        auto m_currentBox = new BoxDGI(current.name());
-        m_currentBox->setPos(m_pos);
-        scene.addItem(m_currentBox);
-        levelBoxes.emplace_back(m_currentBox);
-        auto rect = m_currentBox->boundingRect();
+        auto box = new BoxDGI(current.name(), current.path());
+        box->setPos(m_pos);
+        scene.addItem(box);
+        levelBoxes.emplace_back(box);
+        auto rect = box->boundingRect();
         m_pos = m_pos + QPointF(0, rect.height() + margin.height());
 
         m_levels.emplace_back(levelBoxes);
+        return std::forward_as_tuple(current, box);
     }
 
-    void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNode& current, int currentLevel)
+    void recursiveBuildIncludeTreeLevel(QGraphicsScene& scene, const cm::IncludeNode& current, BoxDGI* currentBox, int currentLevel)
     {
         auto pos2 = m_pos;
         IncludeDiagramTreeLevel levelBoxes;
@@ -57,12 +56,12 @@ private:
         auto& includes = current.includes();
         for(auto& inc : includes)
         {
-            auto box = new BoxDGI(inc.name());
+            auto box = new BoxDGI(inc.name(), inc.path());
             box->setPos(pos2);
             scene.addItem(box);
             levelBoxes.emplace_back(box);
 
-            scene.addItem(new ArrowDGI(m_currentBox, box));
+            scene.addItem(new ArrowDGI(currentBox, box));
 
             pos2 = pos2 + QPointF(box->boundingRect().width() + margin.width(), 0);
             h = box->boundingRect().height();
@@ -88,7 +87,7 @@ private:
         {
             auto& inc = includes[i];
             auto box = levelBoxes[i];
-            recursiveBuildIncludeTreeLevel(scene, inc, currentLevel + 1);
+            recursiveBuildIncludeTreeLevel(scene, inc, box, currentLevel + 1);
         }
 
         // set back this levels y coordinate and x coordinate for next boxes on this level.

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.12)
+cmake_minimum_required(VERSION 3.9.6)
 
 project(CodeMapGUI)
 
@@ -29,6 +29,10 @@ add_executable(${PROJECT_NAME}
     AppState.cpp
     ImageHandler.cpp
     StringListEditorDialog.cpp)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+            CXX_STANDARD 17
+            )
 
 target_include_directories(${PROJECT_NAME} 
     PRIVATE CodeParser)
