@@ -29,10 +29,12 @@ class BoxDGI : public QGraphicsItem
     QString m_displayName;
     QString m_fullName;
     QFont m_font;
+    bool m_fullInclude = false;
 
 public:
     explicit BoxDGI(IncludeDiagramView& parentView, const std::string& displayName, const std::string& fullName, QGraphicsItem* parent = nullptr);
     BoxDGI(IncludeDiagramView& parentView, const QString& displayName, const QString& fullName, QGraphicsItem* parent = nullptr);
+    void setFullInclude(bool fullInclude) { m_fullInclude = fullInclude; }
     QRectF boundingRect() const override;
     QString getFullName() { return m_fullName; }
 
@@ -50,6 +52,7 @@ class IncludeDiagramView : public DiagramView
 public:
     explicit IncludeDiagramView(QWidget *parent = nullptr);
 
+    void clearSelectedID();
     void setSelectedID(const QString& id);
     bool isBoxSelectedWithID(QString& id);
 };

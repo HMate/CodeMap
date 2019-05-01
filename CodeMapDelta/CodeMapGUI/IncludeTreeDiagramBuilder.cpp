@@ -76,7 +76,7 @@ private:
         auto levelBoxes = IncludeDiagramBuilderLevel();
 
         auto box = new BoxDGI(diagram, current.name(), current.path());
-        box->setPos(m_pos);
+        box->setFullInclude(current.isFullInclude());
         scene.addItem(box);
 
         BoxBuilder bb{ current, box };
@@ -102,6 +102,7 @@ private:
         for(auto& inc : includes)
         {
             auto box = new BoxDGI(diagram, inc.name(), inc.path());
+            box->setFullInclude(inc.isFullInclude());
             scene.addItem(box);
             BoxBuilder bb{ inc, box };
             levelBoxes.emplace_back(bb);

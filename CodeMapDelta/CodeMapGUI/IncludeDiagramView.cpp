@@ -58,6 +58,10 @@ void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     {
         painter->setBrush(QBrush(QColor(200, 250, 250)));
     }
+    else if(m_fullInclude)
+    {
+        painter->setBrush(QBrush(QColor(160, 160, 250)));
+    }
 
     const int margin = 10;
     const int w = fmetric.width(m_displayName);
@@ -81,6 +85,7 @@ QRectF BoxDGI::boundingRect() const
 
 QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
+    
     if(change == GraphicsItemChange::ItemSelectedHasChanged && isSelected())
     {
         // TODO: Handle case when multiple boxes are selected
@@ -94,6 +99,10 @@ QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVar
     // 2) if selection changed, have to update boxes, because their color could have changed
     if(scene() != nullptr && m_parentView.updatesEnabled())
     {
+        if(scene()->selectedItems().size() == 0)
+        {
+            m_parentView.clearSelectedID();
+        }
         scene()->update(scene()->sceneRect());
     }
     return result;
@@ -102,6 +111,11 @@ QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVar
 IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
 {
 
+}
+
+void IncludeDiagramView::clearSelectedID()
+{
+    m_selectedID = "";
 }
 
 void IncludeDiagramView::setSelectedID(const QString& id)
