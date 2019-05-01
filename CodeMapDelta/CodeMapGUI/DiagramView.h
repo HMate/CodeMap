@@ -6,9 +6,21 @@
 #include <QLabel>
 #include <QToolBar>
 
+#include <QGraphicsView>
+
 class QGridLayout;
-class QGraphicsView;
 class QGraphicsScene;
+
+class DiagramGraphicsView : public QGraphicsView
+{
+    Q_OBJECT
+public:
+    DiagramGraphicsView(QWidget* parent) : QGraphicsView(parent) {}
+
+    void enterEvent(QEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+};
 
 class DiagramView : public QWidget
 {
@@ -20,12 +32,16 @@ class DiagramView : public QWidget
 
     QGraphicsView* m_view = nullptr;
     QGraphicsScene* m_scene = nullptr;
+
+
+    QPointF m_targetScenePos, m_targetViewportPos;
 public:
     explicit DiagramView(QWidget *parent = nullptr);
     void setId(const QString id);
     QGraphicsScene* getScene() { return m_scene; }
     QGraphicsView* getView() { return m_view; }
 
+    bool eventFilter(QObject *object, QEvent *ev);
 protected:
     QToolBar* createToolbar();
 };

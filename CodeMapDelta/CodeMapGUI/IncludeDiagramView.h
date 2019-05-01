@@ -45,6 +45,13 @@ protected:
 };
 
 
+// TODO:
+// -Multiselect, Ctrl+select, move multiple
+// -Open file on double click / right click menu
+// -Gui: 
+//  - show/hide include guarded files
+//  - color legend
+//  - statistics: how many includes total / unique includes / child of selected / tree of selected
 class IncludeDiagramView : public DiagramView
 {
     QString m_selectedID;
