@@ -3,11 +3,62 @@
 #include <QGridLayout>
 #include <QGraphicsScene>
 
+#include <QDebug>
+
 #include <qmath.h>
 #include <QMouseEvent>
 
 #include "MainWindow.h"
 
+DiagramGraphicsView::DiagramGraphicsView(QWidget* parent) : QGraphicsView(parent)
+{
+    m_box = new QGroupBox("Legend", this);
+    QVBoxLayout *boxLayout = new QVBoxLayout();
+    m_box->setLayout(boxLayout);
+
+    m_label = new QLabel("waht a label", this);
+    boxLayout->addWidget(m_label);
+
+    m_check = new QCheckBox("check this", this);
+    boxLayout->addWidget(m_check);
+}
+
+// Override mouse events to set cursor back to an arrow while in DragMode::ScrollHandDrag
+void DiagramGraphicsView::enterEvent(QEvent *event)
+{
+    QGraphicsView::enterEvent(event);
+    viewport()->setCursor(Qt::ArrowCursor);
+}
+
+void DiagramGraphicsView::mousePressEvent(QMouseEvent *event)
+{
+    QGraphicsView::mousePressEvent(event);
+    viewport()->setCursor(Qt::ArrowCursor);
+}
+
+void DiagramGraphicsView::mouseReleaseEvent(QMouseEvent *event)
+{
+    QGraphicsView::mouseReleaseEvent(event);
+    viewport()->setCursor(Qt::ArrowCursor);
+}
+
+void DiagramGraphicsView::drawForeground(QPainter *painter, const QRectF &rect)
+{
+    painter->resetTransform();
+    
+    painter->setBrush(QBrush(QColor(130, 100, 100)));
+
+    QRectF guiFrame = QRectF(0, 0, 100, 220);
+    //painter->drawRect(guiFrame);
+
+    m_box->render(painter, QPoint(10, 20));
+}
+
+void DiagramGraphicsView::scrollContentsBy(int dx, int dy)
+{
+    QGraphicsView::scrollContentsBy(dx, dy);
+    scene()->invalidate();
+}
 
 DiagramView::DiagramView(QWidget *parent) : QWidget(parent)
 {
@@ -72,8 +123,7 @@ bool DiagramView::eventFilter(QObject *object, QEvent *ev)
         if(wheel_event->orientation() == Qt::Vertical) {
             double angle = wheel_event->angleDelta().y();
             double factor = qPow(1.0015, angle);
-            //gentle_zoom(factor);
-
+            
             m_view->scale(factor, factor);
             m_view->centerOn(m_targetScenePos);
             QPointF delta_viewport_pos = m_targetViewportPos - QPointF(m_view->viewport()->width() / 2.0,
@@ -85,22 +135,4 @@ bool DiagramView::eventFilter(QObject *object, QEvent *ev)
         }
     }
     return false;
-}
-
-void DiagramGraphicsView::enterEvent(QEvent *event)
-{
-    QGraphicsView::enterEvent(event);
-    viewport()->setCursor(Qt::ArrowCursor);
-}
-
-void DiagramGraphicsView::mousePressEvent(QMouseEvent *event)
-{
-    QGraphicsView::mousePressEvent(event);
-    viewport()->setCursor(Qt::ArrowCursor);
-}
-
-void DiagramGraphicsView::mouseReleaseEvent(QMouseEvent *event)
-{
-    QGraphicsView::mouseReleaseEvent(event);
-    viewport()->setCursor(Qt::ArrowCursor);
 }
