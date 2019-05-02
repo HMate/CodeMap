@@ -12,15 +12,12 @@
 
 DiagramGraphicsView::DiagramGraphicsView(QWidget* parent) : QGraphicsView(parent)
 {
-    m_box = new QGroupBox("Legend", this);
-    QVBoxLayout *boxLayout = new QVBoxLayout();
-    m_box->setLayout(boxLayout);
+}
 
-    m_label = new QLabel("waht a label", this);
-    boxLayout->addWidget(m_label);
-
-    m_check = new QCheckBox("check this", this);
-    boxLayout->addWidget(m_check);
+void DiagramGraphicsView::registerLegendUiWidget(QWidget* widget)
+{
+    m_legendUi = widget;
+    m_legendUi->setParent(this);
 }
 
 // Override mouse events to set cursor back to an arrow while in DragMode::ScrollHandDrag
@@ -51,7 +48,8 @@ void DiagramGraphicsView::drawForeground(QPainter *painter, const QRectF &rect)
     QRectF guiFrame = QRectF(0, 0, 100, 220);
     //painter->drawRect(guiFrame);
 
-    m_box->render(painter, QPoint(10, 20));
+    if(m_legendUi)
+        m_legendUi->render(painter, QPoint(10, 20));
 }
 
 void DiagramGraphicsView::scrollContentsBy(int dx, int dy)

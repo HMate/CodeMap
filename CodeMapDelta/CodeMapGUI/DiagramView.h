@@ -2,8 +2,6 @@
 #define DIAGRAMVIEW_H
 
 #include <QWidget>
-#include <QGroupBox>
-#include <QCheckBox>
 #include <QString>
 #include <QLabel>
 #include <QToolBar>
@@ -17,11 +15,11 @@ class DiagramGraphicsView : public QGraphicsView
 {
     Q_OBJECT
 
-    QGroupBox* m_box;
-    QLabel* m_label;
-    QCheckBox* m_check;
+    QWidget* m_legendUi;
 public:
     DiagramGraphicsView(QWidget* parent);
+
+    void registerLegendUiWidget(QWidget* widget);
 
     void enterEvent(QEvent *event);
     void mousePressEvent(QMouseEvent *event);
@@ -40,7 +38,7 @@ class DiagramView : public QWidget
     QLabel* m_idLabel = nullptr;
     QString m_id;
 
-    QGraphicsView* m_view = nullptr;
+    DiagramGraphicsView* m_view = nullptr;
     QGraphicsScene* m_scene = nullptr;
 
 
@@ -49,7 +47,7 @@ public:
     explicit DiagramView(QWidget *parent = nullptr);
     void setId(const QString id);
     QGraphicsScene* getScene() { return m_scene; }
-    QGraphicsView* getView() { return m_view; }
+    DiagramGraphicsView* getView() { return m_view; }
 
     bool eventFilter(QObject *object, QEvent *ev);
 protected:

@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QGraphicsItem>
+#include <QGroupBox>
+#include <QCheckBox>
 
 #include "DiagramView.h"
 
@@ -56,8 +58,12 @@ protected:
 //  - statistics: how many includes total / unique includes / child of selected / tree of selected
 class IncludeDiagramView : public DiagramView
 {
-    QString m_selectedID;
     Q_OBJECT
+
+    QString m_selectedID;
+    QGroupBox* m_box;
+    QLabel* m_label;
+    QCheckBox* m_check;
 public:
     explicit IncludeDiagramView(QWidget *parent = nullptr);
 

@@ -1,6 +1,7 @@
 #include "IncludeDiagramView.h"
 
 #include <QPainter>
+#include <QVBoxLayout>
 #include <QGraphicsScene>
 #include <QGraphicsSceneHoverEvent>
 
@@ -120,7 +121,20 @@ void BoxDGI::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 
 IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
 {
+    m_box = new QGroupBox("", this);
+    m_box->setObjectName("LegendUi");
+    QVBoxLayout *boxLayout = new QVBoxLayout();
+    m_box->setLayout(boxLayout);
 
+    m_label = new QLabel("waht a label", this);
+    boxLayout->addWidget(m_label);
+
+    m_check = new QCheckBox("check this", this);
+    boxLayout->addWidget(m_check);
+
+    m_box->setStyleSheet("QGroupBox#LegendUi{ background-color:rgba(150, 100, 100, 230); border: 2px solid rgba(0,0,0,255); }");
+
+    getView()->registerLegendUiWidget(m_box);
 }
 
 void IncludeDiagramView::clearSelectedID()
