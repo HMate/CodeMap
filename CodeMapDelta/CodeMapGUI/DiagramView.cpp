@@ -134,3 +134,19 @@ bool DiagramView::eventFilter(QObject *object, QEvent *ev)
     }
     return false;
 }
+
+void DiagramView::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Control)
+    {
+        m_view->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
+    }
+}
+
+void DiagramView::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Control)
+    {
+        m_view->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+    }
+}

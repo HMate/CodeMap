@@ -89,10 +89,12 @@ QRectF BoxDGI::boundingRect() const
 QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
 {
     
-    if(change == GraphicsItemChange::ItemSelectedHasChanged && isSelected())
+    if(change == GraphicsItemChange::ItemSelectedHasChanged)
     {
-        // TODO: Handle case when multiple boxes are selected
-        m_parentView.setSelectedID(m_fullName);
+        if(isSelected())
+            m_parentView.setSelectedID(m_fullName);
+        else
+            m_parentView.clearSelectedID(m_fullName);
     }
 
     QVariant result = QGraphicsItem::itemChange(change, value);
@@ -100,12 +102,10 @@ QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVar
     // update for 2 purpose:
     // 1) if item position change, have to update arrows
     // 2) if selection changed, have to update boxes, because their color could have changed
-    if(scene() != nullptr && m_parentView.updatesEnabled())
+    if(scene() != nullptr && m_parentView.updatesEnabled() && 
+        (change == GraphicsItemChange::ItemSelectedHasChanged || 
+            change == GraphicsItemChange::ItemPositionHasChanged))
     {
-        if(scene()->selectedItems().size() == 0)
-        {
-            m_parentView.clearSelectedID();
-        }
         scene()->update(scene()->sceneRect());
     }
     return result;
@@ -137,21 +137,17 @@ IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
     getView()->registerLegendUiWidget(m_box);
 }
 
-void IncludeDiagramView::clearSelectedID()
+void IncludeDiagramView::clearSelectedID(const QString& id)
 {
-    m_selectedID = "";
+    m_selectedIDs[id]--;
 }
 
 void IncludeDiagramView::setSelectedID(const QString& id)
 {
-    m_selectedID = id;
+    m_selectedIDs[id]++;
 }
 
-bool IncludeDiagramView::isBoxSelectedWithID(QString& id)
+bool IncludeDiagramView::isBoxSelectedWithID(const QString& id)
 {
-    if(m_selectedID != "")
-    {
-        return m_selectedID == id;
-    }
-    return false;
+    return m_selectedIDs[id] > 0;
 }

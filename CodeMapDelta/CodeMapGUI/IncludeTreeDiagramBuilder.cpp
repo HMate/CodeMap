@@ -151,8 +151,8 @@ private:
             levelSizes.emplace_back(size);
         }
 
-        // TODO: I need somehow to align boxes under theirparent locally not just to level center
-        // This becomes interesting when two neighbour parents have many children, which will overlap
+        // TODO: I need somehow to align boxes under theirparent locally not just to level center.
+        // This becomes interesting when two neighbour parents have many children, which will overlap.
         // The pretty solution is to move the parents further apart, but the questions is by how much?
         // use std::vector<std::vector<std::vector<BoxDGI*>>> for this?
         // basically std::vector<Level<BoxGroup>>

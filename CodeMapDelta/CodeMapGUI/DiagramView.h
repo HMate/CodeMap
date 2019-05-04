@@ -50,6 +50,9 @@ public:
     DiagramGraphicsView* getView() { return m_view; }
 
     bool eventFilter(QObject *object, QEvent *ev);
+
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 protected:
     QToolBar* createToolbar();
 };

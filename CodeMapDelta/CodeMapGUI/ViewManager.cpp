@@ -318,17 +318,18 @@ IncludeDiagramView* SplitDocumentView::openIncludeDiagramView(const QString& id)
 {
     logTerminal("Opening diagram");
 
+    // TODO: Dont use burnt in indicies for tabbedviews -> closeDiagramView has to use the same index.
     size_t usedTab = 0;
     if(tabbedViews.size() < usedTab+1)
         addTabbedDocumentView();
 
-    // TODO: Dont use burnt in indicies for tabbedviews
     return tabbedViews[usedTab]->openIncludeDiagramView(id);
 }
 
 void SplitDocumentView::closeDiagramView(DiagramView* view)
 {
-    tabbedViews[1]->closeDiagramView(view);
+    size_t usedTab = 0;
+    tabbedViews[usedTab]->closeDiagramView(view);
 }
 
 long long SplitDocumentView::getTabbedDocumentViewIndexFromAddress(FileView* const view)

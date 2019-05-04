@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QHash>
 #include <QGraphicsItem>
 #include <QGroupBox>
 #include <QCheckBox>
@@ -60,14 +61,15 @@ class IncludeDiagramView : public DiagramView
 {
     Q_OBJECT
 
-    QString m_selectedID;
+    QHash<QString, int> m_selectedIDs;
+
     QGroupBox* m_box;
     QLabel* m_label;
     QCheckBox* m_check;
 public:
     explicit IncludeDiagramView(QWidget *parent = nullptr);
 
-    void clearSelectedID();
+    void clearSelectedID(const QString& id);
     void setSelectedID(const QString& id);
-    bool isBoxSelectedWithID(QString& id);
+    bool isBoxSelectedWithID(const QString& id);
 };
