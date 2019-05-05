@@ -72,4 +72,7 @@ public:
     void clearSelectedID(const QString& id);
     void setSelectedID(const QString& id);
     bool isBoxSelectedWithID(const QString& id);
+
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 };

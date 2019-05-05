@@ -4,6 +4,8 @@
 #include <QVBoxLayout>
 #include <QGraphicsScene>
 #include <QGraphicsSceneHoverEvent>
+#include <QKeyEvent>
+
 
 ArrowDGI::ArrowDGI(QGraphicsItem* startItem, QGraphicsItem* endItem, QGraphicsItem* parent)
     : m_startItem(startItem), m_endItem(endItem), QGraphicsItem(parent) {}
@@ -126,7 +128,7 @@ IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
     QVBoxLayout *boxLayout = new QVBoxLayout();
     m_box->setLayout(boxLayout);
 
-    m_label = new QLabel("waht a label", this);
+    m_label = new QLabel("Ctrl - group select", this);
     boxLayout->addWidget(m_label);
 
     m_check = new QCheckBox("check this", this);
@@ -150,4 +152,20 @@ void IncludeDiagramView::setSelectedID(const QString& id)
 bool IncludeDiagramView::isBoxSelectedWithID(const QString& id)
 {
     return m_selectedIDs[id] > 0;
+}
+
+void IncludeDiagramView::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Control)
+    {
+        getView()->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
+    }
+}
+
+void IncludeDiagramView::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Control)
+    {
+        getView()->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+    }
 }

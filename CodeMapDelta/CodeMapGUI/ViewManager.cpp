@@ -130,7 +130,7 @@ FileView* TabbedDocumentView::addNewFileView(const QString& name)
 IncludeDiagramView* TabbedDocumentView::openIncludeDiagramView(const QString& id)
 {
     auto view = new IncludeDiagramView(this);
-    view->setId(id);
+    view->setDisplayName(id);
     logTerminal(tr("adding tab with id %1").arg(id));
     tabs->addTab(view, id);
     return view;

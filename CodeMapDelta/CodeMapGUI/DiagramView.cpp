@@ -60,7 +60,7 @@ void DiagramGraphicsView::scrollContentsBy(int dx, int dy)
 
 DiagramView::DiagramView(QWidget *parent) : QWidget(parent)
 {
-    m_idLabel = new QLabel("TEST_Diagram");
+    m_displayNameLabel = new QLabel("TEST_Diagram");
     setSizePolicy(QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Expanding);
     m_layout = new QGridLayout(this);
     m_layout->setMargin(0);
@@ -81,16 +81,16 @@ DiagramView::DiagramView(QWidget *parent) : QWidget(parent)
     m_view->setScene(m_scene);
 }
 
-void DiagramView::setId(const QString id)
+void DiagramView::setDisplayName(const QString id)
 {
-    m_id = id;
-    m_idLabel->setText(m_id);
+    m_displayName = id;
+    m_displayNameLabel->setText(m_displayName);
 }
 
 QToolBar* DiagramView::createToolbar()
 {
     QToolBar* toolbar = new QToolBar("DiagramView", this);
-    toolbar->addWidget(m_idLabel);
+    toolbar->addWidget(m_displayNameLabel);
     QWidget *spacerWidget = new QWidget(this);
     spacerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     toolbar->addWidget(spacerWidget);
@@ -133,20 +133,4 @@ bool DiagramView::eventFilter(QObject *object, QEvent *ev)
         }
     }
     return false;
-}
-
-void DiagramView::keyPressEvent(QKeyEvent *event)
-{
-    if(event->key() == Qt::Key_Control)
-    {
-        m_view->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
-    }
-}
-
-void DiagramView::keyReleaseEvent(QKeyEvent *event)
-{
-    if(event->key() == Qt::Key_Control)
-    {
-        m_view->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
-    }
 }

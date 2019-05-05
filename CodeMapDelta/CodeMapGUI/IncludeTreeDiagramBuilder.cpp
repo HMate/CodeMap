@@ -57,13 +57,11 @@ public:
         m_pos = QPointF(0, 0);
         m_levels = IncludeDiagramTree();
 
-        auto& box = addRootBox(diagram, scene, tree);
-        
         diagram.setUpdatesEnabled(false);
 
+        auto& box = addRootBox(diagram, scene, tree);
         recursiveBuildIncludeTreeLevel(diagram, scene, box, 1);
-
-        alignBoxes();
+        alignBoxes(m_levels);
 
         diagram.setUpdatesEnabled(true);
         diagram.update();
@@ -131,10 +129,10 @@ private:
     }
 
     /// Align the boxes of levels to not overlap, and to be centered relative to the prev level.
-    void alignBoxes()
+    void alignBoxes(IncludeDiagramTree& levels)
     {
         std::vector<QSizeF> levelSizes;
-        for(auto& level : m_levels)
+        for(auto& level : levels)
         {
             QSizeF size(0, 0);
             for(auto& box : level)
@@ -156,12 +154,12 @@ private:
         // The pretty solution is to move the parents further apart, but the questions is by how much?
         // use std::vector<std::vector<std::vector<BoxDGI*>>> for this?
         // basically std::vector<Level<BoxGroup>>
-        Q_ASSERT(levelSizes.size() == m_levels.size());
+        Q_ASSERT(levelSizes.size() == levels.size());
 
         qreal y = 0;
-        for(size_t i = 0; i < m_levels.size(); i++)
+        for(size_t i = 0; i < levels.size(); i++)
         {
-            auto& level = m_levels[i];
+            auto& level = levels[i];
             Q_ASSERT(level.size() > 0);
 
             auto size = levelSizes[i];

@@ -35,24 +35,22 @@ class DiagramView : public QWidget
     Q_OBJECT
 
     QGridLayout* m_layout = nullptr;
-    QLabel* m_idLabel = nullptr;
-    QString m_id;
+    QLabel* m_displayNameLabel = nullptr;
+    QString m_displayName;
+
+    QPointF m_targetScenePos, m_targetViewportPos;
 
     DiagramGraphicsView* m_view = nullptr;
     QGraphicsScene* m_scene = nullptr;
 
 
-    QPointF m_targetScenePos, m_targetViewportPos;
 public:
     explicit DiagramView(QWidget *parent = nullptr);
-    void setId(const QString id);
+    void setDisplayName(const QString id);
     QGraphicsScene* getScene() { return m_scene; }
     DiagramGraphicsView* getView() { return m_view; }
 
     bool eventFilter(QObject *object, QEvent *ev);
-
-    void keyPressEvent(QKeyEvent *event);
-    void keyReleaseEvent(QKeyEvent *event);
 protected:
     QToolBar* createToolbar();
 };
