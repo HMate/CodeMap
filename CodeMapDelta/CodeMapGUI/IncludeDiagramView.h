@@ -50,8 +50,8 @@ protected:
 
 
 // TODO:
-// -Multiselect, Ctrl+select, move multiple
-// -Open file on double click / right click menu
+// -Save, open diagram
+// -Open code file on double click / right click menu
 // -Gui: 
 //  - show/hide include guarded files
 //  - Filter boxes by path

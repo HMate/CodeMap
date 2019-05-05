@@ -1,5 +1,8 @@
 #include "IncludeDiagramView.h"
 
+#include <QTime>
+#include <QDebug>
+
 #include <QPainter>
 #include <QVBoxLayout>
 #include <QGraphicsScene>
@@ -13,7 +16,6 @@ ArrowDGI::ArrowDGI(QGraphicsItem* startItem, QGraphicsItem* endItem, QGraphicsIt
 void ArrowDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->setBrush(Qt::black);
-
     painter->drawLine(startPoint(), endPoint());
 }
 
@@ -50,9 +52,10 @@ BoxDGI::BoxDGI(IncludeDiagramView& parentView, const QString& displayName, const
 
 void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    // TODO: The actually rendered font is not Helvetica. Find out what happens.
-    painter->setFont(m_font);
-    auto fmetric = painter->fontMetrics();
+
+    //QTime time;
+    //time.start();
+    
 
     painter->setBrush(QBrush(QColor(200, 200, 250)));
     if(isSelected())
@@ -68,15 +71,21 @@ void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
         painter->setBrush(QBrush(QColor(160, 160, 250)));
     }
 
-    const int margin = 10;
-    const int w = fmetric.width(m_displayName);
-    const int h = fmetric.height();
-
     auto rectSize = boundingRect();
     painter->drawRect(rectSize);
 
+    // TODO: The actually rendered font is not Helvetica. Find out what happens.
+    painter->setFont(m_font);
+
+    auto fmetric = painter->fontMetrics();
+    const int w = fmetric.width(m_displayName);
+    const int h = fmetric.height();
     auto textMargin = (rectSize.width() - w) / 2.0;
+    const int margin = 10;
     painter->drawText(textMargin, margin + h, m_displayName);
+
+    //qDebug() << "  box took " << time.elapsed();
+
 }
 
 QRectF BoxDGI::boundingRect() const
@@ -108,7 +117,7 @@ QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVar
         (change == GraphicsItemChange::ItemSelectedHasChanged || 
             change == GraphicsItemChange::ItemPositionHasChanged))
     {
-        scene()->update(scene()->sceneRect());
+        scene()->update();
     }
     return result;
 }

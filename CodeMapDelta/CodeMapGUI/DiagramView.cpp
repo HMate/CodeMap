@@ -4,6 +4,8 @@
 #include <QGraphicsScene>
 
 #include <QDebug>
+#include <QDateTime>
+#include <QTime>
 
 #include <qmath.h>
 #include <QMouseEvent>
@@ -18,6 +20,15 @@ void DiagramGraphicsView::registerLegendUiWidget(QWidget* widget)
 {
     m_legendUi = widget;
     m_legendUi->setParent(this);
+}
+
+void DiagramGraphicsView::paintEvent(QPaintEvent *event)
+{
+    QTime time;
+    time.start();
+    qDebug() << "painting graphics view at " << QTime::currentTime();
+    QGraphicsView::paintEvent(event);
+    qDebug() << "  painting took " << time.elapsed();
 }
 
 // Override mouse events to set cursor back to an arrow while in DragMode::ScrollHandDrag
@@ -43,11 +54,6 @@ void DiagramGraphicsView::drawForeground(QPainter *painter, const QRectF &rect)
 {
     painter->resetTransform();
     
-    painter->setBrush(QBrush(QColor(130, 100, 100)));
-
-    QRectF guiFrame = QRectF(0, 0, 100, 220);
-    //painter->drawRect(guiFrame);
-
     if(m_legendUi)
         m_legendUi->render(painter, QPoint(10, 20));
 }
@@ -72,7 +78,7 @@ DiagramView::DiagramView(QWidget *parent) : QWidget(parent)
     m_view = new DiagramGraphicsView(this);
     m_layout->addWidget(m_view, 1, 0, 1, -1);
 
-    m_view->setRenderHint(QPainter::Antialiasing);
+    //m_view->setRenderHint(QPainter::Antialiasing);
     m_view->viewport()->installEventFilter(this);
     m_view->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 

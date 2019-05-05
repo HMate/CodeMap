@@ -19,8 +19,11 @@ struct BoxBuilder
 
 class IncludeDiagramBuilderLevel
 {
+    std::vector<IncludeDiagramBuilderLevel> m_groups;
     std::vector<BoxBuilder> m_items;
+    BoxBuilder m_parent;
 public:
+    IncludeDiagramBuilderLevel(const BoxBuilder& parent) : m_parent(parent) {}
 
     void emplace_back(BoxBuilder box)
     {
@@ -33,9 +36,21 @@ public:
     BoxBuilder back() { return m_items.front(); }
     std::vector<BoxBuilder>::iterator begin() noexcept { return m_items.begin(); }
     std::vector<BoxBuilder>::iterator end() noexcept { return m_items.end(); }
-    void insert(IncludeDiagramBuilderLevel& other) noexcept
+
+    const std::vector<IncludeDiagramBuilderLevel>& groups()
     {
+        return m_groups;
+    }
+
+    void insertGroup(IncludeDiagramBuilderLevel& other) noexcept
+    {
+        m_groups.push_back(other);
         m_items.insert(this->end(), other.begin(), other.end());
+    }
+
+    const BoxBuilder& parent()
+    {
+        return m_parent;
     }
 };
 
@@ -61,7 +76,8 @@ public:
 
         auto& box = addRootBox(diagram, scene, tree);
         recursiveBuildIncludeTreeLevel(diagram, scene, box, 1);
-        alignBoxes(m_levels);
+        //alignBoxesToCenter(m_levels);
+        alignBoxesToGroups(m_levels);
 
         diagram.setUpdatesEnabled(true);
         diagram.update();
@@ -71,13 +87,13 @@ private:
     BoxBuilder addRootBox(IncludeDiagramView& diagram, QGraphicsScene& scene, cm::IncludeTree& tree)
     {
         auto& current = tree.root();
-        auto levelBoxes = IncludeDiagramBuilderLevel();
 
         auto box = new BoxDGI(diagram, current.name(), current.path());
         box->setFullInclude(current.isFullInclude());
         scene.addItem(box);
 
         BoxBuilder bb{ current, box };
+        auto levelBoxes = IncludeDiagramBuilderLevel(bb);
         levelBoxes.emplace_back(bb);
         auto rect = box->boundingRect();
         m_pos = m_pos + QPointF(0, rect.height() + margin.height());
@@ -85,16 +101,10 @@ private:
         m_levels.emplace_back(levelBoxes);
         return bb;
     }
-
-    void buildTreeLevel(IncludeDiagramView& diagram, QGraphicsScene& scene, const cm::IncludeNode& current, BoxDGI* currentBox, int currentLevel)
-    {
-        auto pos2 = m_pos;
-        IncludeDiagramBuilderLevel levelBoxes;
-    }
-
+    
     void recursiveBuildIncludeTreeLevel(IncludeDiagramView& diagram, QGraphicsScene& scene, const BoxBuilder& current, int currentLevel)
     {
-        IncludeDiagramBuilderLevel levelBoxes;
+        IncludeDiagramBuilderLevel levelBoxes(current);
 
         auto& includes = current.m_node.includes();
         for(auto& inc : includes)
@@ -117,7 +127,7 @@ private:
         else
         {
             auto& level = m_levels[currentLevel];
-            level.insert(levelBoxes);
+            level.insertGroup(levelBoxes);
         }
 
         Q_ASSERT(includes.size() == levelBoxes.size());
@@ -129,11 +139,91 @@ private:
     }
 
     /// Align the boxes of levels to not overlap, and to be centered relative to the prev level.
-    void alignBoxes(IncludeDiagramTree& levels)
+    void alignBoxesToCenter(IncludeDiagramTree& levels)
+    {
+        std::vector<QSizeF> levelSizes = calculateLevelSizes(levels);
+
+        qreal y = 0;
+        for(size_t i = 0; i < levels.size(); i++)
+        {
+            auto& level = levels[i];
+            auto size = levelSizes[i];
+
+            qreal levelCenter = size.width() / 2.0;
+            qreal x = -levelCenter;
+            for(auto& box : level)
+            {
+                box.m_box->setPos(x, y);
+                x += box.m_box->boundingRect().width() + margin.width();
+            }
+            y += size.height() + margin.height();
+        }
+    }
+
+    /// Align the boxes of levels to not overlap.
+    /// Do this by making groups out of boxes who have the same parent. These groups are centered to their parent.
+    /// But the space between group elements is based on how many child they have.
+    void alignBoxesToGroups(IncludeDiagramTree& levels)
+    {
+        std::vector<QSizeF> levelSizes = calculateLevelSizes(levels);
+
+        // TODO: I need somehow to align boxes under theirparent locally not just to level center.
+        // This becomes interesting when two neighbour parents have many children, which will overlap.
+        // The pretty solution is to move the parents further apart, but the questions is by how much?
+        // use std::vector<std::vector<std::vector<BoxDGI*>>> for this?
+        // basically std::vector<Level<BoxGroup>>
+
+        qreal y = 0;
+        for(size_t i = 0; i < levels.size(); i++)
+        {
+            auto& level = levels[i];
+            auto size = levelSizes[i];
+
+            for(auto& box : level)
+            {
+                box.m_box->setY(y);
+            }
+            y += size.height() + margin.height();
+        }
+
+        auto& widestLevel = std::max_element(levelSizes.begin(), levelSizes.end(), [](const QSizeF& s1, const QSizeF& s2)
+        {
+            return s2.width() > s1.width();
+        });
+
+        size_t widestIndex = std::distance(levelSizes.begin(), widestLevel);
+
+        auto& level = levels[widestIndex];
+        auto size = levelSizes[widestIndex];
+        qreal levelCenter = size.width() / 2.0;
+        qreal x = -levelCenter;
+        for(auto& box : level)
+        {
+            box.m_box->setX(x);
+            x += box.m_box->boundingRect().width() + margin.width();
+        }
+
+        for(size_t i = 0; i < levels.size(); i++)
+        {
+            auto& level = levels[i];
+            auto size = levelSizes[i];
+
+            qreal levelCenter = size.width() / 2.0;
+            qreal x = -levelCenter;
+            for(auto& box : level)
+            {
+                box.m_box->setX(x);
+                x += box.m_box->boundingRect().width() + margin.width();
+            }
+        }
+    }
+
+    std::vector<QSizeF> calculateLevelSizes(IncludeDiagramTree levels)
     {
         std::vector<QSizeF> levelSizes;
         for(auto& level : levels)
         {
+            Q_ASSERT(level.size() > 0);
             QSizeF size(0, 0);
             for(auto& box : level)
             {
@@ -148,31 +238,8 @@ private:
             size.setWidth(size.width() + level.size()*margin.width());
             levelSizes.emplace_back(size);
         }
-
-        // TODO: I need somehow to align boxes under theirparent locally not just to level center.
-        // This becomes interesting when two neighbour parents have many children, which will overlap.
-        // The pretty solution is to move the parents further apart, but the questions is by how much?
-        // use std::vector<std::vector<std::vector<BoxDGI*>>> for this?
-        // basically std::vector<Level<BoxGroup>>
         Q_ASSERT(levelSizes.size() == levels.size());
-
-        qreal y = 0;
-        for(size_t i = 0; i < levels.size(); i++)
-        {
-            auto& level = levels[i];
-            Q_ASSERT(level.size() > 0);
-
-            auto size = levelSizes[i];
-
-            qreal levelCenter = size.width() / 2.0;
-            qreal x = -levelCenter;
-            for(auto& box : level)
-            {
-                box.m_box->setPos(x, y);
-                x += box.m_box->boundingRect().width() + margin.width();
-            }
-            y += size.height() + margin.height();
-        }
+        return levelSizes;
     }
 };
 

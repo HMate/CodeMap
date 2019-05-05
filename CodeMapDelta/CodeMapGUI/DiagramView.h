@@ -28,6 +28,8 @@ public:
     // draw gui
     void drawForeground(QPainter *painter, const QRectF &rect);
     void scrollContentsBy(int dx, int dy);
+
+    void paintEvent(QPaintEvent *event);
 };
 
 class DiagramView : public QWidget
