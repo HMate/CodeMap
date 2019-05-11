@@ -15,6 +15,11 @@ struct BoxBuilder
         m_box = other.m_box;
         return *this;
     }
+
+    bool operator==(const BoxBuilder& o)
+    {
+        return m_box == o.m_box;
+    }
 };
 
 class IncludeDiagramBuilderLevel
@@ -36,6 +41,7 @@ public:
     BoxBuilder back() { return m_items.front(); }
     std::vector<BoxBuilder>::iterator begin() noexcept { return m_items.begin(); }
     std::vector<BoxBuilder>::iterator end() noexcept { return m_items.end(); }
+    std::reverse_iterator<std::vector<BoxBuilder>::iterator> rend() noexcept { return m_items.rend(); }
 
     const std::vector<IncludeDiagramBuilderLevel>& groups()
     {
@@ -112,6 +118,7 @@ private:
             auto box = new BoxDGI(diagram, inc.name(), inc.path());
             box->setFullInclude(inc.isFullInclude());
             scene.addItem(box);
+            current.m_box->addChild(box);
             BoxBuilder bb{ inc, box };
             levelBoxes.emplace_back(bb);
 
@@ -165,56 +172,160 @@ private:
     /// But the space between group elements is based on how many child they have.
     void alignBoxesToGroups(IncludeDiagramTree& levels)
     {
-        std::vector<QSizeF> levelSizes = calculateLevelSizes(levels);
-
-        // TODO: I need somehow to align boxes under theirparent locally not just to level center.
-        // This becomes interesting when two neighbour parents have many children, which will overlap.
-        // The pretty solution is to move the parents further apart, but the questions is by how much?
-        // use std::vector<std::vector<std::vector<BoxDGI*>>> for this?
-        // basically std::vector<Level<BoxGroup>>
-
         qreal y = 0;
         for(size_t i = 0; i < levels.size(); i++)
         {
             auto& level = levels[i];
-            auto size = levelSizes[i];
-
+            
+            qreal levelHeight = 0;
             for(auto& box : level)
             {
                 box.m_box->setY(y);
+                levelHeight = std::max(box.m_box->boundingRect().height(), levelHeight);
             }
-            y += size.height() + margin.height();
+            y += levelHeight + margin.height();
         }
-
-        auto& widestLevel = std::max_element(levelSizes.begin(), levelSizes.end(), [](const QSizeF& s1, const QSizeF& s2)
-        {
-            return s2.width() > s1.width();
-        });
-
-        size_t widestIndex = std::distance(levelSizes.begin(), widestLevel);
-
-        auto& level = levels[widestIndex];
-        auto size = levelSizes[widestIndex];
-        qreal levelCenter = size.width() / 2.0;
-        qreal x = -levelCenter;
-        for(auto& box : level)
-        {
-            box.m_box->setX(x);
-            x += box.m_box->boundingRect().width() + margin.width();
-        }
-
-        for(size_t i = 0; i < levels.size(); i++)
+        
+        // Place boxes bottom-up, to deal with overlaping boxes
+        for(int i = levels.size()-1; i >= 0; i--)
         {
             auto& level = levels[i];
-            auto size = levelSizes[i];
 
-            qreal levelCenter = size.width() / 2.0;
-            qreal x = -levelCenter;
-            for(auto& box : level)
+            // First place boxes with children, then fill up space with remaining boxes.
+            // Left neihgbours of first parent needs calculation for placement
+
+            std::vector<BoxBuilder> parents;
+            std::copy_if(level.begin(), level.end(), std::back_inserter(parents), [](const BoxBuilder& box) 
             {
-                box.m_box->setX(x);
-                x += box.m_box->boundingRect().width() + margin.width();
+                return box.m_node.includes().size() > 0;
+            });
+
+            if(parents.size() == 0)
+            {
+                // this is the bottom row
+                qreal x = 0;
+                for(auto& box : level)
+                {
+                    box.m_box->setX(x);
+                    x += box.m_box->boundingRect().width() + margin.width();
+                }
             }
+            else 
+            {
+                for(auto& box : parents)
+                {
+                    Q_ASSERT(box.m_box->getChildren().size() > 0);
+
+                    auto& children = box.m_box->getChildren();
+                    const qreal xStart = children.front()->pos().x();
+                    const qreal xEnd = children.back()->pos().x() + children.back()->boundingRect().width();
+                    const qreal width = box.m_box->boundingRect().width();
+                    box.m_box->setX((xStart + xEnd - width) / 2.0);
+                }
+
+                auto& firstParentIt = std::find(level.begin(), level.end(), parents.front());
+                qreal leftX = firstParentIt->m_box->pos().x();
+                auto& beforeFirst = std::reverse_iterator(firstParentIt);
+                for(; beforeFirst != level.rend(); beforeFirst++)
+                {
+                    auto& neighbour = beforeFirst->m_box;
+                    auto moveBy = neighbour->boundingRect().width() + margin.width();
+                    leftX = leftX - moveBy;
+                    neighbour->setX(leftX);
+                }
+
+                auto secondParentIt = firstParentIt;
+
+                while(firstParentIt != level.end())
+                {
+                    while(secondParentIt != level.end())
+                    {
+                        secondParentIt++;
+                        if(secondParentIt != level.end() &&
+                            secondParentIt->m_box->getChildren().size() > 0)
+                            break;
+                    }
+
+                    if(secondParentIt != level.end())
+                    {
+                        auto holeCount = std::distance(firstParentIt, secondParentIt);
+                        const qreal minMarginWidth = margin.width() * holeCount;
+                        qreal boxWidth = 0;
+                        for(auto boxIt = std::next(firstParentIt); boxIt != secondParentIt; boxIt++)
+                        {
+                            boxWidth += boxIt->m_box->boundingRect().width();
+                        }
+
+                        qreal xStart = firstParentIt->m_box->pos().x() + firstParentIt->m_box->boundingRect().width();
+                        if(secondParentIt->m_box->pos().x() < (xStart + boxWidth + minMarginWidth))
+                        {
+                            auto moveBy = (xStart + boxWidth + minMarginWidth) - secondParentIt->m_box->pos().x();
+                            
+                            size_t boxIndex = std::distance(level.begin(), secondParentIt);
+                            moveBoxesToRightRecursively(levels, i, boxIndex, moveBy);
+                        }
+
+                        const qreal actualSpace = secondParentIt->m_box->pos().x() - xStart;
+                        const qreal totalMarginWidth = actualSpace - boxWidth;
+                        const qreal marginW = totalMarginWidth / holeCount;
+                        qreal x = xStart + marginW;
+                        for(auto boxIt = std::next(firstParentIt); boxIt != secondParentIt; boxIt++)
+                        {
+                            BoxDGI* box = boxIt->m_box;
+                            box->setX(x);
+                            x += box->boundingRect().width() + marginW;
+                        }
+                    }
+                    else
+                    {
+                        // just place boxes to the right of firstParent
+                        qreal x = firstParentIt->m_box->pos().x() + firstParentIt->m_box->boundingRect().width() + margin.width();
+                        firstParentIt++;
+                        for(; firstParentIt != level.end(); firstParentIt++)
+                        {
+                            auto& box = firstParentIt->m_box;
+                            box->setX(x);
+                            x += box->boundingRect().width() + margin.width();
+                        }
+                    }
+                    firstParentIt = secondParentIt;
+                }
+            }
+        }
+    }
+
+    void moveBoxesToRightRecursively(IncludeDiagramTree& levels, size_t levelIndex, size_t from, qreal moveBy)
+    {
+        auto& level = levels[levelIndex];
+        auto nextLevelIndex = levelIndex + 1;
+        bool hasMoreLevels = levels.size() > nextLevelIndex;
+        int firstChildIndex = -1;
+        for(auto i = from; i < level.size(); i++)
+        {
+            BoxDGI* b = level[i].m_box;
+            b->setX(b->x() + moveBy);
+
+            // TODO: finish getting child level index and calling to recursively
+            if(hasMoreLevels && firstChildIndex < 0 && b->getChildren().size() > 0)
+            {
+                auto& firstChild = b->getChildren().begin();
+                
+                auto& nextLevel = levels[nextLevelIndex];
+                for(size_t index = 0; index < nextLevel.size(); index++)
+                {
+                    auto& bb = nextLevel[index];
+                    if(bb.m_box == *firstChild)
+                    {
+                        firstChildIndex = index;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if(firstChildIndex >= 0)
+        {
+            moveBoxesToRightRecursively(levels, nextLevelIndex, firstChildIndex, moveBy);
         }
     }
 

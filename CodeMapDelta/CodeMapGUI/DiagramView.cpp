@@ -78,7 +78,7 @@ DiagramView::DiagramView(QWidget *parent) : QWidget(parent)
     m_view = new DiagramGraphicsView(this);
     m_layout->addWidget(m_view, 1, 0, 1, -1);
 
-    //m_view->setRenderHint(QPainter::Antialiasing);
+    m_view->setRenderHint(QPainter::Antialiasing);
     m_view->viewport()->installEventFilter(this);
     m_view->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 

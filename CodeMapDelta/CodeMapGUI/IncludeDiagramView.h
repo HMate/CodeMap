@@ -29,6 +29,7 @@ protected:
 class BoxDGI : public QGraphicsItem
 {
     IncludeDiagramView& m_parentView;
+    std::vector<BoxDGI*> m_children;
     QString m_displayName;
     QString m_fullName;
     QFont m_font;
@@ -39,6 +40,9 @@ public:
     BoxDGI(IncludeDiagramView& parentView, const QString& displayName, const QString& fullName, QGraphicsItem* parent = nullptr);
     void setFullInclude(bool fullInclude) { m_fullInclude = fullInclude; }
     QRectF boundingRect() const override;
+
+    void addChild(BoxDGI* child) { m_children.emplace_back(child); }
+    const std::vector<BoxDGI*>& getChildren() { return m_children; }
     QString getFullName() { return m_fullName; }
 
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event);
