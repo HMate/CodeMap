@@ -68,8 +68,11 @@ class IncludeDiagramView : public DiagramView
     QHash<QString, int> m_selectedIDs;
 
     QGroupBox* m_box;
-    QLabel* m_label;
+    QCheckBox* m_label;
     QCheckBox* m_check;
+
+    // can select mltiple boxes without holding ctrl
+    bool m_boxSelectionMode = false;
 public:
     explicit IncludeDiagramView(QWidget *parent = nullptr);
 
@@ -77,6 +80,11 @@ public:
     void setSelectedID(const QString& id);
     bool isBoxSelectedWithID(const QString& id);
 
+    bool getBoxSelectionMode() const;
+
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
+
+public slots:
+    void setBoxSelectionMode(bool toggleOn);
 };

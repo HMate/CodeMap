@@ -141,7 +141,8 @@ IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
     QVBoxLayout *boxLayout = new QVBoxLayout();
     m_box->setLayout(boxLayout);
 
-    m_label = new QLabel("Ctrl - group select", this);
+    m_label = new QCheckBox("Ctrl - group select", this);
+    connect(m_label, &QCheckBox::toggled, this, &IncludeDiagramView::setBoxSelectionMode);
     boxLayout->addWidget(m_label);
 
     m_check = new QCheckBox("check this", this);
@@ -169,7 +170,7 @@ bool IncludeDiagramView::isBoxSelectedWithID(const QString& id)
 
 void IncludeDiagramView::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Control)
+    if(event->key() == Qt::Key_Control && !getBoxSelectionMode())
     {
         getView()->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
     }
@@ -177,8 +178,28 @@ void IncludeDiagramView::keyPressEvent(QKeyEvent *event)
 
 void IncludeDiagramView::keyReleaseEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Control)
+    if(event->key() == Qt::Key_Control && !getBoxSelectionMode())
     {
         getView()->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
     }
 }
+
+bool IncludeDiagramView::getBoxSelectionMode() const
+{
+    return m_boxSelectionMode;
+}
+
+void IncludeDiagramView::setBoxSelectionMode(bool toggleOn)
+{
+    m_boxSelectionMode = toggleOn;
+    if(toggleOn)
+    {
+        getView()->setDragMode(QGraphicsView::DragMode::RubberBandDrag);
+    }
+    else
+    {
+        getView()->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+    }
+}
+
+
