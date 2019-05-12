@@ -192,17 +192,16 @@ private:
             auto& level = levels[i];
 
             // First place boxes with children, then fill up space with remaining boxes.
-            // Left neihgbours of first parent needs calculation for placement
 
             std::vector<BoxBuilder> parents;
             std::copy_if(level.begin(), level.end(), std::back_inserter(parents), [](const BoxBuilder& box) 
             {
-                return box.m_node.includes().size() > 0;
+                return box.m_box->getChildren().size() > 0;
             });
 
             if(parents.size() == 0)
             {
-                // this is the bottom row
+                // this is the bottom row, nobody has children, just place them next to each other
                 qreal x = 0;
                 for(auto& box : level)
                 {
@@ -212,6 +211,7 @@ private:
             }
             else 
             {
+                // Place parents to average of childs position
                 for(auto& box : parents)
                 {
                     Q_ASSERT(box.m_box->getChildren().size() > 0);
@@ -223,6 +223,7 @@ private:
                     box.m_box->setX((xStart + xEnd - width) / 2.0);
                 }
 
+                // Left neighbours of first parent: just place them next to each other from right to left
                 auto& firstParentIt = std::find(level.begin(), level.end(), parents.front());
                 qreal leftX = firstParentIt->m_box->pos().x();
                 auto& beforeFirst = std::reverse_iterator(firstParentIt);
@@ -234,6 +235,9 @@ private:
                     neighbour->setX(leftX);
                 }
 
+                // Now place every box without children.
+                // We want to place these boxes evenly between box with children.
+                // So in 1 cycle of this loop, we place the boxes between 2 parents
                 auto secondParentIt = firstParentIt;
 
                 while(firstParentIt != level.end())
@@ -278,7 +282,7 @@ private:
                     }
                     else
                     {
-                        // just place boxes to the right of firstParent
+                        // First parent box is the last parent in this row, so just place boxes to the right of firstParent
                         qreal x = firstParentIt->m_box->pos().x() + firstParentIt->m_box->boundingRect().width() + margin.width();
                         firstParentIt++;
                         for(; firstParentIt != level.end(); firstParentIt++)
@@ -305,7 +309,6 @@ private:
             BoxDGI* b = level[i].m_box;
             b->setX(b->x() + moveBy);
 
-            // TODO: finish getting child level index and calling to recursively
             if(hasMoreLevels && firstChildIndex < 0 && b->getChildren().size() > 0)
             {
                 auto& firstChild = b->getChildren().begin();

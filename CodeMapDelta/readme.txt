@@ -1,6 +1,6 @@
 Current developer environment:
 OS: Win7
-IDE: Qt Creator 4.7.0
+IDE: Visual Studio 2017
 Build tool: Cmake 3.9.6
 Dependecy manager: vcpkg
 

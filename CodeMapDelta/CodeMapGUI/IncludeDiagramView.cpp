@@ -16,6 +16,7 @@ ArrowDGI::ArrowDGI(QGraphicsItem* startItem, QGraphicsItem* endItem, QGraphicsIt
 void ArrowDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->setBrush(Qt::black);
+    // TODO: make line visible even if startPoint is offscreen.
     painter->drawLine(startPoint(), endPoint());
 }
 
