@@ -8,7 +8,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsSceneHoverEvent>
 #include <QKeyEvent>
-
+#include <QStyleOptionGraphicsItem>
 
 ArrowDGI::ArrowDGI(QGraphicsItem* startItem, QGraphicsItem* endItem, QGraphicsItem* parent)
     : m_startItem(startItem), m_endItem(endItem), QGraphicsItem(parent) {}
@@ -16,13 +16,20 @@ ArrowDGI::ArrowDGI(QGraphicsItem* startItem, QGraphicsItem* endItem, QGraphicsIt
 void ArrowDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->setBrush(Qt::black);
-    // TODO: make line visible even if startPoint is offscreen.
     painter->drawLine(startPoint(), endPoint());
 }
 
 QRectF ArrowDGI::boundingRect() const
 {
-    return QRectF(startPoint(), endPoint());
+    // Adjust rect so width is positive, and x() is left side, y() is top side
+    // otherwise the arrow dissappears in some circumstances
+    QRectF r = QRectF(startPoint(), endPoint());
+    if(r.width() < 0)
+    {
+        r.setWidth(-r.width());
+        r.setX(r.x() - r.width());
+    }
+    return r;
 }
 
 QPointF ArrowDGI::startPoint() const
@@ -53,11 +60,6 @@ BoxDGI::BoxDGI(IncludeDiagramView& parentView, const QString& displayName, const
 
 void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-
-    //QTime time;
-    //time.start();
-    
-
     painter->setBrush(QBrush(QColor(200, 200, 250)));
     if(isSelected())
     {
@@ -84,9 +86,6 @@ void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     auto textMargin = (rectSize.width() - w) / 2.0;
     const int margin = 10;
     painter->drawText(textMargin, margin + h, m_displayName);
-
-    //qDebug() << "  box took " << time.elapsed();
-
 }
 
 QRectF BoxDGI::boundingRect() const
@@ -127,7 +126,11 @@ void BoxDGI::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 {
     if(event->type() == QEvent::GraphicsSceneHoverEnter || event->type() == QEvent::GraphicsSceneHoverMove)
     {
+#if !defined(CM_DEBUG)
         setToolTip(m_fullName);
+#else
+        setToolTip(m_fullName + QStringLiteral(" (x=%1, y=%2)").arg(this->pos().x()).arg(this->pos().y()));
+#endif
     }
 }
 

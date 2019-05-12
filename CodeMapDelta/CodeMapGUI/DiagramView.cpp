@@ -2,11 +2,6 @@
 
 #include <QGridLayout>
 #include <QGraphicsScene>
-
-#include <QDebug>
-#include <QDateTime>
-#include <QTime>
-
 #include <qmath.h>
 #include <QMouseEvent>
 
@@ -24,11 +19,7 @@ void DiagramGraphicsView::registerLegendUiWidget(QWidget* widget)
 
 void DiagramGraphicsView::paintEvent(QPaintEvent *event)
 {
-    QTime time;
-    time.start();
-    qDebug() << "painting graphics view at " << QTime::currentTime();
     QGraphicsView::paintEvent(event);
-    qDebug() << "  painting took " << time.elapsed();
 }
 
 // Override mouse events to set cursor back to an arrow while in DragMode::ScrollHandDrag

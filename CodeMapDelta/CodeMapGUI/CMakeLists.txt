@@ -30,6 +30,8 @@ add_executable(${PROJECT_NAME}
     ImageHandler.cpp
     StringListEditorDialog.cpp)
 
+target_compile_definitions(CodeMapGUI PUBLIC "$<$<CONFIG:DEBUG>:CM_DEBUG>")
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
             CXX_STANDARD 17
             )

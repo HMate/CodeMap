@@ -45,7 +45,7 @@ public:
     const std::vector<BoxDGI*>& getChildren() { return m_children; }
     QString getFullName() { return m_fullName; }
 
-    void hoverMoveEvent(QGraphicsSceneHoverEvent* event);
+    void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
 protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
 
