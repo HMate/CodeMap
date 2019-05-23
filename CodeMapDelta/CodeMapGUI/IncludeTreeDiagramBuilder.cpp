@@ -60,7 +60,29 @@ public:
     }
 };
 
-typedef std::vector<IncludeDiagramBuilderLevel> IncludeDiagramTree;
+class IncludeDiagramTree
+{
+    using LevelList = std::vector<IncludeDiagramBuilderLevel>;
+    LevelList m_levels;
+public:
+
+    void addLevel(const IncludeDiagramBuilderLevel& level)
+    {
+        m_levels.emplace_back(level);
+    }
+
+    IncludeDiagramBuilderLevel& operator[](size_t index)
+    {
+        return m_levels[index];
+    }
+
+    size_t size() const noexcept
+    {
+        return m_levels.size();
+    }
+    LevelList::iterator begin() noexcept { return m_levels.begin(); }
+    LevelList::iterator end() noexcept { return m_levels.end(); }
+};
 
 class IncludeDiagramBuilder
 {
@@ -99,12 +121,12 @@ private:
         scene.addItem(box);
 
         BoxBuilder bb{ current, box };
-        auto levelBoxes = IncludeDiagramBuilderLevel(bb);
+        IncludeDiagramBuilderLevel levelBoxes(bb);
         levelBoxes.emplace_back(bb);
         auto rect = box->boundingRect();
         m_pos = m_pos + QPointF(0, rect.height() + margin.height());
 
-        m_levels.emplace_back(levelBoxes);
+        m_levels.addLevel(levelBoxes);
         return bb;
     }
     
@@ -129,7 +151,7 @@ private:
         if(m_levels.size() == currentLevel)
         {
             if(levelBoxes.size() > 0)
-                m_levels.emplace_back(levelBoxes);
+                m_levels.addLevel(levelBoxes);
         }
         else
         {
