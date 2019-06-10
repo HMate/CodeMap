@@ -9,7 +9,7 @@
 #include "SettingsView.h"
 
 #include "IncludeTreeBuilder.h"
-#include "IncludeTreeDiagramBuilder.h"
+#include "Diagram/IncludeTreeDiagramBuilder.h"
 
 /* DONE
     - Need to save/load AppState:

@@ -15,9 +15,9 @@ add_executable(${PROJECT_NAME}
     TerminalGui.cpp
     ViewManager.cpp
     
-    DiagramView.cpp
-    IncludeDiagramView.cpp
-    IncludeTreeDiagramBuilder.cpp
+    Diagram/DiagramView.cpp
+    Diagram/IncludeDiagramView.cpp
+    Diagram/IncludeTreeDiagramBuilder.cpp
     
     FileView.cpp
     FileEdit.cpp

@@ -9,7 +9,8 @@
 #include "FileView.h"
 #include "EditorFoldingArea.h"
 
-#include "IncludeTreeDiagramBuilder.h"
+#include "Diagram/IncludeDiagramView.h"
+#include "Diagram/IncludeTreeDiagramBuilder.h"
 
 FileEdit::FileEdit(QWidget* parent) : QPlainTextEdit(parent), m_view((FileView*)parent)
 {
@@ -62,8 +63,8 @@ void FileEdit::showIncludeDiagramAsync(const QString& filePath)
 void FileEdit::showInludeTreeFinished()
 {
     auto& result = *m_IncludeDiagramResult;
-    m_IncludeDiagramView = MainWindow::instance()->getDocumentManager()->openIncludeDiagramView(QString::fromStdString(result.root().path()));
-    buildIncludeTreeDiagram(*m_IncludeDiagramView, result);
+    IncludeDiagramView* includeDiagramView = MainWindow::instance()->getDocumentManager()->openIncludeDiagramView(QString::fromStdString(result.root().path()));
+    buildIncludeTreeDiagram(*includeDiagramView, result);
 }
 
 void FileEdit::foldDefines()

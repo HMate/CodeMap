@@ -5,7 +5,6 @@
 #include <QFutureWatcher>
 #include <QTextBlock>
 
-#include "IncludeDiagramView.h"
 #include "CodeParser.h"
 
 class FileView;
@@ -20,7 +19,6 @@ class FileEdit : public QPlainTextEdit
     FileView* m_PreprocessedFileView;
     QFutureWatcher<cm::ParserResult> m_foldWatcher;
 
-    IncludeDiagramView* m_IncludeDiagramView;
     std::unique_ptr<cm::IncludeTree> m_IncludeDiagramResult;
     QFutureWatcher<void> m_includeDiagramWatcher;
 public:
