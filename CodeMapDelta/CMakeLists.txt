@@ -26,7 +26,9 @@ endif()
 add_definitions(-DQT_DEPRECATED_WARNINGS)
 
 add_subdirectory(CodeParser)
+add_subdirectory(CodeMapLib)
 add_subdirectory(CodeMapGUI)
 
 #Tests
 add_subdirectory(CodeParserTest)
+add_subdirectory(CodeMapLibTest)

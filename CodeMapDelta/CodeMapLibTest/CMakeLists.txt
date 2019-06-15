@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 2.8.12)
 
-project(CodeParserTest LANGUAGES CXX)
+project(CodeMapLibTest LANGUAGES CXX)
 
-include_directories(../CodeParser)
+include_directories(../CodeMapLib)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
@@ -12,17 +12,13 @@ find_package(Qt5 CONFIG REQUIRED Core)
 
 add_executable(${PROJECT_NAME}
 	Test.cpp
-    TestParser.cpp
-	TestIncludeCollector.cpp)
+    TestDiagram.cpp)
+
 
 target_link_libraries(${PROJECT_NAME} 
 	Catch2::Catch2
 	Qt5::Core
-    CodeParser)
-    
-# copy testPatterns after every cmake run next to test exe
-file(COPY ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/TestPatterns
-    DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    CodeMapLib)
     
 if ( WIN32 )
     # Copy dlls for tests

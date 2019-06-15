@@ -5,49 +5,27 @@ project(CodeMapGUI)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
-find_package(Qt5 CONFIG REQUIRED Widgets Concurrent)
+find_package(Qt5 CONFIG REQUIRED Widgets)
 
 add_executable(${PROJECT_NAME}
-    Main.cpp
-    MainWindow.cpp
-    SettingsView.cpp
-    Settings.cpp
-    TerminalGui.cpp
-    ViewManager.cpp
-    
-    Diagram/DiagramView.cpp
-    Diagram/IncludeDiagramView.cpp
-    Diagram/IncludeTreeDiagramBuilder.cpp
-    
-    FileView.cpp
-    FileEdit.cpp
-    TextFolder.cpp
-    LinenumberArea.cpp
-    EditorFoldingArea.cpp
+    Main.cpp)
 
-    FileSystem.cpp
-    AppState.cpp
-    ImageHandler.cpp
-    StringListEditorDialog.cpp)
-
-target_compile_definitions(CodeMapGUI PUBLIC "$<$<CONFIG:DEBUG>:CM_DEBUG>")
+target_compile_definitions(${PROJECT_NAME} PUBLIC "$<$<CONFIG:DEBUG>:CM_DEBUG>")
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
             CXX_STANDARD 17
             )
 
 target_include_directories(${PROJECT_NAME} 
-    PRIVATE CodeParser)
+    PRIVATE CodeMapLib)
 
 target_link_libraries(${PROJECT_NAME} 
     Qt5::Widgets
-    Qt5::Concurrent
-    
-    CodeParser)
+    CodeMapLib)
 
-file(COPY ${CMAKE_SOURCE_DIR}/${PROJECT_NAME}/gui_icons
+file(COPY ${CMAKE_SOURCE_DIR}/CodeMapLib/gui_icons
     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data)
-
+    
 if ( WIN32 )
     # Copy dlls to exe
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD

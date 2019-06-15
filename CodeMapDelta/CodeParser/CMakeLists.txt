@@ -7,7 +7,8 @@ set(CMAKE_AUTOMOC ON)
 
 find_package(Qt5 CONFIG REQUIRED Core)
 
-SET(LLVM_BINARY_DIR_PATH "D:/prog/llvm_vs2017_x86_64_ver_60" CACHE PATH "Path to the root directory of llvm installation. This should contain the /libs and /includes directories.")
+SET(LLVM_BINARY_DIR_PATH "D:/prog/llvm_vs2017_x86_64_ver_60" CACHE 
+    PATH "Path to the root directory of llvm installation. This should contain the /libs and /includes directories.")
 set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${LLVM_BINARY_DIR_PATH})
 
 find_package(llvm REQUIRED)
