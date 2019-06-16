@@ -13,10 +13,13 @@ struct IncludeNode
     bool m_fullInclude = false;
 
     IncludeNode(std::string name, std::string path) : m_name(name), m_path(path) {}
+    
     const std::string name() const;
     const std::string path() const;
+    
     std::vector<IncludeNode>& includes();
     const std::vector<IncludeNode>& includes() const;
+
     void addInclude(std::string name, std::string path);
     void setFullInclude(bool fullInclude);
     bool isFullInclude() const;
@@ -28,6 +31,7 @@ struct IncludeTree
 
     IncludeTree() : m_root("", "") {}
     IncludeNode& root();
+    const IncludeNode& root() const;
 };
 
 }

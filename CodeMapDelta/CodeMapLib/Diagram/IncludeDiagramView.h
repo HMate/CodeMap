@@ -1,56 +1,13 @@
-#pragma once
+#ifndef INCLUDEDIAGRAMVIEW_H
+#define INCLUDEDIAGRAMVIEW_H
 
 #include <QHash>
-#include <QGraphicsItem>
 #include <QGroupBox>
 #include <QCheckBox>
 
 #include "DiagramView.h"
-
-class IncludeDiagramView;
-
-class ArrowDGI : public QGraphicsItem
-{
-    QGraphicsItem* m_startItem;
-    QGraphicsItem* m_endItem;
-
-public:
-    ArrowDGI(QGraphicsItem* startItem, QGraphicsItem* endItem, QGraphicsItem* parent = nullptr);
-
-protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
-    QRectF boundingRect() const override;
-
-    QPointF startPoint() const;
-    QPointF endPoint() const;
-};
-
-// BoxDiagramGraphicsItem
-class BoxDGI : public QGraphicsItem
-{
-    IncludeDiagramView& m_parentView;
-    std::vector<BoxDGI*> m_children;
-    QString m_displayName;
-    QString m_fullName;
-    QFont m_font;
-    bool m_fullInclude = false;
-
-public:
-    explicit BoxDGI(IncludeDiagramView& parentView, const std::string& displayName, const std::string& fullName, QGraphicsItem* parent = nullptr);
-    BoxDGI(IncludeDiagramView& parentView, const QString& displayName, const QString& fullName, QGraphicsItem* parent = nullptr);
-    void setFullInclude(bool fullInclude) { m_fullInclude = fullInclude; }
-    QRectF boundingRect() const override;
-
-    void addChild(BoxDGI* child) { m_children.emplace_back(child); }
-    const std::vector<BoxDGI*>& getChildren() { return m_children; }
-    QString getFullName() { return m_fullName; }
-
-    void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
-protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = nullptr) override;
-
-    virtual QVariant itemChange(GraphicsItemChange change, const QVariant &value) override;
-};
+#include "DiagramItems.h"
+#include "IncludeTreeDiagram.h"
 
 
 // TODO:
@@ -66,6 +23,7 @@ class IncludeDiagramView : public DiagramView
     Q_OBJECT
 
     QHash<QString, int> m_selectedIDs;
+    std::unique_ptr<IncludeTreeDiagram> m_diagram = nullptr;
 
     QGroupBox* m_box;
     QCheckBox* m_label;
@@ -75,6 +33,9 @@ class IncludeDiagramView : public DiagramView
     bool m_boxSelectionMode = false;
 public:
     explicit IncludeDiagramView(QWidget *parent = nullptr);
+
+    IncludeTreeDiagram& getDiagram();
+    void setDiagram(std::unique_ptr<IncludeTreeDiagram>& diagram);
 
     void clearSelectedID(const QString& id);
     void setSelectedID(const QString& id);
@@ -88,3 +49,5 @@ public:
 public slots:
     void setBoxSelectionMode(bool toggleOn);
 };
+
+#endif // INCLUDEDIAGRAMVIEW_H

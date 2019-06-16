@@ -14,9 +14,12 @@ add_library(${PROJECT_NAME} STATIC
     TerminalGui.cpp
     ViewManager.cpp
     
+    Diagram/DiagramItems.cpp
     Diagram/DiagramView.cpp
+    Diagram/IncludeTreeDiagram.cpp
     Diagram/IncludeDiagramView.cpp
     Diagram/IncludeTreeDiagramBuilder.cpp
+    Diagram/BoxPositioner.cpp
     
     FileView.cpp
     FileEdit.cpp

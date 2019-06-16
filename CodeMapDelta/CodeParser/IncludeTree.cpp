@@ -48,4 +48,9 @@ IncludeNode& IncludeTree::root()
     return m_root;
 }
 
+const IncludeNode& IncludeTree::root() const
+{
+    return m_root;
+}
+
 }
