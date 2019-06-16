@@ -26,12 +26,15 @@ public:
         m_items.emplace_back(box);
     }
 
-    size_t size() noexcept { return m_items.size(); }
+    size_t size() const noexcept { return m_items.size(); }
     BoxBuilder operator[](size_t index) { return m_items[index]; }
+    BoxBuilder operator[](size_t index) const { return m_items[index]; }
     BoxBuilder front() { return m_items.front(); }
-    BoxBuilder back() { return m_items.front(); }
+    BoxBuilder back() { return m_items.back(); }
     std::vector<BoxBuilder>::iterator begin() noexcept { return m_items.begin(); }
+    std::vector<BoxBuilder>::const_iterator begin() const noexcept { return m_items.cbegin(); }
     std::vector<BoxBuilder>::iterator end() noexcept { return m_items.end(); }
+    std::vector<BoxBuilder>::const_iterator end() const noexcept { return m_items.cend(); }
     std::reverse_iterator<std::vector<BoxBuilder>::iterator> rend() noexcept { return m_items.rend(); }
 
     const std::vector<IncludeDiagramBuilderLevel>& groups()
@@ -51,17 +54,11 @@ public:
     }
 };
 
-class IncludeTreeDiagram
+class IncludeTreeDiagram : public std::vector<IncludeDiagramBuilderLevel>
 {
-    using LevelList = std::vector<IncludeDiagramBuilderLevel>;
-    LevelList m_levels;
 public:
 
-    void addLevel(const IncludeDiagramBuilderLevel& level) { m_levels.emplace_back(level); }
-    IncludeDiagramBuilderLevel& operator[](size_t index) { return m_levels[index]; }
-    size_t size() const noexcept{ return m_levels.size(); }
-    LevelList::iterator begin() noexcept { return m_levels.begin(); }
-    LevelList::iterator end() noexcept { return m_levels.end(); }
+    void addLevel(const IncludeDiagramBuilderLevel& level) { emplace_back(level); }
 };
 
 

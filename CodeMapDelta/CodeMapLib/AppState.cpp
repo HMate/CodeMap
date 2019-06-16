@@ -42,7 +42,7 @@ const std::vector<FileViewStateItem>& AppStateHandler::getFileViews()
 
 Settings& AppStateHandler::settings()
 {
-    return appSettings;
+    return m_appSettings;
 }
 
 const QString& AppStateHandler::getLastOpenedDirectory()
@@ -90,7 +90,7 @@ void AppStateHandler::saveStateToDisk()
     QJsonObject stateJson{{"version", 2}};
     QJsonArray fileViewsJson = json(m_fileViews);
     stateJson.insert("fileViews", fileViewsJson);
-    QJsonObject settingsJson = json(appSettings);
+    QJsonObject settingsJson = json(m_appSettings);
     stateJson.insert("settings", settingsJson);
 
     const QString serialized = QJsonDocument(stateJson).toJson();
@@ -152,11 +152,11 @@ void AppStateHandler::loadStateFromDisk()
                 if (includesValueRef.isArray())
                 {
                     QJsonArray includesJson = includesValueRef.toArray();
-                    appSettings.globalIncludes.clear();
+                    m_appSettings.globalIncludes.clear();
                     for (const auto f : includesJson)
                     {
                         if (f.isString())
-                            appSettings.globalIncludes.append(f.toString());
+                            m_appSettings.globalIncludes.append(f.toString());
                     }
                 }
             }

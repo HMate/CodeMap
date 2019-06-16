@@ -40,7 +40,8 @@ public:
 
     void addChild(BoxDGI* child) { m_children.emplace_back(child); }
     const std::vector<BoxDGI*>& getChildren() { return m_children; }
-    QString getFullName() { return m_fullName; }
+    QString getDisplayName() const { return m_displayName; }
+    QString getFullName() const { return m_fullName; }
 
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
 protected:

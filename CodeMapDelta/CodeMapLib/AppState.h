@@ -29,7 +29,7 @@ class AppStateHandler
     QString lastOpenedDirPath;
     std::vector<FileViewStateItem> m_fileViews;
 
-    Settings appSettings;
+    Settings m_appSettings;
 public:
     AppStateHandler();
 
