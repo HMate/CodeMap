@@ -43,10 +43,10 @@ TEST_CASE("Serialize diagram", "[diagram][serialization]")
     QString result = DiagramSerializer::serialize(diagram);
 
     QString expected = R"Text({
+    "type": "IncludeDiagram",
+    "version": "1.0",
     "diagram": {
-        "edges": { 
-            "0": ["1", "2"]
-        },
+        "edges": { "0": [1,2] },
         "nodes": [
             { 
                 "id": 0,
@@ -64,10 +64,8 @@ TEST_CASE("Serialize diagram", "[diagram][serialization]")
                 "path": "root/include2"
             }
         ]
-    },
-    "type": "IncludeDiagram",
-    "version": "1.0"
+    }
 })Text";
 
-    REQUIRE(expected == result);
+    REQUIRE(QJsonDocument::fromJson(expected.toLocal8Bit()) == QJsonDocument::fromJson(result.toLocal8Bit()));
 }
