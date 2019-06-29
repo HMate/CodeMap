@@ -13,7 +13,7 @@ struct IncludeNode
     std::vector<IncludeNode> m_includes;
     bool m_fullInclude = false;
 
-    IncludeNode(std::string name, std::string path) : m_name(name), m_path(path) {}
+    IncludeNode(std::string name, std::string path, bool fullInclude = false);
     
     const std::string name() const;
     const std::string path() const;

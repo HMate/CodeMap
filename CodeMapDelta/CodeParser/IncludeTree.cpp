@@ -6,6 +6,9 @@ namespace cm
 
 /**************** IncludeNode *****************/
 
+IncludeNode::IncludeNode(std::string name, std::string path, bool fullInclude)
+    : m_name(name), m_path(path), m_fullInclude(fullInclude) {}
+
 const std::string IncludeNode::name() const
 {
     return this->m_name;

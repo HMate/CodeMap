@@ -9,6 +9,7 @@ struct IncludeDiagramNode
     int m_id;
     QString m_name;
     QString m_path;
+    bool m_fullInclude;
 };
 
 QString DiagramSerializer::serialize(const IncludeTreeDiagram& diagram)
@@ -17,15 +18,21 @@ QString DiagramSerializer::serialize(const IncludeTreeDiagram& diagram)
     QJsonObject diagramJson;
     QJsonArray nodesJson;
 
-    std::map<QString, IncludeDiagramNode> nodes;
+    // TODO: using a pointer as a map key is gross, figure out a better way
+    std::map<BoxDGI*, IncludeDiagramNode> nodes;
     int index = 0;
     for(auto& level : diagram)
     {
         for(auto& node : level)
         {
-            IncludeDiagramNode idn{index, node.m_box->getDisplayName(), node.m_box->getFullName() };
-            nodesJson.append(QJsonObject{ {"id", index}, {"name", idn.m_name}, {"path", idn.m_path} });
-            nodes.insert_or_assign(idn.m_path, idn);
+            auto& box = node.m_box;
+            IncludeDiagramNode idn{index, box->getDisplayName(), box->getFullName(), box->isFullInclude() };
+            nodesJson.append(QJsonObject{ 
+                {"id", index}, 
+                {"name", idn.m_name}, 
+                {"path", idn.m_path}, 
+                {"fullInclude", idn.m_fullInclude} });
+            nodes.insert_or_assign(node.m_box, idn);
             ++index;
         }
     }
@@ -37,14 +44,14 @@ QString DiagramSerializer::serialize(const IncludeTreeDiagram& diagram)
     {
         for (auto& node : level)
         {
-            auto& idn = nodes[node.m_box->getFullName()];
+            auto& idn = nodes[node.m_box];
             QJsonArray edgeList;
             auto& children = node.m_box->getChildren();
             if (children.size() > 0)
             {
                 for (auto& child : children)
                 {
-                    edgeList.append(nodes[child->getFullName()].m_id);
+                    edgeList.append(nodes[child].m_id);
                 }
                 edgesJson.insert(QString::number(idn.m_id), edgeList);
             }

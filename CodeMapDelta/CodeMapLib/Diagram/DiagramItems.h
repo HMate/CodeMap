@@ -42,6 +42,7 @@ public:
     const std::vector<BoxDGI*>& getChildren() { return m_children; }
     QString getDisplayName() const { return m_displayName; }
     QString getFullName() const { return m_fullName; }
+    bool isFullInclude() const { return m_fullInclude; }
 
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
 protected:
