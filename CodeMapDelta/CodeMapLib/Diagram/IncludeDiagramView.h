@@ -52,6 +52,7 @@ public:
 
 public slots:
     void setBoxSelectionMode(bool toggleOn);
+    void toggleDiagramAlign(bool setGroupedAlignment);
 };
 
 #endif // INCLUDEDIAGRAMVIEW_H

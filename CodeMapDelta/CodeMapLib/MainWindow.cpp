@@ -9,6 +9,8 @@
 #include "SettingsView.h"
 
 #include "IncludeTreeBuilder.h"
+#include "Diagram/IncludeDiagramView.h"
+#include "Diagram/IncludeTreeDiagramAligners.h"
 #include "Diagram/IncludeTreeDiagramBuilder.h"
 
 /* DONE
@@ -270,6 +272,7 @@ void MainWindow::openDiagramView()
     builder.addNode("include_inner2", "root/include1/include_inner2");
 
     buildIncludeTreeDiagram(*diagV, tree);
+    CenterDiagramAligner::alignDiagram(*diagV);
 
     // TODO: save to state?
 }

@@ -7,6 +7,7 @@
 #include <QGraphicsScene>
 #include <QKeyEvent>
 #include <QStyleOptionGraphicsItem>
+#include "Diagram/IncludeTreeDiagramAligners.h"
 
 IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
 {
@@ -15,11 +16,12 @@ IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
     QVBoxLayout *boxLayout = new QVBoxLayout();
     m_box->setLayout(boxLayout);
 
-    m_label = new QCheckBox("Ctrl - group select", this);
+    m_label = new QCheckBox(QStringLiteral("Ctrl - group select"), this);
     connect(m_label, &QCheckBox::toggled, this, &IncludeDiagramView::setBoxSelectionMode);
     boxLayout->addWidget(m_label);
 
-    m_check = new QCheckBox("check this", this);
+    m_check = new QCheckBox(QStringLiteral("Center aligned boxes"), this);
+    connect(m_check, &QCheckBox::toggled, this, &IncludeDiagramView::toggleDiagramAlign);
     boxLayout->addWidget(m_check);
 
     m_box->setStyleSheet("QGroupBox#LegendUi{ background-color:rgba(150, 100, 100, 230); border: 2px solid rgba(0,0,0,255); }");
@@ -94,6 +96,22 @@ void IncludeDiagramView::setBoxSelectionMode(bool toggleOn)
     else
     {
         getView()->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+    }
+}
+
+void IncludeDiagramView::toggleDiagramAlign(bool setGroupedAlignment)
+{
+    if (setGroupedAlignment)
+    {
+        GroupDiagramAligner aligner;
+        aligner.alignDiagram(*this);
+        m_check->setText(QStringLiteral("Group aligned boxes"));
+    }
+    else
+    {
+        CenterDiagramAligner aligner;
+        aligner.alignDiagram(*this);
+        m_check->setText(QStringLiteral("Center aligned boxes"));
     }
 }
 

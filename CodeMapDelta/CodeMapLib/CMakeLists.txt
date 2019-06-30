@@ -18,6 +18,7 @@ add_library(${PROJECT_NAME} STATIC
     Diagram/DiagramView.cpp
     Diagram/IncludeTreeDiagram.cpp
     Diagram/IncludeDiagramView.cpp
+    Diagram/IncludeTreeDiagramAligners.cpp
     Diagram/IncludeTreeDiagramBuilder.cpp
     Diagram/BoxPositioner.cpp
     Diagram/DiagramSerializer.cpp

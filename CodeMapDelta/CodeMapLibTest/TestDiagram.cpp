@@ -6,6 +6,7 @@
 #include "IncludeTreeBuilder.h"
 #include "Diagram/IncludeDiagramView.h"
 #include "Diagram/IncludeTreeDiagramBuilder.h"
+#include "Diagram/IncludeTreeDiagramAligners.h"
 #include "Diagram/DiagramSerializer.h"
 
 TEST_CASE("Create a diagram from code", "[diagram]")
@@ -40,6 +41,53 @@ TEST_CASE("Serialize diagram", "[diagram][serialization]")
     builder.addNode("include2", "root/include2").setFullInclude(true);
 
     buildIncludeTreeDiagram(*view, tree);
+    QString result = DiagramSerializer::serialize(view->getDiagram());
+    QString expected = R"Text({
+    "type": "IncludeDiagram",
+    "version": "1.0",
+    "diagram": {
+        "edges": { "0": [1, 2] },
+        "nodes": [
+            { 
+                "id": 0,
+                "name": "test",
+                "path": "testy",
+                "fullInclude": true,
+                "pos": "0;0"
+            },
+            { 
+                "id": 1,
+                "name": "include1",
+                "path": "root/include1",
+                "fullInclude": true,
+                "pos": "0;0"
+            },
+            { 
+                "id": 2,
+                "name": "include2",
+                "path": "root/include2",
+                "fullInclude": true,
+                "pos": "0;0"
+            }
+        ]
+    }
+})Text";
+
+    REQUIRE_JSON(expected, result);
+}
+
+TEST_CASE("Serialize diagram box positions", "[diagram][serialization]")
+{
+    IncludeDiagramView* view = new IncludeDiagramView();
+
+    auto tree = std::make_shared<cm::IncludeTree>();
+    cm::IncludeTreeBuilder builder(*tree);
+    builder.setRoot("test", "testy");
+    builder.addNode("include1", "root/include1").setFullInclude(true);
+    builder.addNode("include2", "root/include2").setFullInclude(true);
+
+    buildIncludeTreeDiagram(*view, tree);
+    GroupDiagramAligner::alignDiagram(*view);
     QString result = DiagramSerializer::serialize(view->getDiagram());
     QString expected = R"Text({
     "type": "IncludeDiagram",
@@ -88,6 +136,7 @@ TEST_CASE("Serialize with duplicate nodes in diagram", "[diagram][serialization]
     builder.addNode("include1", "root/include1");
 
     buildIncludeTreeDiagram(*view, tree);
+    GroupDiagramAligner::alignDiagram(*view);
     QString result = DiagramSerializer::serialize(view->getDiagram());
 
     QString expected = QStringLiteral(R"Text({
