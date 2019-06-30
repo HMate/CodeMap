@@ -19,7 +19,9 @@ QString DiagramSerializer::serialize(const IncludeTreeDiagram& diagram)
                 {"id", static_cast<int>(box->getNodeId())},
                 {"name", box->getDisplayName()},
                 {"path", box->getFullName()},
-                {"fullInclude", box->isFullInclude()} });
+                {"fullInclude", box->isFullInclude()},
+                {"pos", QStringLiteral("%1;%2").arg(box->pos().x()).arg(box->pos().y()) }
+            });
         }
     }
     diagramJson.insert("nodes", nodesJson);

@@ -51,19 +51,22 @@ TEST_CASE("Serialize diagram", "[diagram][serialization]")
                 "id": 0,
                 "name": "test",
                 "path": "testy",
-                "fullInclude": true
+                "fullInclude": true,
+                "pos": "61.5;0"
             },
             { 
                 "id": 1,
                 "name": "include1",
                 "path": "root/include1",
-                "fullInclude": true
+                "fullInclude": true,
+                "pos": "0;54"
             },
             { 
                 "id": 2,
                 "name": "include2",
                 "path": "root/include2",
-                "fullInclude": true
+                "fullInclude": true,
+                "pos": "89;54"
             }
         ]
     }
@@ -100,25 +103,29 @@ TEST_CASE("Serialize with duplicate nodes in diagram", "[diagram][serialization]
                 "id": 0,
                 "name": "test",
                 "path": "testy",
-                "fullInclude": true
+                "fullInclude": true,
+                "pos": "-27.5;0"
             },
             { 
                 "id": 1,
                 "name": "include1",
                 "path": "root/include1",
-                "fullInclude": true
+                "fullInclude": true,
+                "pos": "-89;54"
             },
             { 
                 "id": 2,
                 "name": "include2",
                 "path": "root/include2",
-                "fullInclude": true
+                "fullInclude": true,
+                "pos": "0;54"
             },
             { 
                 "id": 3,
                 "name": "include1",
                 "path": "root/include1",
-                "fullInclude": false
+                "fullInclude": false,
+                "pos": "0;108"
             }
         ]
     }
