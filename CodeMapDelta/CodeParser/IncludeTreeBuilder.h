@@ -17,6 +17,7 @@ class IncludeTreeBuilder
     IncludeTree& m_tree;
     IncludeNode* m_currentNode;
     std::stack<IncludeNode*> m_selectionStack;
+    int32_t m_nextId = 1;
 public:
     IncludeTreeBuilder(IncludeTree& tree);
     IncludeNode& getRoot() const;

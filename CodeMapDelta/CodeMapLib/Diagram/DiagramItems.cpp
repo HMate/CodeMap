@@ -42,11 +42,8 @@ QPointF ArrowDGI::endPoint() const
     return QPointF(m_endItem->x() + (rect.width() / 2.0), m_endItem->y());
 }
 
-BoxDGI::BoxDGI(IncludeDiagramView& parentView, const std::string& displayName, const std::string& fullName, QGraphicsItem* parent)
-    : BoxDGI(parentView, QString(displayName.c_str()), QString(fullName.c_str()), parent) {}
-
-BoxDGI::BoxDGI(IncludeDiagramView& parentView, const QString& displayName, const QString& fullName, QGraphicsItem* parent)
-    : QGraphicsItem(parent), m_parentView(parentView), m_displayName(displayName), m_fullName(fullName)
+BoxDGI::BoxDGI(IncludeDiagramView& parentView, const cm::IncludeNode& node, QGraphicsItem* parent)
+    : QGraphicsItem(parent), m_parentView(parentView), m_node(node)
 {
     setFlags(QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable |
         QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemSendsScenePositionChanges);
@@ -61,11 +58,11 @@ void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     {
         painter->setBrush(QBrush(QColor(100, 250, 250)));
     }
-    else if(m_parentView.isBoxSelectedWithID(m_fullName))
+    else if(m_parentView.isBoxSelectedWithID(getFullName()))
     {
         painter->setBrush(QBrush(QColor(200, 250, 250)));
     }
-    else if(m_fullInclude)
+    else if(isFullInclude())
     {
         painter->setBrush(QBrush(QColor(160, 160, 250)));
     }
@@ -77,20 +74,20 @@ void BoxDGI::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     painter->setFont(m_font);
 
     auto fmetric = painter->fontMetrics();
-    const int w = fmetric.width(m_displayName);
+    const int w = fmetric.width(getDisplayName());
     const int h = fmetric.height();
     auto textMargin = (rectSize.width() - w) / 2.0;
     const int margin = 10;
-    painter->drawText(textMargin, margin + h, m_displayName);
+    painter->drawText(textMargin, margin + h, getDisplayName());
 }
 
 QRectF BoxDGI::boundingRect() const
 {
     QFontMetrics fmetric(m_font);
-    const int margin = 10;
-    const int w = fmetric.width(m_displayName);
-    const int h = fmetric.height();
-    return QRectF(0, 0, 2 * margin + w, 2 * margin + h);
+    const long long margin = 10LL;
+    const long long w = fmetric.width(getDisplayName());
+    const long long h = fmetric.height();
+    return QRectF(0, 0, 2LL * margin + w, 2LL * margin + h);
 }
 
 QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVariant &value)
@@ -99,9 +96,9 @@ QVariant BoxDGI::itemChange(QGraphicsItem::GraphicsItemChange change, const QVar
     if(change == GraphicsItemChange::ItemSelectedHasChanged)
     {
         if(isSelected())
-            m_parentView.setSelectedID(m_fullName);
+            m_parentView.setSelectedID(getFullName());
         else
-            m_parentView.clearSelectedID(m_fullName);
+            m_parentView.clearSelectedID(getFullName());
     }
 
     QVariant result = QGraphicsItem::itemChange(change, value);
@@ -125,7 +122,7 @@ void BoxDGI::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
 #if !defined(CM_DEBUG)
         setToolTip(m_fullName);
 #else
-        setToolTip(m_fullName + QStringLiteral(" (x=%1, y=%2)").arg(this->pos().x()).arg(this->pos().y()));
+        setToolTip(getFullName() + QStringLiteral(" (x=%1, y=%2)").arg(this->pos().x()).arg(this->pos().y()));
 #endif
     }
 }

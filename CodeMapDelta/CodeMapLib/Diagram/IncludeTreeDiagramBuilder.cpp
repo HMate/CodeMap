@@ -31,8 +31,7 @@ BoxBuilder IncludeDiagramBuilder::addRootBox(IncludeDiagramView& diagram, QGraph
 {
     auto& current = tree.root();
 
-    auto box = new BoxDGI(diagram, current.name(), current.path());
-    box->setFullInclude(current.isFullInclude());
+    auto box = new BoxDGI(diagram, current);
     scene.addItem(box);
 
     BoxBuilder bb{ current, box };
@@ -52,8 +51,7 @@ void IncludeDiagramBuilder::recursiveBuildIncludeTreeLevel(IncludeDiagramView& d
     auto& includes = current.m_node.includes();
     for(auto& inc : includes)
     {
-        auto box = new BoxDGI(diagram, inc.name(), inc.path());
-        box->setFullInclude(inc.isFullInclude());
+        auto box = new BoxDGI(diagram, inc);
         scene.addItem(box);
         current.m_box->addChild(box);
         BoxBuilder bb{ inc, box };

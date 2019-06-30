@@ -30,9 +30,8 @@ IncludeNode& IncludeTreeBuilder::currentNode()
 
 void IncludeTreeBuilder::setRoot(std::string name, std::string path)
 {
-    m_tree.m_root.m_name = name;
-    m_tree.m_root.m_path = path;
-    m_tree.m_root.m_includes.clear();
+    m_tree.m_root.setNameAndPath(name, path);
+    m_tree.m_root.includes().clear();
     m_tree.m_root.setFullInclude(true);
     m_currentNode = &(m_tree.m_root);
 }
@@ -42,7 +41,7 @@ IncludeNode& IncludeTreeBuilder::addNode(std::string name, std::string path)
     assert(m_currentNode != nullptr);
     if(m_currentNode != nullptr)
     {
-        return m_currentNode->addInclude(name, path);
+        return m_currentNode->addInclude(m_nextId++, name, path);
     }
     return *m_currentNode;
 }
@@ -72,7 +71,7 @@ void IncludeTreeBuilder::selectPreviousNode()
 
 bool IncludeTreeBuilder::isRootSelected()
 {
-    return m_currentNode == &m_tree.m_root;
+    return m_currentNode == &m_tree.root();
 }
 
 /**************** IncludeCollectorCallback *****************/

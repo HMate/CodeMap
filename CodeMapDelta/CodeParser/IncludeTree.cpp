@@ -6,32 +6,43 @@ namespace cm
 
 /**************** IncludeNode *****************/
 
-IncludeNode::IncludeNode(std::string name, std::string path, bool fullInclude)
-    : m_name(name), m_path(path), m_fullInclude(fullInclude) {}
+IncludeNode::IncludeNode(int32_t id, std::string name, std::string path, bool fullInclude)
+    : m_id(id), m_name(name), m_path(path), m_fullInclude(fullInclude) {}
+
+const int32_t IncludeNode::id() const
+{
+    return m_id;
+}
 
 const std::string IncludeNode::name() const
 {
-    return this->m_name;
+    return m_name;
 }
 
 const std::string IncludeNode::path() const
 {
-    return this->m_path;
+    return m_path;
 }
 
 std::vector<IncludeNode>& IncludeNode::includes()
 {
-    return this->m_includes;
+    return m_includes;
 }
 
 const std::vector<IncludeNode>& IncludeNode::includes() const
 {
-    return this->m_includes;
+    return m_includes;
+}
+
+void IncludeNode::setNameAndPath(std::string name, std::string path)
+{
+    m_name = name;
+    m_path = path;
 }
 
 void IncludeNode::setFullInclude(bool fullInclude)
 {
-    this->m_fullInclude = fullInclude;
+    m_fullInclude = fullInclude;
 }
 
 bool IncludeNode::isFullInclude() const
@@ -39,10 +50,10 @@ bool IncludeNode::isFullInclude() const
     return m_fullInclude;
 }
 
-IncludeNode& IncludeNode::addInclude(std::string name, std::string path)
+IncludeNode& IncludeNode::addInclude(int32_t id, std::string name, std::string path)
 {
-    this->m_includes.emplace_back(name, path);
-    return this->m_includes.back();
+    m_includes.emplace_back(id, name, path);
+    return m_includes.back();
 }
 
 /**************** IncludeTree *****************/

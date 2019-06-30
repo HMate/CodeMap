@@ -3,6 +3,7 @@
 
 #include <QGraphicsItem>
 #include <QFont>
+#include "IncludeTree.h"
 
 class IncludeDiagramView;
 
@@ -26,23 +27,20 @@ protected:
 class BoxDGI : public QGraphicsItem
 {
     IncludeDiagramView& m_parentView;
+    const cm::IncludeNode& m_node;
     std::vector<BoxDGI*> m_children;
-    QString m_displayName;
-    QString m_fullName;
     QFont m_font;
-    bool m_fullInclude = false;
 
 public:
-    explicit BoxDGI(IncludeDiagramView& parentView, const std::string& displayName, const std::string& fullName, QGraphicsItem* parent = nullptr);
-    BoxDGI(IncludeDiagramView& parentView, const QString& displayName, const QString& fullName, QGraphicsItem* parent = nullptr);
-    void setFullInclude(bool fullInclude) { m_fullInclude = fullInclude; }
+    explicit BoxDGI(IncludeDiagramView& parentView, const cm::IncludeNode& node, QGraphicsItem* parent = nullptr);
     QRectF boundingRect() const override;
 
     void addChild(BoxDGI* child) { m_children.emplace_back(child); }
     const std::vector<BoxDGI*>& getChildren() { return m_children; }
-    QString getDisplayName() const { return m_displayName; }
-    QString getFullName() const { return m_fullName; }
-    bool isFullInclude() const { return m_fullInclude; }
+    int32_t getNodeId() const { return m_node.id(); }
+    QString getDisplayName() const { return QString::fromStdString(m_node.name()); }
+    QString getFullName() const { return QString::fromStdString(m_node.path()); }
+    bool isFullInclude() const { return m_node.isFullInclude(); }
 
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;
 protected:

@@ -11,8 +11,10 @@ TEST_CASE("Include tree builder", "[includes]")
 
     builder.setRoot("test", "testy");
     REQUIRE(builder.isRootSelected());
+    REQUIRE(builder.currentNode().id() == 0);
     builder.addNode("include1", "full/name/of/include1");
     REQUIRE(builder.getRoot().includes().size() == 1);
+    REQUIRE(builder.getRoot().includes()[0].id() == 1);
     REQUIRE(builder.getRoot().includes()[0].name() == "include1");
     REQUIRE(builder.getRoot().includes()[0].path() == "full/name/of/include1");
     
@@ -31,6 +33,7 @@ TEST_CASE("Include tree builder", "[includes]")
 
 
     REQUIRE(builder.selectNode("full/name/of/include1/include_inner2"));
+    REQUIRE(builder.currentNode().id() == 3);
     REQUIRE(builder.currentNode().name() == "include_inner2");
     REQUIRE(builder.currentNode().path() == "full/name/of/include1/include_inner2");
 
@@ -51,7 +54,7 @@ TEST_CASE("Include tree builder", "[includes]")
     REQUIRE(tree.root().name() == "test");
 }
 
-TEST_CASE("Include tree contains unique nodes", "[includes]")
+TEST_CASE("Include tree contains duplicate nodes", "[includes]")
 {
     cm::IncludeTree tree;
     cm::IncludeTreeBuilder builder(tree);
@@ -69,7 +72,8 @@ TEST_CASE("Include tree contains unique nodes", "[includes]")
     builder.addNode("include_inner3", "root/include1/include_inner3");
     builder.addNode("include_inner4", "root/include1/include_inner4");
     builder.addNode("include_inner5", "root/include1/include_inner5");
-    
+
+    REQUIRE(tree.root().id() == 0);
     REQUIRE(tree.root().includes().size() == 2);
     REQUIRE(tree.root().includes()[0].includes()[1].path() == "root/include1/include_inner2");
     REQUIRE(tree.root().includes()[0].includes()[1].isFullInclude());
