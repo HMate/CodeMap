@@ -23,6 +23,7 @@ class IncludeDiagramView : public DiagramView
     Q_OBJECT
 
     QHash<QString, int> m_selectedIDs;
+    std::shared_ptr<cm::IncludeTree> m_tree;
     std::unique_ptr<IncludeTreeDiagram> m_diagram = nullptr;
 
     QGroupBox* m_box;
@@ -33,6 +34,9 @@ class IncludeDiagramView : public DiagramView
     bool m_boxSelectionMode = false;
 public:
     explicit IncludeDiagramView(QWidget *parent = nullptr);
+
+    cm::IncludeTree& getIncludeTree();
+    void setIncludeTree(const std::shared_ptr<cm::IncludeTree>& tree);
 
     IncludeTreeDiagram& getDiagram();
     void setDiagram(std::unique_ptr<IncludeTreeDiagram>& diagram);

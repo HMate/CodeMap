@@ -64,7 +64,7 @@ void FileEdit::showInludeTreeFinished()
 {
     auto& result = *m_IncludeDiagramResult;
     IncludeDiagramView* includeDiagramView = MainWindow::instance()->getDocumentManager()->openIncludeDiagramView(QString::fromStdString(result.root().path()));
-    buildIncludeTreeDiagram(*includeDiagramView, result);
+    buildIncludeTreeDiagram(*includeDiagramView, std::move(m_IncludeDiagramResult));
 }
 
 void FileEdit::foldDefines()

@@ -27,6 +27,17 @@ IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
     getView()->registerLegendUiWidget(m_box);
 }
 
+
+cm::IncludeTree& IncludeDiagramView::getIncludeTree()
+{
+    return *m_tree;
+}
+
+void IncludeDiagramView::setIncludeTree(const std::shared_ptr<cm::IncludeTree>& tree)
+{
+    m_tree = tree;
+}
+
 IncludeTreeDiagram& IncludeDiagramView::getDiagram()
 {
     return *m_diagram;

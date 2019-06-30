@@ -7,8 +7,10 @@
 const QSizeF margin = QSizeF(10, 15);
 
 
-void IncludeDiagramBuilder::build(IncludeDiagramView& diagram, cm::IncludeTree& tree)
+void IncludeDiagramBuilder::build(IncludeDiagramView& diagram)
 {
+    cm::IncludeTree& tree = diagram.getIncludeTree();
+
     // lefttop is x-y-, middle is x0y0, rightbot is x+y+
     QGraphicsScene& scene = *diagram.getScene();
     m_pos = QPointF(0, 0);
@@ -288,9 +290,10 @@ std::vector<QSizeF> IncludeDiagramBuilder::calculateLevelSizes(IncludeTreeDiagra
     return levelSizes;
 }
 
-void buildIncludeTreeDiagram(IncludeDiagramView& diagram, cm::IncludeTree& tree)
+void buildIncludeTreeDiagram(IncludeDiagramView& diagram, std::shared_ptr<cm::IncludeTree> tree)
 {
     IncludeDiagramBuilder builder;
-    builder.build(diagram, tree);
+    diagram.setIncludeTree(tree);
+    builder.build(diagram);
 }
 

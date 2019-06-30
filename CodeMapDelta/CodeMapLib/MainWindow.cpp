@@ -244,8 +244,8 @@ void MainWindow::openDiagramView()
     auto docManager = getDocumentManager();
     auto diagV = docManager->openIncludeDiagramView("test Diag");
 
-    cm::IncludeTree tree;
-    cm::IncludeTreeBuilder builder(tree);
+    auto tree = std::make_shared<cm::IncludeTree>();
+    cm::IncludeTreeBuilder builder(*tree);
     builder.setRoot("test", "testy");
     builder.addNode("include1", "root/include1");
     builder.selectNode("root/include1");

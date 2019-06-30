@@ -8,7 +8,7 @@
 
 class IncludeDiagramView;
 
-void buildIncludeTreeDiagram(IncludeDiagramView& diagram, cm::IncludeTree& tree);
+void buildIncludeTreeDiagram(IncludeDiagramView& diagram, std::shared_ptr<cm::IncludeTree> tree);
 
 class IncludeDiagramBuilder
 {
@@ -17,7 +17,7 @@ class IncludeDiagramBuilder
 
 public:
     IncludeDiagramBuilder() {}
-    void build(IncludeDiagramView& diagram, cm::IncludeTree& tree);
+    void build(IncludeDiagramView& diagram);
 
 private:
     BoxBuilder addRootBox(IncludeDiagramView& diagram, QGraphicsScene& scene, cm::IncludeTree& tree);

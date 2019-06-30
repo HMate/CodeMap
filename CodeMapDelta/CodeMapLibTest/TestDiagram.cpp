@@ -12,8 +12,8 @@ TEST_CASE("Create a diagram from code", "[diagram]")
 {
     IncludeDiagramView * view = new IncludeDiagramView();
 
-    cm::IncludeTree tree;
-    cm::IncludeTreeBuilder builder(tree);
+    auto tree = std::make_shared<cm::IncludeTree>();
+    cm::IncludeTreeBuilder builder(*tree);
     builder.setRoot("test", "testy");
     builder.addNode("include1", "root/include1");
     builder.addNode("include2", "root/include2");
@@ -33,8 +33,8 @@ TEST_CASE("Serialize diagram", "[diagram][serialization]")
 {
     IncludeDiagramView * view = new IncludeDiagramView();
 
-    cm::IncludeTree tree;
-    cm::IncludeTreeBuilder builder(tree);
+    auto tree = std::make_shared<cm::IncludeTree>();
+    cm::IncludeTreeBuilder builder(*tree);
     builder.setRoot("test", "testy");
     builder.addNode("include1", "root/include1").setFullInclude(true);
     builder.addNode("include2", "root/include2").setFullInclude(true);
@@ -79,8 +79,8 @@ TEST_CASE("Serialize with duplicate nodes in diagram", "[diagram][serialization]
 {
     IncludeDiagramView* view = new IncludeDiagramView();
 
-    cm::IncludeTree tree;
-    cm::IncludeTreeBuilder builder(tree);
+    auto tree = std::make_shared<cm::IncludeTree>();
+    cm::IncludeTreeBuilder builder(*tree);
     builder.setRoot("test", "testy");
     builder.addNode("include1", "root/include1").setFullInclude(true);
     builder.addNode("include2", "root/include2").setFullInclude(true);
