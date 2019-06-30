@@ -22,7 +22,7 @@ public:
     IncludeNode& getRoot() const;
     IncludeNode& currentNode();
     void setRoot(std::string name, std::string path);
-    void addNode(std::string name, std::string path);
+    IncludeNode& addNode(std::string name, std::string path);
 
     /** Selects the first child node with the given path as the currentNode. 
     * The node must be a child node of the current selected node

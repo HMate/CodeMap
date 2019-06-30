@@ -21,7 +21,7 @@ struct IncludeNode
     std::vector<IncludeNode>& includes();
     const std::vector<IncludeNode>& includes() const;
 
-    void addInclude(std::string name, std::string path);
+    IncludeNode& addInclude(std::string name, std::string path);
     void setFullInclude(bool fullInclude);
     bool isFullInclude() const;
 };

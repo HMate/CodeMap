@@ -58,6 +58,8 @@ TEST_CASE("Include tree contains unique nodes", "[includes]")
 
     builder.setRoot("test", "testy");
     builder.addNode("include1", "root/include1");
+    builder.addNode("include_inner2", "root/include1/include_inner2").setFullInclude(false);
+
     REQUIRE(builder.selectNode("root/include1"));
     builder.addNode("include_inner1", "root/include1/include_inner1");
     builder.addNode("include_inner2", "root/include1/include_inner2");
@@ -67,12 +69,6 @@ TEST_CASE("Include tree contains unique nodes", "[includes]")
     builder.addNode("include_inner3", "root/include1/include_inner3");
     builder.addNode("include_inner4", "root/include1/include_inner4");
     builder.addNode("include_inner5", "root/include1/include_inner5");
-
-    builder.selectPreviousNode();
-    builder.selectPreviousNode();
-    builder.addNode("include_inner2", "root/include1/include_inner2");
-    REQUIRE(builder.selectNode("root/include1/include_inner2"));
-    builder.currentNode().setFullInclude(false);
     
     REQUIRE(tree.root().includes().size() == 2);
     REQUIRE(tree.root().includes()[0].includes()[1].path() == "root/include1/include_inner2");

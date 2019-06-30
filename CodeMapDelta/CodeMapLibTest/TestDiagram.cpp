@@ -36,35 +36,34 @@ TEST_CASE("Serialize diagram", "[diagram][serialization]")
     cm::IncludeTree tree;
     cm::IncludeTreeBuilder builder(tree);
     builder.setRoot("test", "testy");
-    builder.addNode("include1", "root/include1");
-    builder.addNode("include2", "root/include2");
+    builder.addNode("include1", "root/include1").setFullInclude(true);
+    builder.addNode("include2", "root/include2").setFullInclude(true);
 
     buildIncludeTreeDiagram(*view, tree);
     QString result = DiagramSerializer::serialize(view->getDiagram());
-
     QString expected = R"Text({
     "type": "IncludeDiagram",
     "version": "1.0",
     "diagram": {
-        "edges": { "0": [1,2] },
+        "edges": { "0": [1, 2] },
         "nodes": [
             { 
                 "id": 0,
                 "name": "test",
                 "path": "testy",
-                "fullInclude": "true"
+                "fullInclude": true
             },
             { 
                 "id": 1,
                 "name": "include1",
                 "path": "root/include1",
-                "fullInclude": "true"
+                "fullInclude": true
             },
             { 
                 "id": 2,
                 "name": "include2",
                 "path": "root/include2",
-                "fullInclude": "true"
+                "fullInclude": true
             }
         ]
     }
@@ -80,8 +79,8 @@ TEST_CASE("Serialize with duplicate nodes in diagram", "[diagram][serialization]
     cm::IncludeTree tree;
     cm::IncludeTreeBuilder builder(tree);
     builder.setRoot("test", "testy");
-    builder.addNode("include1", "root/include1");
-    builder.addNode("include2", "root/include2");
+    builder.addNode("include1", "root/include1").setFullInclude(true);
+    builder.addNode("include2", "root/include2").setFullInclude(true);
     builder.selectNode("root/include2");
     builder.addNode("include1", "root/include1");
 
@@ -101,25 +100,25 @@ TEST_CASE("Serialize with duplicate nodes in diagram", "[diagram][serialization]
                 "id": 0,
                 "name": "test",
                 "path": "testy",
-                "fullInclude": "true"
+                "fullInclude": true
             },
             { 
                 "id": 1,
                 "name": "include1",
                 "path": "root/include1",
-                "fullInclude": "true"
+                "fullInclude": true
             },
             { 
                 "id": 2,
                 "name": "include2",
                 "path": "root/include2",
-                "fullInclude": "true"
+                "fullInclude": true
             },
             { 
                 "id": 3,
                 "name": "include1",
                 "path": "root/include1",
-                "fullInclude": "false"
+                "fullInclude": false
             }
         ]
     }

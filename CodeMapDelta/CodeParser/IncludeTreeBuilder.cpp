@@ -37,12 +37,14 @@ void IncludeTreeBuilder::setRoot(std::string name, std::string path)
     m_currentNode = &(m_tree.m_root);
 }
 
-void IncludeTreeBuilder::addNode(std::string name, std::string path)
+IncludeNode& IncludeTreeBuilder::addNode(std::string name, std::string path)
 {
+    assert(m_currentNode != nullptr);
     if(m_currentNode != nullptr)
     {
-        m_currentNode->addInclude(name, path);
+        return m_currentNode->addInclude(name, path);
     }
+    return *m_currentNode;
 }
 
 bool IncludeTreeBuilder::selectNode(std::string path)

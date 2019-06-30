@@ -39,9 +39,10 @@ bool IncludeNode::isFullInclude() const
     return m_fullInclude;
 }
 
-void IncludeNode::addInclude(std::string name, std::string path)
+IncludeNode& IncludeNode::addInclude(std::string name, std::string path)
 {
     this->m_includes.emplace_back(name, path);
+    return this->m_includes.back();
 }
 
 /**************** IncludeTree *****************/
