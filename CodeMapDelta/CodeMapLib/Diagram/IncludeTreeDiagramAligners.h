@@ -3,6 +3,12 @@
 
 #include "IncludeTreeDiagram.h"
 
+enum class DiagramAlignment
+{
+    Center,
+    Grouped
+};
+
 /// Align the boxes of levels to not overlap, and to be centered relative to the prev level.
 class CenterDiagramAligner
 {

@@ -7,7 +7,6 @@
 #include <QGraphicsScene>
 #include <QKeyEvent>
 #include <QStyleOptionGraphicsItem>
-#include "Diagram/IncludeTreeDiagramAligners.h"
 
 IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
 {
@@ -16,13 +15,17 @@ IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
     QVBoxLayout *boxLayout = new QVBoxLayout();
     m_box->setLayout(boxLayout);
 
-    m_label = new QCheckBox(QStringLiteral("Ctrl - group select"), this);
-    connect(m_label, &QCheckBox::toggled, this, &IncludeDiagramView::setBoxSelectionMode);
-    boxLayout->addWidget(m_label);
+    m_btnSwitchGroupSelection = new QCheckBox(QStringLiteral("Ctrl - group select"), this);
+    connect(m_btnSwitchGroupSelection, &QCheckBox::toggled, this, &IncludeDiagramView::setBoxSelectionMode);
+    boxLayout->addWidget(m_btnSwitchGroupSelection);
 
-    m_check = new QCheckBox(QStringLiteral("Center aligned boxes"), this);
-    connect(m_check, &QCheckBox::toggled, this, &IncludeDiagramView::toggleDiagramAlign);
-    boxLayout->addWidget(m_check);
+    m_btnChangeBoxAlignment = new QCheckBox(QStringLiteral("Center aligned boxes"), this);
+    connect(m_btnChangeBoxAlignment, &QCheckBox::toggled, this, &IncludeDiagramView::toggleDiagramAlign);
+    boxLayout->addWidget(m_btnChangeBoxAlignment);
+
+    m_btnShowDuplicateNodes = new QCheckBox(QStringLiteral("Showing tree graph"), this);
+    connect(m_btnShowDuplicateNodes, &QCheckBox::toggled, this, &IncludeDiagramView::toggleToShowDuplicateBoxes);
+    boxLayout->addWidget(m_btnShowDuplicateNodes);
 
     m_box->setStyleSheet("QGroupBox#LegendUi{ background-color:rgba(150, 100, 100, 230); border: 2px solid rgba(0,0,0,255); }");
 
@@ -103,16 +106,39 @@ void IncludeDiagramView::toggleDiagramAlign(bool setGroupedAlignment)
 {
     if (setGroupedAlignment)
     {
+        setDiagramAlignment(DiagramAlignment::Grouped);
+    }
+    else
+    {
+        setDiagramAlignment(DiagramAlignment::Center);
+    }
+}
+
+void IncludeDiagramView::toggleToShowDuplicateBoxes(bool showSinglesOnly)
+{
+    // TODO: This needs:
+    // - new group alignment, current wont work i think
+    // - figure out how to handle the levels for circular includes
+}
+
+void IncludeDiagramView::setDiagramAlignment(DiagramAlignment alignment)
+{
+    m_boxAlignment = alignment;
+    if (m_boxAlignment == DiagramAlignment::Grouped)
+    {
         GroupDiagramAligner aligner;
         aligner.alignDiagram(*this);
-        m_check->setText(QStringLiteral("Group aligned boxes"));
+        m_btnChangeBoxAlignment->setText(QStringLiteral("Group aligned boxes"));
     }
     else
     {
         CenterDiagramAligner aligner;
         aligner.alignDiagram(*this);
-        m_check->setText(QStringLiteral("Center aligned boxes"));
+        m_btnChangeBoxAlignment->setText(QStringLiteral("Center aligned boxes"));
     }
 }
 
-
+DiagramAlignment IncludeDiagramView::getDiagramAlignment()
+{
+    return m_boxAlignment;
+}

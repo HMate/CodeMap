@@ -8,7 +8,7 @@
 #include "DiagramView.h"
 #include "DiagramItems.h"
 #include "IncludeTreeDiagram.h"
-
+#include "IncludeTreeDiagramAligners.h"
 
 // TODO:
 // -Save, open diagram
@@ -27,8 +27,11 @@ class IncludeDiagramView : public DiagramView
     std::unique_ptr<IncludeTreeDiagram> m_diagram = nullptr;
 
     QGroupBox* m_box;
-    QCheckBox* m_label;
-    QCheckBox* m_check;
+    QCheckBox* m_btnSwitchGroupSelection;
+    QCheckBox* m_btnChangeBoxAlignment;
+    QCheckBox* m_btnShowDuplicateNodes;
+
+    DiagramAlignment m_boxAlignment = DiagramAlignment::Center;
 
     // can select mltiple boxes without holding ctrl
     bool m_boxSelectionMode = false;
@@ -50,9 +53,14 @@ public:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
+private:
+    void setDiagramAlignment(DiagramAlignment alignment);
+    DiagramAlignment getDiagramAlignment();
+
 public slots:
     void setBoxSelectionMode(bool toggleOn);
     void toggleDiagramAlign(bool setGroupedAlignment);
+    void toggleToShowDuplicateBoxes(bool showSinglesOnly);
 };
 
 #endif // INCLUDEDIAGRAMVIEW_H
