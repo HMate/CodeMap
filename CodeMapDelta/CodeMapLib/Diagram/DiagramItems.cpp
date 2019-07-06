@@ -120,7 +120,7 @@ void BoxDGI::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
     if(event->type() == QEvent::GraphicsSceneHoverEnter || event->type() == QEvent::GraphicsSceneHoverMove)
     {
 #if !defined(CM_DEBUG)
-        setToolTip(m_fullName);
+        setToolTip(getFullName());
 #else
         setToolTip(getFullName() + QStringLiteral(" (x=%1, y=%2)").arg(this->pos().x()).arg(this->pos().y()));
 #endif

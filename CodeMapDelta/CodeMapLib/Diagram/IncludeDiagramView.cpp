@@ -7,6 +7,7 @@
 #include <QGraphicsScene>
 #include <QKeyEvent>
 #include <QStyleOptionGraphicsItem>
+#include <Diagram\IncludeTreeDiagramBuilder.h>
 
 IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
 {
@@ -24,7 +25,7 @@ IncludeDiagramView::IncludeDiagramView(QWidget* parent) : DiagramView(parent)
     boxLayout->addWidget(m_btnChangeBoxAlignment);
 
     m_btnShowDuplicateNodes = new QCheckBox(QStringLiteral("Showing tree graph"), this);
-    connect(m_btnShowDuplicateNodes, &QCheckBox::toggled, this, &IncludeDiagramView::toggleToShowDuplicateBoxes);
+    connect(m_btnShowDuplicateNodes, &QCheckBox::toggled, this, &IncludeDiagramView::toggleDiagramType);
     boxLayout->addWidget(m_btnShowDuplicateNodes);
 
     m_box->setStyleSheet("QGroupBox#LegendUi{ background-color:rgba(150, 100, 100, 230); border: 2px solid rgba(0,0,0,255); }");
@@ -114,13 +115,6 @@ void IncludeDiagramView::toggleDiagramAlign(bool setGroupedAlignment)
     }
 }
 
-void IncludeDiagramView::toggleToShowDuplicateBoxes(bool showSinglesOnly)
-{
-    // TODO: This needs:
-    // - new group alignment, current wont work i think
-    // - figure out how to handle the levels for circular includes
-}
-
 void IncludeDiagramView::setDiagramAlignment(DiagramAlignment alignment)
 {
     m_boxAlignment = alignment;
@@ -138,7 +132,43 @@ void IncludeDiagramView::setDiagramAlignment(DiagramAlignment alignment)
     }
 }
 
+void IncludeDiagramView::toggleDiagramType(bool showSinglesOnly)
+{
+    // TODO: This needs:
+    // - new group alignment, current wont work i think
+    // - figure out how to handle the levels for circular includes
+    if (showSinglesOnly)
+    {
+        m_diagramType = IncludeDiagramType::UniqueNodes;
+    }
+    else
+    {
+        m_diagramType = IncludeDiagramType::DuplicatedNodes;
+    }
+}
+
+void IncludeDiagramView::setDiagramType(IncludeDiagramType diagramType)
+{
+    m_diagramType = diagramType;
+    if (m_diagramType == IncludeDiagramType::DuplicatedNodes)
+    {
+        IncludeDiagramBuilder builder;
+        builder.build(*this);
+    }
+    else
+    {
+        CenterDiagramAligner aligner;
+        aligner.alignDiagram(*this);
+        m_btnChangeBoxAlignment->setText(QStringLiteral("Center aligned boxes"));
+    }
+}
+
 DiagramAlignment IncludeDiagramView::getDiagramAlignment()
 {
     return m_boxAlignment;
+}
+
+IncludeDiagramType IncludeDiagramView::getDiagramType()
+{
+    return m_diagramType;
 }

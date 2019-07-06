@@ -186,6 +186,17 @@ std::unique_ptr<IncludeTree> getIncludeTree(const QString& srcPath, const std::v
     std::unique_ptr<clang::tooling::FrontendActionFactory> actionFactory = std::make_unique<IncludeCollectorFrontendActionFactory>(*tree);
     tool.run(actionFactory.get());
     // TODO: Include errors in result
+
+    if (errorCollector.getNumErrors() > 0)
+    {
+        llvm::outs() << llvm::formatv("Got errors while collecting inlcudes for {0}:\n", srcPath.toStdString());
+        for (auto& error : errorCollector.GetErrorsList())
+        {
+            llvm::outs() << llvm::formatv(" - {0}\n", error);
+        }
+        llvm::outs().flush();
+    }
+
     return tree;
 }
 
