@@ -60,6 +60,9 @@ public:
     void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 
+    // make scene rect bigger so we can pan camera further than last box
+    void addSkirtToScene();
+
 private:
     void setDiagramAlignment(DiagramAlignment alignment);
     DiagramAlignment getDiagramAlignment();

@@ -4,11 +4,13 @@
 #include <QGraphicsScene>
 #include <qmath.h>
 #include <QMouseEvent>
+#include <QDebug>
 
 #include "MainWindow.h"
 
 DiagramGraphicsView::DiagramGraphicsView(QWidget* parent) : QGraphicsView(parent)
 {
+    m_legendUi = new QWidget(this);
 }
 
 void DiagramGraphicsView::registerLegendUiWidget(QWidget* widget)

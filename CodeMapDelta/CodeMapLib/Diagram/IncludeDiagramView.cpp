@@ -172,3 +172,11 @@ IncludeDiagramType IncludeDiagramView::getDiagramType()
 {
     return m_diagramType;
 }
+
+void IncludeDiagramView::addSkirtToScene()
+{
+    qreal skirtSize = 1000.0;
+    auto& rect = getScene()->sceneRect();
+    rect.adjust(-skirtSize, -skirtSize, skirtSize, skirtSize);
+    getScene()->setSceneRect(rect);
+}

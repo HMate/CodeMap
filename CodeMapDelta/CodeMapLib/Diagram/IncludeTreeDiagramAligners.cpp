@@ -28,6 +28,7 @@ void CenterDiagramAligner::alignDiagram(IncludeDiagramView& diagram)
         y += size.height() + margin.height();
     }
 
+    diagram.addSkirtToScene();
     diagram.setUpdatesEnabled(true);
     diagram.update();
 }
@@ -63,6 +64,7 @@ void GroupDiagramAligner::alignDiagram(IncludeDiagramView& diagram)
 
     placeBoxes(levels);
 
+    diagram.addSkirtToScene();
     diagram.setUpdatesEnabled(true);
     diagram.update();
 }
