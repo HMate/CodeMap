@@ -139,11 +139,11 @@ void IncludeDiagramView::toggleDiagramType(bool showSinglesOnly)
     // - figure out how to handle the levels for circular includes
     if (showSinglesOnly)
     {
-        m_diagramType = IncludeDiagramType::UniqueNodes;
+        setDiagramType(IncludeDiagramType::UniqueNodes);
     }
     else
     {
-        m_diagramType = IncludeDiagramType::DuplicatedNodes;
+        setDiagramType(IncludeDiagramType::DuplicatedNodes);
     }
 }
 
@@ -153,13 +153,14 @@ void IncludeDiagramView::setDiagramType(IncludeDiagramType diagramType)
     if (m_diagramType == IncludeDiagramType::DuplicatedNodes)
     {
         IncludeDiagramBuilder builder;
-        builder.build(*this);
+        builder.buildTree(*this);
+        setDiagramAlignment(DiagramAlignment::Center);
     }
     else
     {
-        CenterDiagramAligner aligner;
-        aligner.alignDiagram(*this);
-        m_btnChangeBoxAlignment->setText(QStringLiteral("Center aligned boxes"));
+        IncludeDiagramBuilder builder;
+        builder.buildGraph(*this);
+        setDiagramAlignment(DiagramAlignment::Center);
     }
 }
 

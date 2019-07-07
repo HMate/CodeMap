@@ -42,7 +42,7 @@ public:
         return m_groups;
     }
 
-    void insertGroup(IncludeDiagramBuilderLevel& other) noexcept
+    void insertGroup(const IncludeDiagramBuilderLevel& other) noexcept
     {
         m_groups.push_back(other);
         m_items.insert(this->end(), other.begin(), other.end());
@@ -58,7 +58,10 @@ class IncludeTreeDiagram : public std::vector<IncludeDiagramBuilderLevel>
 {
 public:
 
-    void addLevel(const IncludeDiagramBuilderLevel& level) { emplace_back(level); }
+    void addBoxesToLevel(int levelIndex, const IncludeDiagramBuilderLevel& level);
+    void addLevel(const IncludeDiagramBuilderLevel& level);
+
+    std::pair<bool, BoxBuilder*> tryGetBoxWithPath(std::string path);
 };
 
 

@@ -18,12 +18,17 @@ class IncludeDiagramBuilder
 
 public:
     IncludeDiagramBuilder() {}
-    void build(IncludeDiagramView& diagram);
+
+    /// Build an include tree, where inlcudes of the same files appear as separate nodes.
+    void buildTree(IncludeDiagramView& diagram);
+
+    /// Build an include graph, where multiple includes of the same file point to the same node.
+    void buildGraph(IncludeDiagramView& diagram);
 
 private:
     BoxBuilder addRootBox(IncludeDiagramView& diagram, QGraphicsScene& scene, cm::IncludeTree& tree);
     void recursiveBuildIncludeTreeLevel(IncludeDiagramView& diagram, QGraphicsScene& scene, const BoxBuilder& current, int currentLevel);
-
+    void recursiveBuildIncludeGraphLevel(IncludeDiagramView& diagram, QGraphicsScene& scene, const BoxBuilder& current, int currentLevel);
 };
 
 #endif // !INCLUDETREEDIAGRAMBUILDER_H

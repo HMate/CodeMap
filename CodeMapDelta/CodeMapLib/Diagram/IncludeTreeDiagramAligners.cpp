@@ -12,6 +12,7 @@ void CenterDiagramAligner::alignDiagram(IncludeDiagramView& diagram)
 
     std::vector<QSizeF> levelSizes = calculateLevelSizes(levels);
 
+    // lefttop is x-y-, middle is x0y0, rightbot is x+y+
     qreal y = 0;
     for (size_t i = 0; i < levels.size(); i++)
     {
@@ -71,6 +72,7 @@ void GroupDiagramAligner::alignDiagram(IncludeDiagramView& diagram)
 
 void GroupDiagramAligner::placeBoxes(IncludeTreeDiagram& levels)
 {
+    // lefttop is x-y-, middle is x0y0, rightbot is x+y+
     qreal y = 0;
     for (size_t i = 0; i < levels.size(); i++)
     {
