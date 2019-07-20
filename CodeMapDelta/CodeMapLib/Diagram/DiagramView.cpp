@@ -11,6 +11,10 @@
 DiagramGraphicsView::DiagramGraphicsView(QWidget* parent) : QGraphicsView(parent)
 {
     m_legendUi = new QWidget(this);
+
+    setViewportUpdateMode(BoundingRectViewportUpdate);
+    setRenderHint(QPainter::Antialiasing);
+    setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
 }
 
 void DiagramGraphicsView::registerLegendUiWidget(QWidget* widget)
@@ -69,11 +73,8 @@ DiagramView::DiagramView(QWidget *parent) : QWidget(parent)
     m_layout->addWidget(toolbar, 0, 0, 1, -1);
 
     m_view = new DiagramGraphicsView(this);
-    m_layout->addWidget(m_view, 1, 0, 1, -1);
-
-    m_view->setRenderHint(QPainter::Antialiasing);
     m_view->viewport()->installEventFilter(this);
-    m_view->setDragMode(QGraphicsView::DragMode::ScrollHandDrag);
+    m_layout->addWidget(m_view, 1, 0, 1, -1);
 
     m_scene = new QGraphicsScene(this);
     m_scene->setBackgroundBrush(Qt::gray);
