@@ -40,6 +40,7 @@ public:
     int32_t getNodeId() const { return m_node.id(); }
     QString getDisplayName() const { return QString::fromStdString(m_node.name()); }
     QString getFullName() const { return QString::fromStdString(m_node.path()); }
+    const std::vector<cm::IncludeNode>& getChildrenNodes() const { return m_node.includes(); }
     bool isFullInclude() const { return m_node.isFullInclude(); }
 
     void hoverMoveEvent(QGraphicsSceneHoverEvent* event) override;

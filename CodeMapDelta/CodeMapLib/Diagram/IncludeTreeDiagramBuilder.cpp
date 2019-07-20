@@ -30,7 +30,7 @@ BoxBuilder IncludeDiagramBuilder::addRootBox(IncludeDiagramView& diagram, QGraph
     auto box = new BoxDGI(diagram, current);
     scene.addItem(box);
 
-    BoxBuilder bb{ current, box };
+    BoxBuilder bb{ box };
     IncludeDiagramBuilderLevel levelBoxes(bb);
     levelBoxes.emplace_back(bb);
     auto rect = box->boundingRect();
@@ -43,13 +43,13 @@ void IncludeDiagramBuilder::recursiveBuildIncludeTreeLevel(IncludeDiagramView& d
 {
     IncludeDiagramBuilderLevel levelBoxes(current);
 
-    auto& includes = current.m_node.includes();
+    auto& includes = current.m_box->getChildrenNodes();
     for(auto& inc : includes)
     {
         auto box = new BoxDGI(diagram, inc);
         scene.addItem(box);
         current.m_box->addChild(box);
-        BoxBuilder bb{ inc, box };
+        BoxBuilder bb{ box };
         levelBoxes.emplace_back(bb);
 
         scene.addItem(new ArrowDGI(current.m_box, box));
@@ -86,7 +86,7 @@ void IncludeDiagramBuilder::recursiveBuildIncludeGraphLevel(IncludeDiagramView& 
 {
     IncludeDiagramBuilderLevel levelBoxes(current);
 
-    auto& includes = current.m_node.includes();
+    auto& includes = current.m_box->getChildrenNodes();
     for (auto& inc : includes)
     {
         auto& hasBox = m_levels->tryGetBoxWithPath(inc.path());
@@ -101,7 +101,7 @@ void IncludeDiagramBuilder::recursiveBuildIncludeGraphLevel(IncludeDiagramView& 
         auto box = new BoxDGI(diagram, inc);
         scene.addItem(box);
         current.m_box->addChild(box);
-        BoxBuilder bb{ inc, box };
+        BoxBuilder bb{ box };
         levelBoxes.emplace_back(bb);
 
         scene.addItem(new ArrowDGI(current.m_box, box));

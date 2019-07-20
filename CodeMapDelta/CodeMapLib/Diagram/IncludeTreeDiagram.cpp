@@ -2,7 +2,6 @@
 
 BoxBuilder& BoxBuilder::operator=(const BoxBuilder & other)
 {
-    m_node = other.m_node;
     m_box = other.m_box;
     return *this;
 }
@@ -34,11 +33,12 @@ void IncludeTreeDiagram::addLevel(const IncludeDiagramBuilderLevel& level)
 
 std::pair<bool, BoxBuilder*> IncludeTreeDiagram::tryGetBoxWithPath(std::string path)
 {
+    QString fullPath = QString::fromStdString(path);
     for (auto& level : *this)
     {
         for (auto& item : level)
         {
-            if (item.m_node.path() == path)
+            if (item.m_box->getFullName() == fullPath)
                 return std::make_pair(true, &item);
         }
     }

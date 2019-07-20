@@ -6,7 +6,6 @@
 
 struct BoxBuilder
 {
-    cm::IncludeNode& m_node;
     BoxDGI* m_box;
 
     BoxBuilder& operator=(const BoxBuilder & other);
@@ -61,6 +60,7 @@ public:
     void addBoxesToLevel(int levelIndex, const IncludeDiagramBuilderLevel& level);
     void addLevel(const IncludeDiagramBuilderLevel& level);
 
+    /// Returns (true, box*) if the box is added to the diagram with this path, otherwise false.
     std::pair<bool, BoxBuilder*> tryGetBoxWithPath(std::string path);
 };
 
