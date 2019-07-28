@@ -16,9 +16,8 @@ class IncludeDiagramBuilderLevel
 {
     std::vector<IncludeDiagramBuilderLevel> m_groups;
     std::vector<BoxBuilder> m_items;
-    BoxBuilder m_parent;
 public:
-    IncludeDiagramBuilderLevel(const BoxBuilder& parent) : m_parent(parent) {}
+    IncludeDiagramBuilderLevel() {}
 
     void emplace_back(BoxBuilder box)
     {
@@ -45,11 +44,6 @@ public:
     {
         m_groups.push_back(other);
         m_items.insert(this->end(), other.begin(), other.end());
-    }
-
-    const BoxBuilder& parent()
-    {
-        return m_parent;
     }
 };
 

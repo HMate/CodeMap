@@ -37,6 +37,7 @@ public:
 
     void addChild(BoxDGI* child) { m_children.emplace_back(child); }
     const std::vector<BoxDGI*>& getChildren() { return m_children; }
+    const cm::IncludeNode& getNode() const { return m_node; }
     int32_t getNodeId() const { return m_node.id(); }
     QString getDisplayName() const { return QString::fromStdString(m_node.name()); }
     QString getFullName() const { return QString::fromStdString(m_node.path()); }

@@ -56,6 +56,11 @@ IncludeNode& IncludeNode::addInclude(int32_t id, std::string name, std::string p
     return m_includes.back();
 }
 
+bool IncludeNode::operator==(const IncludeNode& other) const
+{
+    return path() == other.path();
+}
+
 /**************** IncludeTree *****************/
 
 IncludeNode& IncludeTree::root()

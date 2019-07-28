@@ -11,23 +11,7 @@ void CenterDiagramAligner::alignDiagram(IncludeDiagramView& diagram)
     IncludeTreeDiagram& levels = diagram.getDiagram();
 
     std::vector<QSizeF> levelSizes = calculateLevelSizes(levels);
-
-    // lefttop is x-y-, middle is x0y0, rightbot is x+y+
-    qreal y = 0;
-    for (size_t i = 0; i < levels.size(); i++)
-    {
-        auto& level = levels[i];
-        auto size = levelSizes[i];
-
-        qreal levelCenter = size.width() / 2.0;
-        qreal x = -levelCenter;
-        for (auto& box : level)
-        {
-            box.m_box->setPos(x, y);
-            x += box.m_box->boundingRect().width() + margin.width();
-        }
-        y += size.height() + margin.height();
-    }
+    placeBoxes(levels, levelSizes);
 
     diagram.addSkirtToScene();
     diagram.setUpdatesEnabled(true);
@@ -58,12 +42,33 @@ std::vector<QSizeF> CenterDiagramAligner::calculateLevelSizes(IncludeTreeDiagram
     return levelSizes;
 }
 
+void CenterDiagramAligner::placeBoxes(IncludeTreeDiagram& levels, const std::vector<QSizeF>& levelSizes)
+{
+    // lefttop is x-y-, middle is x0y0, rightbot is x+y+
+    qreal y = 0;
+    for (size_t i = 0; i < levels.size(); i++)
+    {
+        auto& level = levels[i];
+        auto size = levelSizes[i];
+
+        qreal levelCenter = size.width() / 2.0;
+        qreal x = -levelCenter;
+        for (auto& box : level)
+        {
+            box.m_box->setPos(x, y);
+            x += box.m_box->boundingRect().width() + margin.width();
+        }
+        y += size.height() + margin.height();
+    }
+}
+
 void GroupDiagramAligner::alignDiagram(IncludeDiagramView& diagram)
 {
     diagram.setUpdatesEnabled(false);
     IncludeTreeDiagram& levels = diagram.getDiagram();
 
     placeBoxes(levels);
+    moveBoxesToScreen(levels);
 
     diagram.addSkirtToScene();
     diagram.setUpdatesEnabled(true);
@@ -73,6 +78,8 @@ void GroupDiagramAligner::alignDiagram(IncludeDiagramView& diagram)
 void GroupDiagramAligner::placeBoxes(IncludeTreeDiagram& levels)
 {
     // lefttop is x-y-, middle is x0y0, rightbot is x+y+
+
+    // move boxes on y axis to their level
     qreal y = 0;
     for (size_t i = 0; i < levels.size(); i++)
     {
@@ -232,4 +239,47 @@ void GroupDiagramAligner::moveBoxesToRightRecursively(IncludeTreeDiagram& levels
         moveBoxesToRightRecursively(levels, nextLevelIndex, firstChildIndex, moveBy);
     }
 }
+
+void GroupDiagramAligner::moveBoxesToScreen(IncludeTreeDiagram& levels)
+{
+    if (levels.size() == 0)
+        return;
+
+    // move first level to center, determines distance to move every other node.
+    auto& firstLevel = levels[0];
+    Q_ASSERT(firstLevel.size() == 1);
+    auto& root = firstLevel[0];
+    qreal distance = -root.m_box->x();
+
+    for (size_t i = 0; i < levels.size(); i++)
+    {
+        auto& level = levels[i];
+
+        for (auto& node : level)
+        {
+            node.m_box->setX(node.m_box->x() + distance);
+        }
+    }
+}
+
+// -------------------------------------------------------
+
+void GraphDiagramAligner::alignDiagram(IncludeDiagramView& diagram)
+{
+    CenterDiagramAligner::alignDiagram(diagram);
+    //diagram.setUpdatesEnabled(false);
+    //IncludeTreeDiagram& levels = diagram.getDiagram();
+
+    //placeBoxes(levels);
+
+    //diagram.addSkirtToScene();
+    //diagram.setUpdatesEnabled(true);
+    //diagram.update();
+}
+
+void GraphDiagramAligner::placeBoxes(IncludeTreeDiagram& levels)
+{
+
+}
+
 

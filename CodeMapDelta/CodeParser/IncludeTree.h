@@ -28,6 +28,8 @@ public:
     void setNameAndPath(std::string name, std::string path);
     void setFullInclude(bool fullInclude);
     bool isFullInclude() const;
+
+    bool operator==(const IncludeNode& other) const;
 };
 
 struct IncludeTree

@@ -124,11 +124,17 @@ void IncludeDiagramView::setDiagramAlignment(DiagramAlignment alignment)
         aligner.alignDiagram(*this);
         m_btnChangeBoxAlignment->setText(QStringLiteral("Group aligned boxes"));
     }
-    else
+    else if (m_boxAlignment == DiagramAlignment::Center)
     {
         CenterDiagramAligner aligner;
         aligner.alignDiagram(*this);
         m_btnChangeBoxAlignment->setText(QStringLiteral("Center aligned boxes"));
+    }
+    else if (m_boxAlignment == DiagramAlignment::Graph)
+    {
+        GraphDiagramAligner aligner;
+        aligner.alignDiagram(*this);
+        m_btnChangeBoxAlignment->setText(QStringLiteral("Graph aligned boxes"));
     }
 }
 
@@ -155,12 +161,14 @@ void IncludeDiagramView::setDiagramType(IncludeDiagramType diagramType)
         IncludeDiagramBuilder builder;
         builder.buildTree(*this);
         setDiagramAlignment(DiagramAlignment::Center);
+        m_btnChangeBoxAlignment->setDisabled(false);
     }
     else
     {
         IncludeDiagramBuilder builder;
         builder.buildGraph(*this);
         setDiagramAlignment(DiagramAlignment::Center);
+        m_btnChangeBoxAlignment->setDisabled(true);
     }
 }
 

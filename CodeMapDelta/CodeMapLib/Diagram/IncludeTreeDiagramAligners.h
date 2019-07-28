@@ -6,16 +6,18 @@
 enum class DiagramAlignment
 {
     Center,
-    Grouped
+    Grouped,
+    Graph
 };
 
-/// Align the boxes of levels to not overlap, and to be centered relative to the prev level.
+/// Align the boxes of levels to not overlap, and to be centered along a common axis.
 class CenterDiagramAligner
 {
 public:
     static void alignDiagram(IncludeDiagramView& diagram);
 private:
     static std::vector<QSizeF> calculateLevelSizes(IncludeTreeDiagram& levels);
+    static void placeBoxes(IncludeTreeDiagram& levels, const std::vector<QSizeF>& levelSizes);
 };
 
 /// Align the boxes of levels to not overlap.
@@ -28,6 +30,16 @@ public:
 private:
     static void placeBoxes(IncludeTreeDiagram& levels);
     static void moveBoxesToRightRecursively(IncludeTreeDiagram& levels, size_t levelIndex, size_t from, qreal moveBy);
+    static void moveBoxesToScreen(IncludeTreeDiagram& levels);
+};
+
+/// Align the boxes as a directed graph with cycles.
+/// A node will be placed on a level where every parent is above it.
+class GraphDiagramAligner
+{
+public:
+    static void alignDiagram(IncludeDiagramView& diagram);
+    static void placeBoxes(IncludeTreeDiagram& levels);
 };
 
 #endif //INCLUDETREEDIAGRAMALIGNERS_H

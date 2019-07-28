@@ -86,3 +86,14 @@ TEST_CASE("Include tree contains duplicate nodes", "[includes]")
     REQUIRE(!tree.root().includes()[1].isFullInclude());
     REQUIRE(tree.root().includes()[1].includes().size() == 0);
 }
+
+TEST_CASE("Include node equality", "[includes]")
+{
+    cm::IncludeNode node1(1, "test", "fullpath", true);
+    cm::IncludeNode node2(2, "other", "fullpath2", true);
+    cm::IncludeNode node3(3, "other", "fullpath", false);
+    cm::IncludeNode node4(3, "other", "fullpath", true);
+    REQUIRE_FALSE(node1 == node2);
+    REQUIRE(node1 == node3);
+    REQUIRE(node1 == node4);
+}
